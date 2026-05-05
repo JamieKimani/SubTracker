@@ -1,0 +1,54 @@
+package com.example.trackifyv1.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.trackifyv1.ui.theme.screens.profile.ProfileScreen
+import com.example.trackifyv1.ui.theme.screens.dashboard.DashboardScreen
+import com.example.trackifyv1.ui.theme.screens.login.LoginScreen
+import com.example.trackifyv1.ui.theme.screens.register.RegisterScreen
+import com.example.trackifyv1.ui.theme.screens.splash.SplashScreen
+import com.example.trackifyv1.ui.theme.screens.subscriptions.AddSubscriptionScreen
+import com.example.trackifyv1.ui.theme.screens.subscriptions.ViewSubscriptionsScreen
+
+@Composable
+fun AppNavHost(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = ROUTE_SPLASH
+) {
+    NavHost(
+        modifier = modifier,
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable(ROUTE_SPLASH) {
+            SplashScreen(onLoadingComplete = {
+                navController.navigate(ROUTE_LOGIN) {
+                    popUpTo(ROUTE_SPLASH) { inclusive = true }
+                }
+            })
+        }
+        composable(ROUTE_LOGIN) {
+            LoginScreen(navController = navController)
+        }
+        composable(ROUTE_REGISTER) {
+            RegisterScreen(navController = navController)
+        }
+        composable(ROUTE_DASHBOARD) {
+            DashboardScreen(navController = navController)
+        }
+        composable(ROUTE_ADD_SUBSCRIPTION) {
+            AddSubscriptionScreen(navController = navController)
+        }
+        composable(ROUTE_VIEW_SUBSCRIPTIONS) {
+            ViewSubscriptionsScreen(navController = navController)
+        }
+        composable(ROUTE_PROFILE) {
+            ProfileScreen(navController = navController)
+        }
+    }
+}
