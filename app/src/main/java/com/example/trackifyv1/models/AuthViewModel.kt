@@ -53,7 +53,6 @@ class AuthViewModel : ViewModel() {
                 val result = auth.createUserWithEmailAndPassword(email, password).await()
                 val uid = result.user?.uid ?: return@launch
 
-                // Save user to Firebase Database
                 val user = UserModel(
                     id    = uid,
                     name  = name,
@@ -107,17 +106,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun logout(navController: NavController, context: Context) {
-        auth.signOut()
-        _isLoggedIn.value = false
-        _message.value = "Logged out successfully"
-        Toast.makeText(context, "Logged out", Toast.LENGTH_SHORT).show()
-        navController.navigate(ROUTE_LOGIN) {
-            popUpTo(0)
-        }
-    }
 
-    fun clearMessage() {
-        _message.value = null
-    }
+
 }
