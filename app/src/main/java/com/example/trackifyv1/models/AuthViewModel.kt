@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import com.example.trackifyv1.navigation.ROUTE_DASHBOARD
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -106,6 +107,9 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
+    fun signInWithGoogle(navController: NavController, context: Context) {
+        // Implement Google Sign-In logic here
+        Toast.makeText(context, "Google Sign-In Clicked", Toast.LENGTH_SHORT).show()
+    }
 
 }

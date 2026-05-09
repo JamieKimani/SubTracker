@@ -1,6 +1,9 @@
 package com.example.trackifyv1.navigation
 
+import androidx.activity.compose.LocalOnBackPressedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -15,22 +18,10 @@ import com.example.trackifyv1.ui.theme.screens.subscriptions.AddSubscriptionScre
 import com.example.trackifyv1.ui.theme.screens.subscriptions.ViewSubscriptionsScreen
 
 @Composable
-fun AppNavHost(
-    modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUTE_SPLASH
-) {
-    NavHost(
-        modifier = modifier,
-        navController = navController,
-        startDestination = startDestination
-    ) {
+fun AppNavHost(modifier: Modifier = Modifier, navController: NavHostController = rememberNavController(), startDestination: String = ROUTE_SPLASH) {
+    NavHost(modifier = modifier, navController = navController, startDestination = startDestination) {
         composable(ROUTE_SPLASH) {
-            SplashScreen(onLoadingComplete = {
-                navController.navigate(ROUTE_LOGIN) {
-                    popUpTo(ROUTE_SPLASH) { inclusive = true }
-                }
-            })
+            SplashScreen(onLoadingComplete = { navController.navigate(ROUTE_LOGIN) { popUpTo(ROUTE_SPLASH) { inclusive = true } } })
         }
         composable(ROUTE_LOGIN) {
             LoginScreen(navController = navController)
@@ -39,6 +30,14 @@ fun AppNavHost(
             RegisterScreen(navController = navController)
         }
         composable(ROUTE_DASHBOARD) {
+            val backDispatcher = LocalOnBackPressedDispatcher.current
+            DisposableEffect(Unit) {
+                val callback = object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {}
+                }
+                backDispatcher?.addCallback(callback)
+                onDispose { callback.remove() }
+            }
             DashboardScreen(navController = navController)
         }
         composable(ROUTE_ADD_SUBSCRIPTION) {
