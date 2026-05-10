@@ -7,5 +7,6 @@ data class SubscriptionModel(
     val subscriptionDate: String = "",
     val expiryDate: String = "",
     val nextRenewalDate: String = "",
-    val category: String = ""
+    val category: String = "",
+    val reminderDate: String = ""
 )

@@ -50,6 +50,7 @@ class SubscriptionViewModel : ViewModel() {
         subscriptionDate: String,
         expiryDate: String,
         nextRenewalDate: String,
+        reminderDate: String,
         context: Context,
         category: String = ""
     ) {
@@ -70,7 +71,8 @@ class SubscriptionViewModel : ViewModel() {
             subscriptionDate = subscriptionDate,
             expiryDate       = expiryDate,
             nextRenewalDate  = nextRenewalDate,
-            category         = category
+            category         = category,
+            reminderDate     = reminderDate
         )
 
         dbRef.child(id).setValue(sub)

@@ -1,6 +1,7 @@
 package com.example.trackifyv1.ui.theme.screens.subscriptions
 
 import android.app.DatePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,8 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.trackifyv1.helpers.scheduleNotification
 import com.example.trackifyv1.models.SubscriptionViewModel
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 
 private val Gold       = Color(0xFFD4A017)
@@ -61,6 +65,7 @@ fun AddSubscriptionScreen(navController: NavController) {
     var subscriptionDate    by remember { mutableStateOf("") }
     var expiryDate          by remember { mutableStateOf("") }
     var nextRenewalDate     by remember { mutableStateOf("") }
+    var reminderDate        by remember { mutableStateOf("") }
     var selectedCategory    by remember { mutableStateOf("") }
     var categoryExpanded    by remember { mutableStateOf(false) }
 
@@ -83,6 +88,8 @@ fun AddSubscriptionScreen(navController: NavController) {
     val startPicker  = remember { makePicker { subscriptionDate = it } }
     val expiryPicker = remember { makePicker { expiryDate = it } }
     val renewPicker  = remember { makePicker { nextRenewalDate = it } }
+    val reminderPicker = remember { makePicker { reminderDate = it } }
+
 
     val gradientBg = Brush.verticalGradient(
         colors = listOf(DarkPurple, DarkGreen, DarkYellow)
@@ -237,6 +244,12 @@ fun AddSubscriptionScreen(navController: NavController) {
                     colors = fieldColors,
                     onPickerClick = { renewPicker.show() }
                 )
+                DateField(
+                    value = reminderDate,
+                    label = "Reminder Date",
+                    colors = fieldColors,
+                    onPickerClick = { reminderPicker.show() }
+                )
             }
 
             Spacer(Modifier.height(20.dp))
@@ -250,9 +263,27 @@ fun AddSubscriptionScreen(navController: NavController) {
                         subscriptionDate,
                         expiryDate,
                         nextRenewalDate,
+                        reminderDate,
                         context,
 
                     )
+                    if (reminderDate.isNotEmpty()) {
+                        try {
+                            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            val date = sdf.parse(reminderDate)
+                            if (date != null) {
+                                scheduleNotification(
+                                    context,
+                                    "Reminder: $subscriptionName",
+                                    "Your subscription is due soon!",
+                                    date.time
+                                )
+                                Toast.makeText(context, "Reminder set for $reminderDate", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Invalid date format for reminder", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                     navController.navigateUp()
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
