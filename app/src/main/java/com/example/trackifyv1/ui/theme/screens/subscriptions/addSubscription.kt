@@ -53,7 +53,6 @@ fun AddSubscriptionScreen(navController: NavController) {
     var subscriptionAmount by remember { mutableStateOf("") }
     var subscriptionDate by remember { mutableStateOf("") }
     var expiryDate by remember { mutableStateOf("") }
-    var nextRenewalDate by remember { mutableStateOf("") }
     var reminderDate by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("") }
     var categoryExpanded by remember { mutableStateOf(false) }
@@ -109,7 +108,6 @@ fun AddSubscriptionScreen(navController: NavController) {
 
                 DateField("Start Date", subscriptionDate, fieldColors) { startPicker.show() }
                 DateField("Expiry Date", expiryDate, fieldColors) { expiryPicker.show() }
-                DateField("Next Renewal Date", nextRenewalDate, fieldColors) { renewPicker.show() }
                 DateField("Reminder Date", reminderDate, fieldColors) { reminderPicker.show() }
             }
 
