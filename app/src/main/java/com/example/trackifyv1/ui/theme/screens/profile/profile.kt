@@ -79,13 +79,13 @@ fun ProfileScreen(navController: NavController) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
+            .statusBarsPadding()
             .padding(top = 20.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text("Profile", color = Gold, fontSize = 20.sp,
             fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
 
-        // Avatar card
         Column(
             modifier = Modifier
                 .fillMaxWidth()

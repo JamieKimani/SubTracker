@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
@@ -49,10 +50,10 @@ fun SplashScreen(onLoadingComplete: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A0A0F)),
+            .background(Color(0xFF0A0A0F))
+            .statusBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
-        // Soft background orbs
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
                 brush = Brush.radialGradient(
@@ -75,7 +76,6 @@ fun SplashScreen(onLoadingComplete: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // App icon
             Box(
                 modifier = Modifier
                     .size(80.dp)
@@ -128,7 +128,6 @@ fun SplashScreen(onLoadingComplete: () -> Unit) {
             )
         }
 
-        // Version tag
         Text(
             text = "v1.0.0",
             style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),

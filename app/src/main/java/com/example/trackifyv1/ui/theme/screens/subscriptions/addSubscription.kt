@@ -73,7 +73,9 @@ fun AddSubscriptionScreen(navController: NavController) {
         focusedTextColor = Color.White, unfocusedTextColor = Color.White, focusedContainerColor = Color.Transparent,
         unfocusedContainerColor = Color.Transparent, cursorColor = Gold, focusedLabelColor = Gold, unfocusedLabelColor = Muted)
 
-    Scaffold(topBar = {
+    Scaffold(
+        modifier = Modifier.statusBarsPadding(),
+        topBar = {
         TopAppBar(title = { Text("Add Subscription", color = Gold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) },
             navigationIcon = { IconButton(onClick = { navController.navigateUp() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Gold) } },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkPurple))

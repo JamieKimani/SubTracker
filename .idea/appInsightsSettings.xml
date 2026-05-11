@@ -6,14 +6,6 @@
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
-              <option name="connection">
-                <ConnectionSetting>
-                  <option name="appId" value="com.example.trackifyv1" />
-                  <option name="mobileSdkAppId" value="1:1012390110692:android:8a5d05189d9ac3d56c13f1" />
-                  <option name="projectId" value="trackify-aab65" />
-                  <option name="projectNumber" value="1012390110692" />
-                </ConnectionSetting>
-              </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
               <option name="visibilityType" value="ALL" />

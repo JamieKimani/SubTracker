@@ -63,7 +63,7 @@ class AuthViewModel : ViewModel() {
 
                 _isLoggedIn.value = true
                 _message.value = "Registration successful"
-                
+
                 launch(Dispatchers.Main) {
                     Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
                     navController.navigate(ROUTE_LOGIN)
@@ -91,7 +91,7 @@ class AuthViewModel : ViewModel() {
                 auth.signInWithEmailAndPassword(email, password).await()
                 _isLoggedIn.value = true
                 _message.value = "Login successful"
-                
+
                 launch(Dispatchers.Main) {
                     Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
                     navController.navigate(ROUTE_DASHBOARD)
@@ -107,9 +107,6 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun signInWithGoogle(navController: NavController, context: Context) {
-        // Implement Google Sign-In logic here
-        Toast.makeText(context, "Google Sign-In Clicked", Toast.LENGTH_SHORT).show()
-    }
+
 
 }

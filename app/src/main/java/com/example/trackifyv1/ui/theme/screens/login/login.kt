@@ -49,6 +49,7 @@ fun LoginScreen(navController: NavController) {
                     )
                 )
             )
+            .statusBarsPadding()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -169,18 +170,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(Modifier.height(12.dp))
 
-        OutlinedButton(
-            onClick = { viewModel.signInWithGoogle(navController, context) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            border = ButtonDefaults.outlinedButtonBorder,
-            colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = Color(0xFF1A0533),
-                contentColor   = Color(0xFFD4A017)
-            )
-        ) {
-            Text("Sign in with Google", color = Color(0xFFD4A017), fontFamily = FontFamily.Monospace)
-        }
+
 
         Spacer(Modifier.height(12.dp))
 

@@ -29,7 +29,6 @@ fun AppNavHost(modifier: Modifier = Modifier, navController: NavHostController =
         }
         composable(ROUTE_DASHBOARD) {
             BackHandler(true) {
-                // Disable back button
             }
             DashboardScreen(navController = navController)
         }

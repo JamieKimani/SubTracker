@@ -51,7 +51,9 @@ fun ViewSubscriptionsScreen(navController: NavController) {
     val subscriptions by viewModel.subscriptions.collectAsState()
     val gradientBg = Brush.verticalGradient(listOf(DarkPurple, DarkGreen, DarkYellow))
 
-    Scaffold(topBar = {
+    Scaffold(
+        modifier = Modifier.statusBarsPadding(),
+        topBar = {
         TopAppBar(title = { Text("My Subscriptions", color = Gold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) },
             navigationIcon = { IconButton(onClick = { navController.navigateUp() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Gold) } },
@@ -69,9 +71,21 @@ fun ViewSubscriptionsScreen(navController: NavController) {
                     Text("Tap + to add your first one", color = BorderIdle, fontFamily = FontFamily.Monospace, fontSize = 13.sp)
                 }
             } else {
-                LazyColumn(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 80.dp)) {
-                    items(subscriptions, key = { it.id }) { sub -> SubscriptionCard(sub, { viewModel.deleteSubscription(sub.id) }, { viewModel.updateSubscription(it) }) }
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(bottom = 80.dp)
+                ) {
+                    items(
+                        items = subscriptions,
+                        key = { it.id }
+                    ) { sub ->
+                        SubscriptionCard(
+                            subscription = sub,
+                            onDelete = { viewModel.deleteSubscription(sub.id) },
+                            onUpdate = { updatedSub -> viewModel.updateSubscription(updatedSub) }
+                        )
+                    }
                 }
             }
         }
@@ -105,11 +119,11 @@ fun SubscriptionCard(subscription: SubscriptionModel, onDelete: () -> Unit, onUp
                     Text(subscription.category, color = chipColor, fontFamily = FontFamily.Monospace, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
-            Divider(color = BorderIdle.copy(alpha = 0.4f), thickness = 0.5.dp)
+            HorizontalDivider(color = BorderIdle.copy(alpha = 0.4f), thickness = 0.5.dp)
             DetailRow("Amount", "KES ${subscription.subscriptionAmount}")
             DetailRow("Start Date", subscription.subscriptionDate.ifBlank { "—" })
             DetailRow("Expiry", subscription.expiryDate.ifBlank { "—" })
-            DetailRow("Next Renewal", subscription.nextRenewalDate.ifBlank { "—" })
+            DetailRow("Reminder", subscription.reminderDate.ifBlank { "—" })
         }
     }
 
