@@ -3,7 +3,6 @@ package com.example.trackifyv1.models
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -14,42 +13,30 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class SubscriptionViewModel : ViewModel() {
 
-    private val dbRef = FirebaseDatabase.getInstance()
-        .getReference("Subscriptions")
+    private val dbRef = FirebaseDatabase.getInstance().getReference("Subscriptions")
 
     private val _subscriptions = MutableStateFlow<List<SubscriptionModel>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionModel>> = _subscriptions.asStateFlow()
 
-    init {
-        fetchSubscriptions()
-    }
-
+    init { fetchSubscriptions() }
 
     private fun fetchSubscriptions() {
         dbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val list = mutableListOf<SubscriptionModel>()
-                for (child in snapshot.children) {
-                    val sub = child.getValue(SubscriptionModel::class.java)
-                    if (sub != null) {
-                        list.add(sub.copy(id = child.key ?: ""))
-                    }
+                _subscriptions.value = snapshot.children.mapNotNull { child ->
+                    child.getValue(SubscriptionModel::class.java)?.copy(id = child.key ?: "")
                 }
-                _subscriptions.value = list
             }
-
-            override fun onCancelled(error: DatabaseError) {
-            }
+            override fun onCancelled(error: DatabaseError) {}
         })
     }
-
 
     fun addSubscription(
         subscriptionName: String,
         subscriptionAmount: String,
         subscriptionDate: String,
         expiryDate: String,
-        nextRenewalDate: String,
+        reminderDate: String,
         context: Context,
         category: String = ""
     ) {
@@ -61,31 +48,18 @@ class SubscriptionViewModel : ViewModel() {
             Toast.makeText(context, "Amount cannot be empty", Toast.LENGTH_SHORT).show()
             return
         }
-
-        val id  = dbRef.push().key ?: return
-        val sub = SubscriptionModel(
-            id               = id,
-            subscriptionName = subscriptionName,
-            subscriptionAmount = subscriptionAmount,
-            subscriptionDate = subscriptionDate,
-            expiryDate       = expiryDate,
-            nextRenewalDate  = nextRenewalDate,
-            category         = category
-        )
-
+        val id = dbRef.push().key ?: return
+        val sub = SubscriptionModel(id, subscriptionName, subscriptionAmount, subscriptionDate, expiryDate, reminderDate, category)
         dbRef.child(id).setValue(sub)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Subscription added!", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+            .addOnSuccessListener { Toast.makeText(context, "Subscription added!", Toast.LENGTH_SHORT).show() }
+            .addOnFailureListener { e -> Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_SHORT).show() }
     }
 
-
     fun deleteSubscription(id: String) {
-        if (id.isNotBlank()) {
-            dbRef.child(id).removeValue()
-        }
+        if (id.isNotBlank()) dbRef.child(id).removeValue()
+    }
+
+    fun updateSubscription(subscription: SubscriptionModel) {
+        if (subscription.id.isNotBlank()) dbRef.child(subscription.id).setValue(subscription)
     }
 }

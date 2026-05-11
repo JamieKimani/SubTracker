@@ -93,10 +93,10 @@ fun SubscriptionCard(subscription: SubscriptionModel, onDelete: () -> Unit, onUp
                     fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
                 Row {
                     IconButton(onClick = { showEditDialog = true }, Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Edit, "Edit", tint = Gold, Modifier.size(18.dp))
+                        Icon(Icons.Default.Edit, "Edit", tint = Gold, modifier = Modifier.size(18.dp))
                     }
                     IconButton(onClick = { showDeleteDialog = true }, Modifier.size(32.dp)) {
-                        Icon(Icons.Default.Delete, "Delete", tint = Crimson, Modifier.size(18.dp))
+                        Icon(Icons.Default.Delete, "Delete", tint = Crimson, modifier = Modifier.size(18.dp))
                     }
                 }
             }

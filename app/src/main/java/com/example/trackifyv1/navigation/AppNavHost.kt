@@ -1,9 +1,7 @@
 package com.example.trackifyv1.navigation
 
-import androidx.activity.compose.LocalOnBackPressedDispatcher
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,13 +28,8 @@ fun AppNavHost(modifier: Modifier = Modifier, navController: NavHostController =
             RegisterScreen(navController = navController)
         }
         composable(ROUTE_DASHBOARD) {
-            val backDispatcher = LocalOnBackPressedDispatcher.current
-            DisposableEffect(Unit) {
-                val callback = object : OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {}
-                }
-                backDispatcher?.addCallback(callback)
-                onDispose { callback.remove() }
+            BackHandler(true) {
+                // Disable back button
             }
             DashboardScreen(navController = navController)
         }

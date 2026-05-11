@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.trackifyv1.helpers.scheduleNotification
 import com.example.trackifyv1.models.SubscriptionViewModel
+import com.example.trackifyv1.notifications.NotificationHelper
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -67,7 +67,6 @@ fun AddSubscriptionScreen(navController: NavController) {
 
     val startPicker = remember { makePicker { subscriptionDate = it } }
     val expiryPicker = remember { makePicker { expiryDate = it } }
-    val renewPicker = remember { makePicker { nextRenewalDate = it } }
     val reminderPicker = remember { makePicker { reminderDate = it } }
 
     val fieldColors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Gold, unfocusedBorderColor = BorderIdle,
@@ -114,12 +113,13 @@ fun AddSubscriptionScreen(navController: NavController) {
             Spacer(Modifier.height(20.dp))
 
             Button(onClick = {
-                vm.addSubscription(subscriptionName, subscriptionAmount, subscriptionDate, expiryDate, nextRenewalDate, reminderDate, context, selectedCategory)
+                vm.addSubscription(subscriptionName, subscriptionAmount, subscriptionDate, expiryDate, reminderDate, context, selectedCategory)
                 if (reminderDate.isNotEmpty()) {
                     try {
                         val date = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(reminderDate)
                         if (date != null) {
-                            scheduleNotification(context, "Reminder: $subscriptionName", "Your subscription is due soon!", date.time)
+                            NotificationHelper(context).scheduleNotification(
+                                "Reminder: $subscriptionName", "Your subscription is due soon!", date.time)
                             Toast.makeText(context, "Reminder set for $reminderDate", Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: Exception) {
