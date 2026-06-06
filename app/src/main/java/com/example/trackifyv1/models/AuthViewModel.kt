@@ -1,6 +1,7 @@
 package com.example.trackifyv1.models
 
 import android.content.Context
+import android.util.Patterns
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +9,10 @@ import androidx.navigation.NavController
 import com.example.trackifyv1.navigation.ROUTE_DASHBOARD
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,14 +22,8 @@ import kotlinx.coroutines.tasks.await
 
 class AuthViewModel : ViewModel() {
 
-    private val auth = FirebaseAuth.getInstance()
+    private val auth     = FirebaseAuth.getInstance()
     private val usersRef = FirebaseDatabase.getInstance().getReference("users")
-
-    private val _isLoggedIn = MutableStateFlow(auth.currentUser != null)
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
-
-    private val _message = MutableStateFlow<String?>(null)
-    val message: StateFlow<String?> = _message
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -34,45 +32,42 @@ class AuthViewModel : ViewModel() {
         name: String,
         email: String,
         password: String,
-        confirmpassword: String,
+        confirmPassword: String,
         navController: NavController,
         context: Context
     ) {
-        if (name.isBlank() || email.isBlank() || password.isBlank() || confirmpassword.isBlank()) {
-            Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (password != confirmpassword) {
-            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
-            return
+        when {
+            name.isBlank()            -> { toast(context, "Please enter your name"); return }
+            email.isBlank()           -> { toast(context, "Please enter your email"); return }
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                                      -> { toast(context, "Please enter a valid email address"); return }
+            password.isBlank()        -> { toast(context, "Please enter a password"); return }
+            password.length < 6       -> { toast(context, "Password must be at least 6 characters"); return }
+            password != confirmPassword -> { toast(context, "Passwords do not match"); return }
         }
 
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             try {
-                val result = auth.createUserWithEmailAndPassword(email, password).await()
-                val uid = result.user?.uid ?: return@launch
+                val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
+                val uid    = result.user?.uid ?: return@launch
 
-                val user = UserModel(
-                    id    = uid,
-                    name  = name,
-                    email = email
-                )
-                usersRef.child(uid).setValue(user).await()
-
-                _isLoggedIn.value = true
-                _message.value = "Registration successful"
+                usersRef.child(uid).setValue(UserModel(id = uid, name = name.trim(), email = email.trim())).await()
 
                 launch(Dispatchers.Main) {
-                    Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
-                    navController.navigate(ROUTE_LOGIN)
+                    toast(context, "Account created! Please log in.")
+                    navController.navigate(ROUTE_LOGIN) {
+                        popUpTo(ROUTE_LOGIN) { inclusive = false }
+                    }
                 }
             } catch (e: Exception) {
-                _message.value = "Registration failed: ${e.message}"
-                launch(Dispatchers.Main) {
-                    Toast.makeText(context, "Registration failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                val msg = when (e) {
+                    is FirebaseAuthWeakPasswordException      -> "Password is too weak. Use at least 6 characters."
+                    is FirebaseAuthUserCollisionException     -> "An account with this email already exists."
+                    is FirebaseAuthInvalidCredentialsException -> "Invalid email address. Please check and try again."
+                    else -> "Registration failed. Please check your connection and try again."
                 }
+                launch(Dispatchers.Main) { toast(context, msg) }
             } finally {
                 _isLoading.value = false
             }
@@ -85,28 +80,34 @@ class AuthViewModel : ViewModel() {
         navController: NavController,
         context: Context
     ) {
+        when {
+            email.isBlank()    -> { toast(context, "Please enter your email"); return }
+            password.isBlank() -> { toast(context, "Please enter your password"); return }
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             try {
-                auth.signInWithEmailAndPassword(email, password).await()
-                _isLoggedIn.value = true
-                _message.value = "Login successful"
-
+                auth.signInWithEmailAndPassword(email.trim(), password).await()
                 launch(Dispatchers.Main) {
-                    Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-                    navController.navigate(ROUTE_DASHBOARD)
+                    toast(context, "Welcome back!")
+                    navController.navigate(ROUTE_DASHBOARD) {
+                        popUpTo(ROUTE_LOGIN) { inclusive = true }
+                    }
                 }
             } catch (e: Exception) {
-                _message.value = "Login failed: ${e.message}"
-                launch(Dispatchers.Main) {
-                    Toast.makeText(context, "Login failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                val msg = when (e) {
+                    is FirebaseAuthInvalidUserException        -> "No account found with this email."
+                    is FirebaseAuthInvalidCredentialsException -> "Incorrect password. Please try again."
+                    else -> "Login failed. Please check your connection and try again."
                 }
+                launch(Dispatchers.Main) { toast(context, msg) }
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-
-
+    private fun toast(context: Context, msg: String) =
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
 }

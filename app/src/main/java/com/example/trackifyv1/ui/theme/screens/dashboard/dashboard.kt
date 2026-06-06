@@ -45,8 +45,8 @@ val categoryColors = listOf(
 
 private data class NavItem(val label: String, val icon: ImageVector)
 private val navItems = listOf(
-    NavItem("Home", Icons.Default.Dashboard),
-    NavItem("Subs", Icons.Default.List),
+    NavItem("Home",    Icons.Default.Dashboard),
+    NavItem("Subs",    Icons.Default.List),
     NavItem("Profile", Icons.Default.Person)
 )
 
@@ -58,11 +58,12 @@ fun DashboardScreen(navController: NavController) {
         Box(Modifier.fillMaxSize().padding(bottom = 90.dp)) {
             when (tab) {
                 0 -> DashboardTab(navController) { tab = 1 }
-                1 -> ViewSubscriptionsScreen(navController)
+                1 -> ViewSubscriptionsScreen(navController, isStandalone = false)
                 2 -> ProfileScreen(navController)
             }
         }
 
+        // Bottom nav bar
         Box(
             Modifier
                 .align(Alignment.BottomCenter)
@@ -81,39 +82,39 @@ fun DashboardScreen(navController: NavController) {
             }
         }
 
-        FloatingActionButton(
-            onClick = { navController.navigate(ROUTE_ADD_SUBSCRIPTION) },
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 44.dp),
-            containerColor = Crimson, contentColor = Gold,
-            shape = RoundedCornerShape(14.dp),
-            elevation = FloatingActionButtonDefaults.elevation(10.dp)
-        ) {
-            Icon(Icons.Default.Add, "Add Subscription", Modifier.size(20.dp))
+        // FAB only visible on Home and Subs tabs
+        if (tab != 2) {
+            FloatingActionButton(
+                onClick = { navController.navigate(ROUTE_ADD_SUBSCRIPTION) },
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 44.dp),
+                containerColor = Crimson, contentColor = Gold,
+                shape = RoundedCornerShape(14.dp),
+                elevation = FloatingActionButtonDefaults.elevation(10.dp)
+            ) {
+                Icon(Icons.Default.Add, "Add Subscription", Modifier.size(20.dp))
+            }
         }
     }
 }
 
 @Composable
 private fun NavPill(item: NavItem, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Box(modifier.clip(RoundedCornerShape(20.dp))
-        .background(if (selected) Gold.copy(alpha = 0.13f) else Color.Transparent), Alignment.Center) {
+    Box(modifier.clip(RoundedCornerShape(20.dp)).background(if (selected) Gold.copy(alpha = 0.13f) else Color.Transparent), Alignment.Center) {
         IconButton(onClick, Modifier.fillMaxWidth()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(item.icon, item.label, tint = if (selected) Gold else Muted, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.height(2.dp))
                 Text(item.label, color = if (selected) Gold else Muted, fontSize = 9.sp,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
+                    fontFamily = FontFamily.Monospace, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
             }
         }
     }
 }
 
-
 @Composable
 fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) {
     val vm: SubscriptionViewModel = viewModel()
-    val subs by vm.subscriptions.collectAsState()
+    val subs    by vm.subscriptions.collectAsState()
     val total   = subs.sumOf { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 }
     val counts  = subs.groupBy { it.category.ifBlank { "Uncategorized" } }.mapValues { it.value.size }
     val amounts = subs.groupBy { it.category.ifBlank { "Uncategorized" } }
@@ -228,6 +229,4 @@ fun CategoryBar(category: String, count: Int, amount: Double, fraction: Float, c
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun DashboardScreenPreview() {
-    DashboardScreen(rememberNavController())
-}
+fun DashboardScreenPreview() { DashboardScreen(rememberNavController()) }

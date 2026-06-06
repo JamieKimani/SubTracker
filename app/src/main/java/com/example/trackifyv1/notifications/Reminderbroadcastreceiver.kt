@@ -1,15 +1,13 @@
 package com.example.trackifyv1.notifications
 
-
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
 class ReminderBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        NotificationHelper(context).sendNotification(
-            intent.getStringExtra("title") ?: "Reminder",
-            intent.getStringExtra("message") ?: "You have a reminder."
-        )
+        val title   = intent.getStringExtra(NotificationHelper.EXTRA_TITLE)   ?: "Subscription Reminder"
+        val message = intent.getStringExtra(NotificationHelper.EXTRA_MESSAGE) ?: "One of your subscriptions is due soon!"
+        NotificationHelper(context).sendNotification(title, message)
     }
 }
