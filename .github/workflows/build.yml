@@ -39,14 +39,18 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
+        id: build
+        run: ./gradlew assembleDebug 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
 
-      - name: Upload build log on failure
+      - name: Post errors as gist on failure
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build.log
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ERRORS=$(grep -E "error:|Error:|FAILED|Exception" build.log | head -60 || true)
+          TAIL=$(tail -80 build.log || true)
+          gh gist create --public --desc "Build errors run ${{ github.run_number }}" \
+            <(echo "=== ERRORS ==="; echo "$ERRORS"; echo ""; echo "=== TAIL ==="; echo "$TAIL")
 
       - name: Upload APK
         if: success()
