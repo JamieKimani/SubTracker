@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -31,6 +32,7 @@ class NotificationHelper(private val context: Context) {
             ).apply {
                 description = "Reminders for upcoming subscription renewals"
                 enableVibration(true)
+                setShowBadge(true)
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -57,16 +59,13 @@ class NotificationHelper(private val context: Context) {
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 
-    /**
-     * Schedule a notification for a subscription.
-     * Uses [subscriptionId] as the unique request code so it can be reliably cancelled later.
-     */
     fun scheduleNotification(
         title: String,
         message: String,
         reminderTimeMillis: Long,
         requestCode: Int = title.hashCode()
     ) {
+        // Don't schedule if time is already passed
         if (reminderTimeMillis <= System.currentTimeMillis()) return
 
         val intent = Intent(context, ReminderBroadcastReceiver::class.java).apply {
@@ -74,12 +73,11 @@ class NotificationHelper(private val context: Context) {
             putExtra(EXTRA_MESSAGE, message)
         }
         val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode,
-            intent,
+            context, requestCode, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
@@ -87,14 +85,22 @@ class NotificationHelper(private val context: Context) {
                         AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
                     )
                 } else {
-                    // Exact alarms not permitted — fall back to inexact and inform user once
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent)
-                    Toast.makeText(
-                        context,
-                        "Note: Reminder may arrive slightly later than scheduled. " +
-                                "Grant 'Alarms & Reminders' permission in Settings for precise timing.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    // Fall back to inexact + prompt user to grant exact alarm permission
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
+                    )
+                    try {
+                        val settingsIntent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        context.startActivity(settingsIntent)
+                    } catch (_: Exception) {
+                        Toast.makeText(
+                            context,
+                            "Grant 'Alarms & Reminders' permission in Settings for accurate reminders.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             } else {
                 alarmManager.setExactAndAllowWhileIdle(
@@ -102,13 +108,22 @@ class NotificationHelper(private val context: Context) {
                 )
             }
         } catch (e: SecurityException) {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent)
+            // Last resort fallback
+            try {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
+                )
+            } catch (_: Exception) {
+                Toast.makeText(context, "Could not schedule reminder: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
     /**
      * Schedule using a subscription's reminder date string (DD/MM/YYYY).
-     * Returns true if successfully scheduled.
+     *
+     * Key fix: if the reminder date is TODAY and it's already past [REMINDER_HOUR],
+     * we fire the notification immediately rather than silently dropping it.
      */
     fun scheduleForSubscription(
         subscriptionId: String,
@@ -119,6 +134,7 @@ class NotificationHelper(private val context: Context) {
         return try {
             val sdf  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val date = sdf.parse(reminderDateStr) ?: return false
+            val now  = Calendar.getInstance()
             val cal  = Calendar.getInstance().apply {
                 time = date
                 set(Calendar.HOUR_OF_DAY, REMINDER_HOUR)
@@ -126,20 +142,33 @@ class NotificationHelper(private val context: Context) {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
-            if (cal.timeInMillis <= System.currentTimeMillis()) return false
+
+            // If the scheduled time has already passed today, fire immediately
+            if (cal.timeInMillis <= now.timeInMillis) {
+                // Only fire immediately if the reminder date is today or in the past
+                val isToday = cal.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+                        cal.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
+                val isPast  = cal.before(now)
+                if (isToday || isPast) {
+                    sendNotification(
+                        title   = "Reminder: $subscriptionName",
+                        message = "Your \"$subscriptionName\" subscription is due today!"
+                    )
+                    return true
+                }
+                return false // future date, wrong time somehow
+            }
+
             scheduleNotification(
-                title       = "Reminder: $subscriptionName",
-                message     = "Your \"$subscriptionName\" subscription is due soon!",
+                title              = "Reminder: $subscriptionName",
+                message            = "Your \"$subscriptionName\" subscription is due soon!",
                 reminderTimeMillis = cal.timeInMillis,
-                requestCode = subscriptionId.hashCode()
+                requestCode        = subscriptionId.hashCode()
             )
             true
         } catch (_: Exception) { false }
     }
 
-    /**
-     * Cancel a previously scheduled notification by request code.
-     */
     fun cancelScheduledNotification(requestCode: Int) {
         val intent = Intent(context, ReminderBroadcastReceiver::class.java)
         val pending = PendingIntent.getBroadcast(
@@ -157,6 +186,6 @@ class NotificationHelper(private val context: Context) {
         const val CHANNEL_ID    = "trackify_reminders"
         const val EXTRA_TITLE   = "title"
         const val EXTRA_MESSAGE = "message"
-        const val REMINDER_HOUR = 9
+        const val REMINDER_HOUR = 9  // 9 AM — for future dates
     }
 }
