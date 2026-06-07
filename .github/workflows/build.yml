@@ -5,6 +5,9 @@ on:
     branches: [ "main", "master" ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -41,17 +46,22 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
 
-      - name: Commit error log to repo on failure
+      - name: Save errors to step summary and repo
         if: failure()
         run: |
+          echo "## Build Errors" >> $GITHUB_STEP_SUMMARY
+          grep -E "error:|Error|FAILED|Exception|Unresolved" build.log | head -50 >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Last 100 lines" >> $GITHUB_STEP_SUMMARY
+          tail -100 build.log >> $GITHUB_STEP_SUMMARY || true
+
+          # Also commit to repo
           git config user.email "ci@trackify.build"
           git config user.name "CI Bot"
-          cp build.log build-error.log
+          tail -200 build.log > build-error.log
           git add build-error.log
-          git commit -m "ci: build error log [skip ci]"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git diff --cached --quiet || git commit -m "ci: build error log run ${{ github.run_number }} [skip ci]"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main || true
 
       - name: Upload APK
         if: success()
