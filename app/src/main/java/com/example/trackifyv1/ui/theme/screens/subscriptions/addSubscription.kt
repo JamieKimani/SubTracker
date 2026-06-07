@@ -30,15 +30,17 @@ import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.notifications.NotificationHelper
 import java.util.Calendar
 
-private val Gold       = Color(0xFFD4A017)
-private val Crimson    = Color(0xFF8B0000)
-private val DarkPurple = Color(0xFF1A0533)
-private val DarkGreen  = Color(0xFF0D2B1A)
-private val DarkYellow = Color(0xFF1A1A00)
-private val CardBg     = Color(0xFF1C1C1C)
-private val Muted      = Color(0xFF9E9E9E)
-private val BorderIdle = Color(0xFF4A3F6B)
+// Private palette — avoids name clash with dashboard's top-level vals
+private val AddGold       = Color(0xFFD4A017)
+private val AddCrimson    = Color(0xFF8B0000)
+private val AddDarkPurple = Color(0xFF1A0533)
+private val AddDarkGreen  = Color(0xFF0D2B1A)
+private val AddDarkYellow = Color(0xFF1A1A00)
+private val AddCardBg     = Color(0xFF1C1C1C)
+private val AddMuted      = Color(0xFF9E9E9E)
+private val AddBorderIdle = Color(0xFF4A3F6B)
 
+// Shared list referenced by both add and view screens
 val subscriptionCategories = listOf(
     "Streaming", "Music", "Cloud Storage", "Productivity", "Gaming",
     "News & Magazines", "Fitness & Health", "Education", "Finance",
@@ -71,10 +73,10 @@ fun AddSubscriptionScreen(navController: NavController) {
     val reminderPicker = remember { makePicker { reminderDate = it } }
 
     val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor      = Gold, unfocusedBorderColor = BorderIdle,
-        focusedTextColor        = Color.White, unfocusedTextColor = Color.White,
+        focusedBorderColor      = AddGold,       unfocusedBorderColor    = AddBorderIdle,
+        focusedTextColor        = Color.White,   unfocusedTextColor      = Color.White,
         focusedContainerColor   = Color.Transparent, unfocusedContainerColor = Color.Transparent,
-        cursorColor             = Gold, focusedLabelColor = Gold, unfocusedLabelColor = Muted
+        cursorColor             = AddGold,       focusedLabelColor       = AddGold, unfocusedLabelColor = AddMuted
     )
 
     Scaffold(
@@ -82,24 +84,22 @@ fun AddSubscriptionScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Add Subscription", color = Gold,
-                        fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold
-                    )
+                    Text("Add Subscription", color = AddGold,
+                        fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Gold)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = AddGold)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkPurple)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = AddDarkPurple)
             )
         }
     ) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
-                .background(Brush.verticalGradient(listOf(DarkPurple, DarkGreen, DarkYellow)))
+                .background(Brush.verticalGradient(listOf(AddDarkPurple, AddDarkGreen, AddDarkYellow)))
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
@@ -107,12 +107,12 @@ fun AddSubscriptionScreen(navController: NavController) {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .background(CardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+                    .background(AddCardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 Text(
-                    "Subscription Details", color = Gold,
+                    "Subscription Details", color = AddGold,
                     fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, fontSize = 14.sp
                 )
 
@@ -138,29 +138,27 @@ fun AddSubscriptionScreen(navController: NavController) {
                 )
 
                 ExposedDropdownMenuBox(
-                    expanded = categoryExpanded,
+                    expanded        = categoryExpanded,
                     onExpandedChange = { categoryExpanded = !categoryExpanded }
                 ) {
                     OutlinedTextField(
                         value = selectedCategory, onValueChange = {}, readOnly = true,
                         label = { Text("Category") },
-                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, "Expand", tint = Gold) },
+                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, "Expand", tint = AddGold) },
                         colors = fieldColors,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        modifier = Modifier.fillMaxWidth().menuAnchor()
                     )
                     ExposedDropdownMenu(
-                        expanded = categoryExpanded,
+                        expanded        = categoryExpanded,
                         onDismissRequest = { categoryExpanded = false },
-                        modifier = Modifier.background(CardBg)
+                        modifier        = Modifier.background(AddCardBg)
                     ) {
                         subscriptionCategories.forEach { cat ->
                             DropdownMenuItem(
-                                text = {
+                                text    = {
                                     Text(
                                         cat,
-                                        color = if (cat == selectedCategory) Gold else Color.White,
+                                        color      = if (cat == selectedCategory) AddGold else Color.White,
                                         fontFamily = FontFamily.Monospace, fontSize = 13.sp
                                     )
                                 },
@@ -170,14 +168,14 @@ fun AddSubscriptionScreen(navController: NavController) {
                     }
                 }
 
-                DateField("Start Date",    subscriptionDate, fieldColors) { startPicker.show() }
-                DateField("Expiry Date",   expiryDate,       fieldColors) { expiryPicker.show() }
-                DateField("Reminder Date", reminderDate,     fieldColors) { reminderPicker.show() }
+                AddDateField("Start Date",    subscriptionDate, fieldColors) { startPicker.show() }
+                AddDateField("Expiry Date",   expiryDate,       fieldColors) { expiryPicker.show() }
+                AddDateField("Reminder Date", reminderDate,     fieldColors) { reminderPicker.show() }
 
                 if (reminderDate.isNotBlank()) {
                     Text(
                         "📅 You'll be reminded on $reminderDate at ${NotificationHelper.REMINDER_HOUR}:00 AM",
-                        color = Gold.copy(alpha = 0.8f), fontFamily = FontFamily.Monospace, fontSize = 11.sp
+                        color = AddGold.copy(alpha = 0.8f), fontFamily = FontFamily.Monospace, fontSize = 11.sp
                     )
                 }
             }
@@ -187,7 +185,6 @@ fun AddSubscriptionScreen(navController: NavController) {
             Button(
                 onClick = {
                     if (amountError) return@Button
-                    // Notification scheduling is now handled inside ViewModel.addSubscription
                     vm.addSubscription(
                         subscriptionName, subscriptionAmount, subscriptionDate,
                         expiryDate, reminderDate, context, selectedCategory,
@@ -195,33 +192,32 @@ fun AddSubscriptionScreen(navController: NavController) {
                     )
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape  = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Crimson)
+                shape    = RoundedCornerShape(12.dp),
+                colors   = ButtonDefaults.buttonColors(containerColor = AddCrimson)
             ) {
                 Text(
-                    "Save Subscription", color = Gold, fontSize = 15.sp,
+                    "Save Subscription", color = AddGold, fontSize = 15.sp,
                     fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold
                 )
             }
 
             Spacer(Modifier.height(16.dp))
             Text(
-                "© 2026 Trackify", fontSize = 11.sp, color = BorderIdle,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.fillMaxWidth().wrapContentWidth()
+                "© 2026 Trackify", fontSize = 11.sp, color = AddBorderIdle,
+                fontFamily = FontFamily.Monospace, modifier = Modifier.fillMaxWidth().wrapContentWidth()
             )
         }
     }
 }
 
 @Composable
-private fun DateField(label: String, value: String, colors: TextFieldColors, onPickerClick: () -> Unit) {
+private fun AddDateField(label: String, value: String, colors: TextFieldColors, onPickerClick: () -> Unit) {
     OutlinedTextField(
         value = value, onValueChange = {}, readOnly = true, label = { Text(label) },
-        placeholder = { Text("DD/MM/YYYY", color = Muted) },
+        placeholder = { Text("DD/MM/YYYY", color = AddMuted) },
         trailingIcon = {
             IconButton(onClick = onPickerClick) {
-                Icon(Icons.Default.DateRange, "Pick $label", tint = Gold)
+                Icon(Icons.Default.DateRange, "Pick $label", tint = AddGold)
             }
         },
         colors = colors, modifier = Modifier.fillMaxWidth()
