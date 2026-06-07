@@ -83,7 +83,6 @@ fun AddSubscriptionScreen(navController: NavController) {
     )
 
     Scaffold(
-        modifier = Modifier.statusBarsPadding(),
         topBar = {
             TopAppBar(
                 title = { Text("Add Subscription", color = AddGold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) },
