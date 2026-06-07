@@ -39,18 +39,19 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Debug APK
-        id: build
         run: ./gradlew assembleDebug 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
 
-      - name: Post errors as gist on failure
+      - name: Commit error log to repo on failure
         if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ERRORS=$(grep -E "error:|Error:|FAILED|Exception" build.log | head -60 || true)
-          TAIL=$(tail -80 build.log || true)
-          gh gist create --public --desc "Build errors run ${{ github.run_number }}" \
-            <(echo "=== ERRORS ==="; echo "$ERRORS"; echo ""; echo "=== TAIL ==="; echo "$TAIL")
+          git config user.email "ci@trackify.build"
+          git config user.name "CI Bot"
+          cp build.log build-error.log
+          git add build-error.log
+          git commit -m "ci: build error log [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload APK
         if: success()
