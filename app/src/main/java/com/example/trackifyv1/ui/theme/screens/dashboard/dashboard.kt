@@ -1,5 +1,6 @@
 package com.example.trackifyv1.ui.theme.screens.dashboard
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,6 +8,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,7 +49,7 @@ val categoryColors = listOf(
 private data class NavItem(val label: String, val icon: ImageVector)
 private val navItems = listOf(
     NavItem("Home",    Icons.Default.Dashboard),
-    NavItem("Subs",    Icons.Default.List),
+    NavItem("Subs",    Icons.AutoMirrored.Filled.List),
     NavItem("Profile", Icons.Default.Person)
 )
 
@@ -183,7 +186,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
                     Text("+ Add", color = Gold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                 }
                 OutlinedButton(onClick = onViewSubscriptions, modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(10.dp), border = ButtonDefaults.outlinedButtonBorder,
+                    shape = RoundedCornerShape(10.dp), border = BorderStroke(1.dp, Color(0xFF4A3F6B)),
                     colors = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold)) {
                     Text("View All", fontFamily = FontFamily.Monospace)
                 }

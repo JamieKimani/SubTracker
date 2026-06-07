@@ -1,5 +1,6 @@
 package com.example.trackifyv1.ui.theme.screens.subscriptions
 
+import androidx.compose.foundation.BorderStroke
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -247,7 +248,7 @@ fun SubscriptionCard(
                             label = { Text("Category") },
                             trailingIcon = { Icon(Icons.Default.ArrowDropDown, null, tint = SubGold) },
                             colors = fColors,
-                            modifier = Modifier.fillMaxWidth().menuAnchor()
+                            modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                         )
                         ExposedDropdownMenu(
                             expanded        = catExpanded,
@@ -297,7 +298,7 @@ fun SubscriptionCard(
             dismissButton = {
                 OutlinedButton(
                     onClick = { showEditDialog = false },
-                    border  = ButtonDefaults.outlinedButtonBorder,
+                    border  = BorderStroke(1.dp, Color(0xFF4A3F6B)),
                     colors  = ButtonDefaults.outlinedButtonColors(containerColor = SubDarkPurple, contentColor = SubGold),
                     shape   = RoundedCornerShape(8.dp)
                 ) { Text("Cancel", fontFamily = FontFamily.Monospace) }
@@ -332,7 +333,7 @@ fun SubscriptionCard(
             dismissButton = {
                 OutlinedButton(
                     onClick = { showDeleteDialog = false },
-                    border  = ButtonDefaults.outlinedButtonBorder,
+                    border  = BorderStroke(1.dp, Color(0xFF4A3F6B)),
                     colors  = ButtonDefaults.outlinedButtonColors(containerColor = SubDarkPurple, contentColor = SubGold),
                     shape   = RoundedCornerShape(8.dp)
                 ) { Text("Cancel", fontFamily = FontFamily.Monospace) }

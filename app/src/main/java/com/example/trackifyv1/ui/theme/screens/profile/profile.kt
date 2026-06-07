@@ -1,5 +1,6 @@
 package com.example.trackifyv1.ui.theme.screens.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -233,7 +234,7 @@ fun ProfileScreen(navController: NavController) {
             },
             dismissButton = {
                 OutlinedButton(onClick = { showLogoutConfirm = false },
-                    border = ButtonDefaults.outlinedButtonBorder,
+                    border = BorderStroke(1.dp, Color(0xFF4A3F6B)),
                     colors = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
                     shape = RoundedCornerShape(8.dp)) {
                     Text("Cancel", fontFamily = FontFamily.Monospace)
@@ -289,7 +290,7 @@ private fun RetroDialog(title: String, onDismiss: () -> Unit, onConfirm: () -> U
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss, border = ButtonDefaults.outlinedButtonBorder,
+            OutlinedButton(onClick = onDismiss, border = BorderStroke(1.dp, Color(0xFF4A3F6B)),
                 colors = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
                 shape = RoundedCornerShape(8.dp)) {
                 Text("Cancel", fontFamily = FontFamily.Monospace)

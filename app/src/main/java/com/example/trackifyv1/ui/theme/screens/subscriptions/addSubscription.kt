@@ -146,7 +146,7 @@ fun AddSubscriptionScreen(navController: NavController) {
                         label = { Text("Category") },
                         trailingIcon = { Icon(Icons.Default.ArrowDropDown, "Expand", tint = AddGold) },
                         colors = fieldColors,
-                        modifier = Modifier.fillMaxWidth().menuAnchor()
+                        modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                     )
                     ExposedDropdownMenu(
                         expanded        = categoryExpanded,

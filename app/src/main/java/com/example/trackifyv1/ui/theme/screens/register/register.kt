@@ -1,6 +1,7 @@
 package com.example.trackifyv1.ui.theme.screens.register
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -157,7 +158,7 @@ fun RegisterScreen(navController: NavController) {
             onClick = { navController.navigate(ROUTE_LOGIN) },   // Fixed: was ROUTE_DASHBOARD
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            border = ButtonDefaults.outlinedButtonBorder,
+            border = BorderStroke(1.dp, Color(0xFF4A3F6B)),
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFF1A0533), contentColor = Color(0xFFD4A017)),
             enabled = !isLoading
         ) {
