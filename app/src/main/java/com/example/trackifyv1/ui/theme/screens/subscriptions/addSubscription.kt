@@ -30,7 +30,6 @@ import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.notifications.NotificationHelper
 import java.util.Calendar
 
-// Private palette — avoids name clash with dashboard's top-level vals
 private val AddGold       = Color(0xFFD4A017)
 private val AddCrimson    = Color(0xFF8B0000)
 private val AddDarkPurple = Color(0xFF1A0533)
@@ -40,12 +39,13 @@ private val AddCardBg     = Color(0xFF1C1C1C)
 private val AddMuted      = Color(0xFF9E9E9E)
 private val AddBorderIdle = Color(0xFF4A3F6B)
 
-// Shared list referenced by both add and view screens
 val subscriptionCategories = listOf(
     "Streaming", "Music", "Cloud Storage", "Productivity", "Gaming",
     "News & Magazines", "Fitness & Health", "Education", "Finance",
     "Social Media", "VPN & Security", "Other"
 )
+
+val billingCycles = listOf("Weekly", "Monthly", "Quarterly", "Yearly")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +56,9 @@ fun AddSubscriptionScreen(navController: NavController) {
     var expiryDate         by remember { mutableStateOf("") }
     var reminderDate       by remember { mutableStateOf("") }
     var selectedCategory   by remember { mutableStateOf("") }
+    var selectedCycle      by remember { mutableStateOf("Monthly") }
     var categoryExpanded   by remember { mutableStateOf(false) }
+    var cycleExpanded      by remember { mutableStateOf(false) }
     var amountError        by remember { mutableStateOf(false) }
 
     val context  = LocalContext.current
@@ -73,20 +75,18 @@ fun AddSubscriptionScreen(navController: NavController) {
     val reminderPicker = remember { makePicker { reminderDate = it } }
 
     val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor      = AddGold,       unfocusedBorderColor    = AddBorderIdle,
-        focusedTextColor        = Color.White,   unfocusedTextColor      = Color.White,
+        focusedBorderColor      = AddGold,        unfocusedBorderColor    = AddBorderIdle,
+        focusedTextColor        = Color.White,    unfocusedTextColor      = Color.White,
         focusedContainerColor   = Color.Transparent, unfocusedContainerColor = Color.Transparent,
-        cursorColor             = AddGold,       focusedLabelColor       = AddGold, unfocusedLabelColor = AddMuted
+        cursorColor             = AddGold,        focusedLabelColor       = AddGold,
+        unfocusedLabelColor     = AddMuted
     )
 
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
         topBar = {
             TopAppBar(
-                title = {
-                    Text("Add Subscription", color = AddGold,
-                        fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-                },
+                title = { Text("Add Subscription", color = AddGold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = AddGold)
@@ -111,57 +111,61 @@ fun AddSubscriptionScreen(navController: NavController) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                Text(
-                    "Subscription Details", color = AddGold,
-                    fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, fontSize = 14.sp
-                )
+                Text("Subscription Details", color = AddGold,
+                    fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
 
+                // Name
                 OutlinedTextField(
                     value = subscriptionName, onValueChange = { subscriptionName = it },
                     label = { Text("Subscription Name") }, singleLine = true,
                     colors = fieldColors, modifier = Modifier.fillMaxWidth()
                 )
 
+                // Amount
                 OutlinedTextField(
                     value = subscriptionAmount,
-                    onValueChange = {
-                        subscriptionAmount = it
-                        amountError = it.isNotBlank() && it.toDoubleOrNull() == null
-                    },
+                    onValueChange = { subscriptionAmount = it; amountError = it.isNotBlank() && it.toDoubleOrNull() == null },
                     label = { Text("Amount (KES)") }, singleLine = true,
                     isError = amountError,
-                    supportingText = {
-                        if (amountError) Text("Enter a valid number (e.g. 500 or 9.99)", color = Color(0xFFFF6D6D))
-                    },
+                    supportingText = { if (amountError) Text("Enter a valid number e.g. 500 or 9.99", color = Color(0xFFFF6D6D)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     colors = fieldColors, modifier = Modifier.fillMaxWidth()
                 )
 
-                ExposedDropdownMenuBox(
-                    expanded        = categoryExpanded,
-                    onExpandedChange = { categoryExpanded = !categoryExpanded }
-                ) {
+                // Billing cycle dropdown
+                ExposedDropdownMenuBox(expanded = cycleExpanded, onExpandedChange = { cycleExpanded = !cycleExpanded }) {
                     OutlinedTextField(
-                        value = selectedCategory, onValueChange = {}, readOnly = true,
-                        label = { Text("Category") },
-                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, "Expand", tint = AddGold) },
+                        value = selectedCycle, onValueChange = {}, readOnly = true,
+                        label = { Text("Billing Cycle") },
+                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, null, tint = AddGold) },
                         colors = fieldColors,
                         modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
                     )
-                    ExposedDropdownMenu(
-                        expanded        = categoryExpanded,
-                        onDismissRequest = { categoryExpanded = false },
-                        modifier        = Modifier.background(AddCardBg)
-                    ) {
+                    ExposedDropdownMenu(expanded = cycleExpanded, onDismissRequest = { cycleExpanded = false },
+                        modifier = Modifier.background(AddCardBg)) {
+                        billingCycles.forEach { cycle ->
+                            DropdownMenuItem(
+                                text = { Text(cycle, color = if (cycle == selectedCycle) AddGold else Color.White, fontFamily = FontFamily.Monospace, fontSize = 13.sp) },
+                                onClick = { selectedCycle = cycle; cycleExpanded = false }
+                            )
+                        }
+                    }
+                }
+
+                // Category dropdown
+                ExposedDropdownMenuBox(expanded = categoryExpanded, onExpandedChange = { categoryExpanded = !categoryExpanded }) {
+                    OutlinedTextField(
+                        value = selectedCategory, onValueChange = {}, readOnly = true,
+                        label = { Text("Category") },
+                        trailingIcon = { Icon(Icons.Default.ArrowDropDown, null, tint = AddGold) },
+                        colors = fieldColors,
+                        modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
+                    )
+                    ExposedDropdownMenu(expanded = categoryExpanded, onDismissRequest = { categoryExpanded = false },
+                        modifier = Modifier.background(AddCardBg)) {
                         subscriptionCategories.forEach { cat ->
                             DropdownMenuItem(
-                                text    = {
-                                    Text(
-                                        cat,
-                                        color      = if (cat == selectedCategory) AddGold else Color.White,
-                                        fontFamily = FontFamily.Monospace, fontSize = 13.sp
-                                    )
-                                },
+                                text = { Text(cat, color = if (cat == selectedCategory) AddGold else Color.White, fontFamily = FontFamily.Monospace, fontSize = 13.sp) },
                                 onClick = { selectedCategory = cat; categoryExpanded = false }
                             )
                         }
@@ -174,7 +178,7 @@ fun AddSubscriptionScreen(navController: NavController) {
 
                 if (reminderDate.isNotBlank()) {
                     Text(
-                        "📅 You'll be reminded on $reminderDate at ${NotificationHelper.REMINDER_HOUR}:00 AM",
+                        "📅 Reminder set for $reminderDate at ${NotificationHelper.REMINDER_HOUR}:00 AM. Repeats $selectedCycle.",
                         color = AddGold.copy(alpha = 0.8f), fontFamily = FontFamily.Monospace, fontSize = 11.sp
                     )
                 }
@@ -187,25 +191,21 @@ fun AddSubscriptionScreen(navController: NavController) {
                     if (amountError) return@Button
                     vm.addSubscription(
                         subscriptionName, subscriptionAmount, subscriptionDate,
-                        expiryDate, reminderDate, context, selectedCategory,
+                        expiryDate, reminderDate, context, selectedCategory, selectedCycle,
                         onSuccess = { navController.navigateUp() }
                     )
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape    = RoundedCornerShape(12.dp),
-                colors   = ButtonDefaults.buttonColors(containerColor = AddCrimson)
+                shape  = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = AddCrimson)
             ) {
-                Text(
-                    "Save Subscription", color = AddGold, fontSize = 15.sp,
-                    fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold
-                )
+                Text("Save Subscription", color = AddGold, fontSize = 15.sp,
+                    fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
             }
 
             Spacer(Modifier.height(16.dp))
-            Text(
-                "© 2026 Trackify", fontSize = 11.sp, color = AddBorderIdle,
-                fontFamily = FontFamily.Monospace, modifier = Modifier.fillMaxWidth().wrapContentWidth()
-            )
+            Text("© 2026 Trackify", fontSize = 11.sp, color = AddBorderIdle,
+                fontFamily = FontFamily.Monospace, modifier = Modifier.fillMaxWidth().wrapContentWidth())
         }
     }
 }
@@ -215,11 +215,7 @@ private fun AddDateField(label: String, value: String, colors: TextFieldColors, 
     OutlinedTextField(
         value = value, onValueChange = {}, readOnly = true, label = { Text(label) },
         placeholder = { Text("DD/MM/YYYY", color = AddMuted) },
-        trailingIcon = {
-            IconButton(onClick = onPickerClick) {
-                Icon(Icons.Default.DateRange, "Pick $label", tint = AddGold)
-            }
-        },
+        trailingIcon = { IconButton(onClick = onPickerClick) { Icon(Icons.Default.DateRange, "Pick $label", tint = AddGold) } },
         colors = colors, modifier = Modifier.fillMaxWidth()
     )
 }

@@ -7,5 +7,7 @@ data class SubscriptionModel(
     val subscriptionDate: String = "",
     val expiryDate: String = "",
     val reminderDate: String = "",
-    val category: String = ""
+    val category: String = "",
+    val billingCycle: String = "Monthly",  // Monthly | Quarterly | Yearly | Weekly | Custom
+    val isActive: Boolean = true           // active / paused toggle
 )
