@@ -159,26 +159,35 @@ fun ProfileScreen(navController: NavController) {
     }
 
     // Edit Name
+    // Snapshot the name once when the dialog opens (stable key prevents re-init on recompose)
     if (showEditName) {
-        var draft by remember { mutableStateOf(profile.name) }
+        val initialName = remember(showEditName) { profile.name }
+        var draft by remember(showEditName) { mutableStateOf(initialName) }
         RetroDialog("Edit Name", { showEditName = false }, {
             profileVm.updateName(draft, context); showEditName = false
         }) {
-            OutlinedTextField(value = draft, onValueChange = { draft = it },
+            OutlinedTextField(
+                value = draft, onValueChange = { draft = it },
                 label = { Text("Display Name") }, singleLine = true,
-                colors = fColors, modifier = Modifier.fillMaxWidth())
+                placeholder = { Text("Enter your name", color = Muted) },
+                colors = fColors, modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 
     // Edit Email
     if (showEditEmail) {
-        var draft by remember { mutableStateOf(profile.email) }
+        val initialEmail = remember(showEditEmail) { profile.email }
+        var draft by remember(showEditEmail) { mutableStateOf(initialEmail) }
         RetroDialog("Edit Email", { showEditEmail = false }, {
             profileVm.updateEmail(draft, context); showEditEmail = false
         }) {
-            OutlinedTextField(value = draft, onValueChange = { draft = it },
+            OutlinedTextField(
+                value = draft, onValueChange = { draft = it },
                 label = { Text("Email Address") }, singleLine = true,
-                colors = fColors, modifier = Modifier.fillMaxWidth())
+                placeholder = { Text("Enter your email", color = Muted) },
+                colors = fColors, modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 

@@ -26,12 +26,29 @@ class SubscriptionViewModel : ViewModel() {
 
     private var listener: ValueEventListener? = null
 
-    init { fetchSubscriptions() }
+    // Auth state listener — re-fetches subscriptions when user signs in
+    private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        if (firebaseAuth.currentUser != null && listener == null) {
+            fetchSubscriptions()
+        } else if (firebaseAuth.currentUser == null) {
+            // User signed out — clear data and detach listener
+            listener?.let { db.child("Subscriptions").removeEventListener(it) }
+            listener = null
+            _subscriptions.value = emptyList()
+        }
+    }
+
+    init {
+        auth.addAuthStateListener(authStateListener)
+        // Also try immediately in case auth is already restored
+        if (auth.currentUser != null) fetchSubscriptions()
+    }
 
     private fun userRef() = auth.currentUser?.uid?.let { db.child("Subscriptions").child(it) }
 
     private fun fetchSubscriptions() {
         val ref = userRef() ?: return
+        if (listener != null) return   // already attached
         _isLoading.value = true
         listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -77,29 +94,40 @@ class SubscriptionViewModel : ViewModel() {
             }
         }
 
-        val id  = ref.push().key ?: return
-        val sub = SubscriptionModel(
-            id, subscriptionName.trim(), subscriptionAmount.trim(),
-            subscriptionDate, expiryDate, reminderDate, category
+        val id  = ref.push().key ?: run {
+            Toast.makeText(context, "Failed to generate ID. Check your connection.", Toast.LENGTH_LONG).show()
+            return
+        }
+        // Store without id field to keep Firebase node clean
+        val sub = mapOf(
+            "id"                 to id,
+            "subscriptionName"   to subscriptionName.trim(),
+            "subscriptionAmount" to subscriptionAmount.trim(),
+            "subscriptionDate"   to subscriptionDate,
+            "expiryDate"         to expiryDate,
+            "reminderDate"       to reminderDate,
+            "category"           to category
         )
 
         ref.child(id).setValue(sub)
             .addOnSuccessListener {
-                // Schedule notification using subscription ID as request code
                 if (reminderDate.isNotBlank()) {
                     NotificationHelper(context).scheduleForSubscription(id, subscriptionName.trim(), reminderDate)
                 }
                 Toast.makeText(context, "\"${subscriptionName.trim()}\" added successfully!", Toast.LENGTH_SHORT).show()
                 onSuccess()
             }
-            .addOnFailureListener {
-                Toast.makeText(context, "Failed to save subscription. Check your connection and try again.", Toast.LENGTH_LONG).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    context,
+                    "Failed to save: ${e.message ?: "Check your connection and try again."}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
     }
 
     fun deleteSubscription(id: String, context: Context? = null) {
         if (id.isBlank()) return
-        // Cancel any scheduled notification before deleting
         context?.let { NotificationHelper(it).cancelScheduledNotification(id.hashCode()) }
         userRef()?.child(id)?.removeValue()
             ?.addOnSuccessListener {
@@ -109,7 +137,7 @@ class SubscriptionViewModel : ViewModel() {
             }
             ?.addOnFailureListener {
                 context?.let { ctx ->
-                    Toast.makeText(ctx, "Could not delete subscription. Please try again.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(ctx, "Could not delete. Please try again.", Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -119,7 +147,6 @@ class SubscriptionViewModel : ViewModel() {
         userRef()?.child(subscription.id)?.setValue(subscription)
             ?.addOnSuccessListener {
                 context?.let { ctx ->
-                    // Cancel old notification and reschedule with updated details
                     val helper = NotificationHelper(ctx)
                     helper.cancelScheduledNotification(subscription.id.hashCode())
                     if (subscription.reminderDate.isNotBlank()) {
@@ -134,13 +161,14 @@ class SubscriptionViewModel : ViewModel() {
             }
             ?.addOnFailureListener {
                 context?.let { ctx ->
-                    Toast.makeText(ctx, "Could not update subscription. Please try again.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(ctx, "Could not update. Please try again.", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
     override fun onCleared() {
         super.onCleared()
+        auth.removeAuthStateListener(authStateListener)
         listener?.let { userRef()?.removeEventListener(it) }
     }
 }
