@@ -25,7 +25,7 @@ data class UserProfile(
 class ProfileViewModel : ViewModel() {
 
     private val auth     = FirebaseAuth.getInstance()
-    private val usersRef = FirebaseDatabase.getInstance().getReference("users")
+    private val usersRef = FirebaseDatabase.getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").getReference("users")
 
     private val _profile   = MutableStateFlow(UserProfile())
     val profile: StateFlow<UserProfile> = _profile.asStateFlow()

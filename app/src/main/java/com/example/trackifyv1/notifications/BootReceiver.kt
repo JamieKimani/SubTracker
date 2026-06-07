@@ -18,7 +18,7 @@ class BootReceiver : BroadcastReceiver() {
             FirebaseAuth.getInstance().currentUser?.uid
         } catch (_: Exception) { null } ?: return
 
-        val ref    = FirebaseDatabase.getInstance().getReference("Subscriptions").child(uid)
+        val ref    = FirebaseDatabase.getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").getReference("Subscriptions").child(uid)
         val helper = NotificationHelper(context)
 
         ref.addListenerForSingleValueEvent(object : ValueEventListener {

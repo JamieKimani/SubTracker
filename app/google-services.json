@@ -2,7 +2,8 @@
   "project_info": {
     "project_number": "1012390110692",
     "project_id": "trackify-aab65",
-    "storage_bucket": "trackify-aab65.firebasestorage.app"
+    "storage_bucket": "trackify-aab65.firebasestorage.app",
+    "firebase_url": "https://trackify-aab65-default-rtdb.firebaseio.com"
   },
   "client": [
     {
@@ -21,6 +22,9 @@
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": []
+        },
+        "firebase_database": {
+          "rules_file": "database.rules.json"
         }
       }
     }

@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class SubscriptionViewModel : ViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
-    private val db   = FirebaseDatabase.getInstance().reference
+    private val db   = FirebaseDatabase.getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").reference
 
     private val _subscriptions = MutableStateFlow<List<SubscriptionModel>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionModel>> = _subscriptions.asStateFlow()
@@ -26,13 +26,12 @@ class SubscriptionViewModel : ViewModel() {
 
     private var listener: ValueEventListener? = null
 
-    // Auth state listener — re-fetches subscriptions when user signs in
+    // Re-fetch when auth session restores (fixes "permission denied" on cold start)
     private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
         if (firebaseAuth.currentUser != null && listener == null) {
             fetchSubscriptions()
         } else if (firebaseAuth.currentUser == null) {
-            // User signed out — clear data and detach listener
-            listener?.let { db.child("Subscriptions").removeEventListener(it) }
+            listener?.let { userRef()?.removeEventListener(it) }
             listener = null
             _subscriptions.value = emptyList()
         }
@@ -40,7 +39,6 @@ class SubscriptionViewModel : ViewModel() {
 
     init {
         auth.addAuthStateListener(authStateListener)
-        // Also try immediately in case auth is already restored
         if (auth.currentUser != null) fetchSubscriptions()
     }
 
@@ -48,7 +46,7 @@ class SubscriptionViewModel : ViewModel() {
 
     private fun fetchSubscriptions() {
         val ref = userRef() ?: return
-        if (listener != null) return   // already attached
+        if (listener != null) return
         _isLoading.value = true
         listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -94,19 +92,14 @@ class SubscriptionViewModel : ViewModel() {
             }
         }
 
-        val id  = ref.push().key ?: run {
+        val id = ref.push().key ?: run {
             Toast.makeText(context, "Failed to generate ID. Check your connection.", Toast.LENGTH_LONG).show()
             return
         }
-        // Store without id field to keep Firebase node clean
-        val sub = mapOf(
-            "id"                 to id,
-            "subscriptionName"   to subscriptionName.trim(),
-            "subscriptionAmount" to subscriptionAmount.trim(),
-            "subscriptionDate"   to subscriptionDate,
-            "expiryDate"         to expiryDate,
-            "reminderDate"       to reminderDate,
-            "category"           to category
+
+        val sub = SubscriptionModel(
+            id, subscriptionName.trim(), subscriptionAmount.trim(),
+            subscriptionDate, expiryDate, reminderDate, category
         )
 
         ref.child(id).setValue(sub)
@@ -118,11 +111,14 @@ class SubscriptionViewModel : ViewModel() {
                 onSuccess()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(
-                    context,
-                    "Failed to save: ${e.message ?: "Check your connection and try again."}",
-                    Toast.LENGTH_LONG
-                ).show()
+                val msg = when {
+                    e.message?.contains("Permission denied", ignoreCase = true) == true ->
+                        "Permission denied. Please log out and log in again."
+                    e.message?.contains("network", ignoreCase = true) == true ->
+                        "No internet connection. Please check your network."
+                    else -> "Failed to save: ${e.message ?: "Unknown error"}"
+                }
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
             }
     }
 
@@ -131,14 +127,10 @@ class SubscriptionViewModel : ViewModel() {
         context?.let { NotificationHelper(it).cancelScheduledNotification(id.hashCode()) }
         userRef()?.child(id)?.removeValue()
             ?.addOnSuccessListener {
-                context?.let { ctx ->
-                    Toast.makeText(ctx, "Subscription deleted.", Toast.LENGTH_SHORT).show()
-                }
+                context?.let { Toast.makeText(it, "Subscription deleted.", Toast.LENGTH_SHORT).show() }
             }
             ?.addOnFailureListener {
-                context?.let { ctx ->
-                    Toast.makeText(ctx, "Could not delete. Please try again.", Toast.LENGTH_SHORT).show()
-                }
+                context?.let { Toast.makeText(it, "Could not delete. Please try again.", Toast.LENGTH_SHORT).show() }
             }
     }
 
@@ -151,18 +143,14 @@ class SubscriptionViewModel : ViewModel() {
                     helper.cancelScheduledNotification(subscription.id.hashCode())
                     if (subscription.reminderDate.isNotBlank()) {
                         helper.scheduleForSubscription(
-                            subscription.id,
-                            subscription.subscriptionName,
-                            subscription.reminderDate
+                            subscription.id, subscription.subscriptionName, subscription.reminderDate
                         )
                     }
                     Toast.makeText(ctx, "Subscription updated!", Toast.LENGTH_SHORT).show()
                 }
             }
             ?.addOnFailureListener {
-                context?.let { ctx ->
-                    Toast.makeText(ctx, "Could not update. Please try again.", Toast.LENGTH_SHORT).show()
-                }
+                context?.let { Toast.makeText(it, "Could not update. Please try again.", Toast.LENGTH_SHORT).show() }
             }
     }
 

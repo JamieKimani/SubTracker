@@ -23,7 +23,7 @@ import kotlinx.coroutines.tasks.await
 class AuthViewModel : ViewModel() {
 
     private val auth     = FirebaseAuth.getInstance()
-    private val usersRef = FirebaseDatabase.getInstance().getReference("users")
+    private val usersRef = FirebaseDatabase.getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").getReference("users")
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
