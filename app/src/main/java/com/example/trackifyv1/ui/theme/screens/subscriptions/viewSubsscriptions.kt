@@ -65,7 +65,7 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
     var query       by remember { mutableStateOf("") }
     var sortOrder   by remember { mutableStateOf(SortOrder.NEWEST) }
     var sortExpanded by remember { mutableStateOf(false) }
-    var filterActive by remember { mutableStateOf<Boolean?>(null) } // null=all, true=active, false=paused
+    var filterActive by remember { mutableStateOf<Boolean?>(null) }
 
     val displayed = allSubs
         .filter { sub ->
@@ -98,7 +98,7 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                     }
                 },
                 actions = {
-                    // Sort menu
+
                     Box {
                         IconButton(onClick = { sortExpanded = true }) {
                             Icon(Icons.Default.Sort, "Sort", tint = SubGold)
@@ -138,7 +138,7 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
     ) { padding ->
         Box(Modifier.fillMaxSize().background(gradientBg).padding(padding)) {
             Column(Modifier.fillMaxSize()) {
-                // ── Search bar ────────────────────────────────────────────────
+
                 OutlinedTextField(
                     value = query, onValueChange = { query = it },
                     placeholder = { Text("Search by name or category…", color = SubMuted, fontSize = 13.sp) },
@@ -155,7 +155,7 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
-                // ── Filter chips: All / Active / Paused ───────────────────────
+
                 Row(
                     Modifier.padding(horizontal = 16.dp).padding(bottom = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -185,7 +185,7 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                         modifier = Modifier.align(Alignment.CenterVertically))
                 }
 
-                // ── List ──────────────────────────────────────────────────────
+
                 if (displayed.isEmpty()) {
                     Column(
                         Modifier.fillMaxSize(),
@@ -250,7 +250,7 @@ fun SubscriptionCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            // Title row
+
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
@@ -279,7 +279,7 @@ fun SubscriptionCard(
                 }
             }
 
-            // Chips row
+
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (subscription.category.isNotBlank()) {
                     Box(Modifier.clip(RoundedCornerShape(20.dp)).background(chipColor.copy(alpha = 0.18f)).padding(horizontal = 8.dp, vertical = 2.dp)) {
@@ -298,7 +298,7 @@ fun SubscriptionCard(
                 valueColor = urgencyColor ?: Color.White)
             SubDetailRow("Reminder", subscription.reminderDate.ifBlank { "—" })
 
-            // Urgency banner + renew button
+
             AnimatedVisibility(visible = urgencyColor != null, enter = expandVertically(), exit = shrinkVertically()) {
                 Row(
                     Modifier.fillMaxWidth().background(urgencyColor?.copy(alpha = 0.1f) ?: Color.Transparent, RoundedCornerShape(8.dp)).padding(horizontal = 10.dp, vertical = 6.dp),
@@ -321,7 +321,7 @@ fun SubscriptionCard(
         }
     }
 
-    // ── Edit Dialog ──────────────────────────────────────────────────────────
+
     if (showEditDialog) {
         var editName    by remember { mutableStateOf(subscription.subscriptionName) }
         var editAmount  by remember { mutableStateOf(subscription.subscriptionAmount) }
@@ -398,7 +398,7 @@ fun SubscriptionCard(
         )
     }
 
-    // ── Delete Dialog ─────────────────────────────────────────────────────────
+
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },

@@ -33,7 +33,7 @@ class ProfileViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // Keep reference so we can remove listener in onCleared()
+
     private var profileListener: ValueEventListener? = null
     private var profileRef: DatabaseReference? = null
 
@@ -61,7 +61,7 @@ class ProfileViewModel : ViewModel() {
             }
             override fun onCancelled(error: DatabaseError) {
                 _isLoading.value = false
-                // Profile data unavailable — fall back to Firebase Auth data
+
                 _profile.value = UserProfile(
                     uid      = uid,
                     name     = auth.currentUser?.displayName ?: "",
@@ -128,7 +128,7 @@ class ProfileViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        // Remove listener to prevent memory leak
+
         profileListener?.let { profileRef?.removeEventListener(it) }
     }
 

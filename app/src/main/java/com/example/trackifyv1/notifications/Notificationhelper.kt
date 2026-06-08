@@ -65,7 +65,7 @@ class NotificationHelper(private val context: Context) {
         reminderTimeMillis: Long,
         requestCode: Int = title.hashCode()
     ) {
-        // Don't schedule if time is already passed
+
         if (reminderTimeMillis <= System.currentTimeMillis()) return
 
         val intent = Intent(context, ReminderBroadcastReceiver::class.java).apply {
@@ -85,7 +85,7 @@ class NotificationHelper(private val context: Context) {
                         AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
                     )
                 } else {
-                    // Fall back to inexact + prompt user to grant exact alarm permission
+
                     alarmManager.setAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
                     )
@@ -108,7 +108,7 @@ class NotificationHelper(private val context: Context) {
                 )
             }
         } catch (e: SecurityException) {
-            // Last resort fallback
+
             try {
                 alarmManager.setAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
@@ -119,12 +119,7 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    /**
-     * Schedule using a subscription's reminder date string (DD/MM/YYYY).
-     *
-     * Key fix: if the reminder date is TODAY and it's already past [REMINDER_HOUR],
-     * we fire the notification immediately rather than silently dropping it.
-     */
+
     fun scheduleForSubscription(
         subscriptionId: String,
         subscriptionName: String,
@@ -143,9 +138,9 @@ class NotificationHelper(private val context: Context) {
                 set(Calendar.MILLISECOND, 0)
             }
 
-            // If the scheduled time has already passed today, fire immediately
+
             if (cal.timeInMillis <= now.timeInMillis) {
-                // Only fire immediately if the reminder date is today or in the past
+
                 val isToday = cal.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
                         cal.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
                 val isPast  = cal.before(now)
@@ -156,7 +151,7 @@ class NotificationHelper(private val context: Context) {
                     )
                     return true
                 }
-                return false // future date, wrong time somehow
+                return false
             }
 
             scheduleNotification(
@@ -186,6 +181,6 @@ class NotificationHelper(private val context: Context) {
         const val CHANNEL_ID    = "trackify_reminders"
         const val EXTRA_TITLE   = "title"
         const val EXTRA_MESSAGE = "message"
-        const val REMINDER_HOUR = 9  // 9 AM — for future dates
+        const val REMINDER_HOUR = 9
     }
 }

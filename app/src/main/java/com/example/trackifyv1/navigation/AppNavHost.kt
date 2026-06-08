@@ -43,7 +43,7 @@ fun AppNavHost(
         }
 
         composable(ROUTE_DASHBOARD) {
-            // Block back button on dashboard — user must log out explicitly
+
             BackHandler(true) {}
             DashboardScreen(navController = navController)
         }

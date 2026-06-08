@@ -116,13 +116,13 @@ fun ProfileScreen(navController: NavController) {
             }
         }
 
-        // Stats row
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             StatCard(Modifier.weight(1f), "KES %.0f".format(monthlySpend), "Monthly")
             StatCard(Modifier.weight(1f), "KES %.0f".format(yearlySpend), "Yearly")
         }
 
-        // Settings section
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -158,8 +158,8 @@ fun ProfileScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth().wrapContentWidth())
     }
 
-    // Edit Name
-    // Snapshot the name once when the dialog opens (stable key prevents re-init on recompose)
+
+
     if (showEditName) {
         val initialName = remember(showEditName) { profile.name }
         var draft by remember(showEditName) { mutableStateOf(initialName) }
@@ -175,7 +175,7 @@ fun ProfileScreen(navController: NavController) {
         }
     }
 
-    // Edit Email
+
     if (showEditEmail) {
         val initialEmail = remember(showEditEmail) { profile.email }
         var draft by remember(showEditEmail) { mutableStateOf(initialEmail) }
@@ -191,7 +191,7 @@ fun ProfileScreen(navController: NavController) {
         }
     }
 
-    // Change Password
+
     if (showChangePassword) {
         var curPw    by remember { mutableStateOf("") }
         var newPw    by remember { mutableStateOf("") }
@@ -226,7 +226,7 @@ fun ProfileScreen(navController: NavController) {
         }
     }
 
-    // Logout confirm
+
     if (showLogoutConfirm) {
         AlertDialog(
             onDismissRequest = { showLogoutConfirm = false },

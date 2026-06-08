@@ -113,14 +113,14 @@ fun AddSubscriptionScreen(navController: NavController) {
                 Text("Subscription Details", color = AddGold,
                     fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
 
-                // Name
+
                 OutlinedTextField(
                     value = subscriptionName, onValueChange = { subscriptionName = it },
                     label = { Text("Subscription Name") }, singleLine = true,
                     colors = fieldColors, modifier = Modifier.fillMaxWidth()
                 )
 
-                // Amount
+
                 OutlinedTextField(
                     value = subscriptionAmount,
                     onValueChange = { subscriptionAmount = it; amountError = it.isNotBlank() && it.toDoubleOrNull() == null },
@@ -131,7 +131,7 @@ fun AddSubscriptionScreen(navController: NavController) {
                     colors = fieldColors, modifier = Modifier.fillMaxWidth()
                 )
 
-                // Billing cycle dropdown
+
                 ExposedDropdownMenuBox(expanded = cycleExpanded, onExpandedChange = { cycleExpanded = !cycleExpanded }) {
                     OutlinedTextField(
                         value = selectedCycle, onValueChange = {}, readOnly = true,
@@ -151,7 +151,7 @@ fun AddSubscriptionScreen(navController: NavController) {
                     }
                 }
 
-                // Category dropdown
+
                 ExposedDropdownMenuBox(expanded = categoryExpanded, onExpandedChange = { categoryExpanded = !categoryExpanded }) {
                     OutlinedTextField(
                         value = selectedCategory, onValueChange = {}, readOnly = true,

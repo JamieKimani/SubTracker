@@ -59,7 +59,6 @@ private val navItems = listOf(
     NavItem("Profile", Icons.Default.Person)
 )
 
-// ─── Helper: days until a DD/MM/YYYY date ────────────────────────────────────
 fun daysUntil(dateStr: String): Int? {
     if (dateStr.isBlank()) return null
     return try {
@@ -145,7 +144,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
         .mapValues { e -> e.value.sumOf { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 } }
     val counts       = activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }.mapValues { it.value.size }
 
-    // Upcoming: active subs with expiry within 30 days, sorted by soonest
+
     val upcoming = activeSubs
         .mapNotNull { sub ->
             val days = daysUntil(sub.expiryDate) ?: return@mapNotNull null
@@ -162,7 +161,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             .padding(top = 10.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // ── Header ────────────────────────────────────────────────────────────
+
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             Box(
                 Modifier.size(56.dp).background(Brush.linearGradient(listOf(Gold, Crimson)), RoundedCornerShape(12.dp)),
@@ -174,7 +173,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             }
         }
 
-        // ── 4-stat summary row ────────────────────────────────────────────────
+
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             SummaryCard(Modifier.weight(1f), "Active",   "${activeSubs.size}",             Gold)
             SummaryCard(Modifier.weight(1f), "Monthly",  "KES ${"%.0f".format(monthlyTotal)}", TealAccent)
@@ -182,7 +181,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             SummaryCard(Modifier.weight(1f), "Paused",   "${subs.size - activeSubs.size}", Muted)
         }
 
-        // ── Upcoming renewals (only shown when there are any) ─────────────────
+
         if (upcoming.isNotEmpty()) {
             SectionCard("⏰  Renewing soon") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -198,7 +197,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             }
         }
 
-        // ── Spend by category ─────────────────────────────────────────────────
+
         SectionCard("Spend by category") {
             if (counts.isEmpty()) {
                 Text("No subscriptions yet.\nTap + to add your first one.",
@@ -216,7 +215,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             }
         }
 
-        // ── Category share legend ──────────────────────────────────────────────
+
         if (counts.isNotEmpty()) {
             SectionCard("Category share") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -233,7 +232,7 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             }
         }
 
-        // ── Quick actions ─────────────────────────────────────────────────────
+
         SectionCard("Quick actions") {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(
@@ -254,13 +253,12 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
     }
 }
 
-// ── Upcoming renewal row ──────────────────────────────────────────────────────
 @Composable
 fun UpcomingRenewalRow(sub: SubscriptionModel, daysLeft: Int, onRenew: () -> Unit) {
     val urgencyColor = when {
-        daysLeft <= 3  -> Color(0xFFE53935)   // red — critical
-        daysLeft <= 7  -> Color(0xFFFF6D00)   // orange — soon
-        else           -> TealAccent           // teal — upcoming
+        daysLeft <= 3  -> Color(0xFFE53935)
+        daysLeft <= 7  -> Color(0xFFFF6D00)
+        else           -> TealAccent
     }
     val label = when (daysLeft) {
         0    -> "Today!"

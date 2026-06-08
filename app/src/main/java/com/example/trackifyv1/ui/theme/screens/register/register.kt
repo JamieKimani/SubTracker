@@ -155,7 +155,7 @@ fun RegisterScreen(navController: NavController) {
         Spacer(Modifier.height(12.dp))
 
         OutlinedButton(
-            onClick = { navController.navigate(ROUTE_LOGIN) },   // Fixed: was ROUTE_DASHBOARD
+            onClick = { navController.navigate(ROUTE_LOGIN) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             border = BorderStroke(1.dp, Color(0xFF4A3F6B)),

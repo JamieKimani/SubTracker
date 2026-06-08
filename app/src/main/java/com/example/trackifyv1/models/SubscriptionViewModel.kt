@@ -129,10 +129,7 @@ class SubscriptionViewModel : ViewModel() {
             ?.addOnFailureListener { context?.let { Toast.makeText(it, "Could not update. Please try again.", Toast.LENGTH_SHORT).show() } }
     }
 
-    /**
-     * Advance expiry + reminder dates by one billing cycle and reschedule notification.
-     * Called when user marks a subscription as renewed.
-     */
+
     fun renewSubscription(subscription: SubscriptionModel, context: Context) {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         fun advanceDate(dateStr: String, cycle: String): String {
@@ -156,9 +153,7 @@ class SubscriptionViewModel : ViewModel() {
         updateSubscription(renewed, context)
     }
 
-    /**
-     * Toggle active/paused state.
-     */
+
     fun toggleActive(subscription: SubscriptionModel, context: Context) {
         updateSubscription(subscription.copy(isActive = !subscription.isActive), context)
     }

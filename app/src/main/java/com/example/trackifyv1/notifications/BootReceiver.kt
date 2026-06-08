@@ -13,7 +13,7 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
 
-        // Firebase may not be fully initialised right after boot; catch any init error
+
         val uid = try {
             FirebaseAuth.getInstance().currentUser?.uid
         } catch (_: Exception) { null } ?: return
