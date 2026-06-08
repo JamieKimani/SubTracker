@@ -5,30 +5,27 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Teal arc ring (open, suggesting cycle/renewal) -->
-    <!-- Full circle path then trimmed via pathData arc segments -->
+    <!-- Teal renewal arc (open circle, arrow tip) -->
     <path
-        android:fillColor="#00000000"
-        android:strokeColor="#00C8A0"
-        android:strokeWidth="6.5"
+        android:strokeColor="#37DAB5"
+        android:strokeWidth="5.5"
         android:strokeLineCap="round"
-        android:pathData="M54,16
-            A38,38 0 1,1 25.1,67.5"
-        />
-
-    <!-- Arrow tip at end of arc -->
+        android:fillColor="#00000000"
+        android:pathData="M54,26
+            A28,28 0 1,1 33.2,67.6"/>
+    <!-- Arrow tip -->
     <path
-        android:fillColor="#00C8A0"
-        android:pathData="M21,60 L26,72 L34,64 Z"/>
+        android:fillColor="#37DAB5"
+        android:pathData="M28,60 L34,72 L41,63 Z"/>
 
     <!-- T crossbar -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M32,50 Q32,46 36,46 L72,46 Q76,46 76,50 L76,56 Q76,60 72,60 L36,60 Q32,60 32,56 Z"/>
+        android:pathData="M33,58 Q33,53 38,53 L70,53 Q75,53 75,58 L75,63 Q75,68 70,68 L38,68 Q33,68 33,63 Z"/>
 
     <!-- T stem -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M48,58 Q48,54 54,54 Q60,54 60,58 L60,84 Q60,88 54,88 Q48,88 48,84 Z"/>
+        android:pathData="M49,66 Q49,61 54,61 Q59,61 59,66 L59,88 Q59,93 54,93 Q49,93 49,88 Z"/>
 
 </vector>
