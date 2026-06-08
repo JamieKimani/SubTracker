@@ -2,13 +2,16 @@ package com.example.trackifyv1.ui.theme.screens.dashboard
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +21,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -32,9 +36,9 @@ import com.example.trackifyv1.models.SubscriptionModel
 import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
 import com.example.trackifyv1.ui.theme.screens.profile.ProfileScreen
+import com.example.trackifyv1.ui.theme.screens.subscriptions.SubscriptionCard
 import com.example.trackifyv1.ui.theme.screens.subscriptions.ViewSubscriptionsScreen
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 
 val Gold        = Color(0xFFD4A017)
@@ -51,6 +55,16 @@ val categoryColors = listOf(
     Color(0xFFD4A017), Color(0xFF8B0000), Color(0xFF00BCD4), Color(0xFF7C4DFF),
     Color(0xFF00E676), Color(0xFFFF6D00), Color(0xFFE91E63), Color(0xFF1DE9B6)
 )
+
+fun monthlyAmount(sub: SubscriptionModel): Double {
+    val amt = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
+    return when (sub.billingCycle) {
+        "Weekly"    -> amt * 4.33
+        "Quarterly" -> amt / 3.0
+        "Yearly"    -> amt / 12.0
+        else        -> amt
+    }
+}
 
 private data class NavItem(val label: String, val icon: ImageVector)
 private val navItems = listOf(
@@ -69,13 +83,23 @@ fun daysUntil(dateStr: String): Int? {
     } catch (_: Exception) { null }
 }
 
+enum class SheetFilter { MONTHLY, YEARLY, ACTIVE, PAUSED, NONE }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(navController: NavController) {
     var tab by remember { mutableStateOf(0) }
+    var sheetFilter by remember { mutableStateOf(SheetFilter.NONE) }
+    val sheetState  = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     Box(Modifier.fillMaxSize().background(AppGradient)) {
         Box(Modifier.fillMaxSize().padding(bottom = 90.dp)) {
             when (tab) {
-                0 -> DashboardTab(navController) { tab = 1 }
+                0 -> DashboardTab(
+                    navController      = navController,
+                    onViewSubscriptions = { tab = 1 },
+                    onStatCardTap      = { sheetFilter = it }
+                )
                 1 -> ViewSubscriptionsScreen(navController, isStandalone = false)
                 2 -> ProfileScreen(navController)
             }
@@ -99,13 +123,158 @@ fun DashboardScreen(navController: NavController) {
         }
         if (tab != 2) {
             FloatingActionButton(
-                onClick  = { navController.navigate(ROUTE_ADD_SUBSCRIPTION) },
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 44.dp),
+                onClick   = { navController.navigate(ROUTE_ADD_SUBSCRIPTION) },
+                modifier  = Modifier.align(Alignment.BottomCenter).padding(bottom = 44.dp),
                 containerColor = Crimson, contentColor = Gold,
-                shape    = RoundedCornerShape(14.dp),
+                shape     = RoundedCornerShape(14.dp),
                 elevation = FloatingActionButtonDefaults.elevation(10.dp)
             ) { Icon(Icons.Default.Add, "Add Subscription", Modifier.size(20.dp)) }
         }
+    }
+
+    if (sheetFilter != SheetFilter.NONE) {
+        SubscriptionDetailSheet(
+            filter     = sheetFilter,
+            sheetState = sheetState,
+            onDismiss  = { sheetFilter = SheetFilter.NONE }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubscriptionDetailSheet(
+    filter: SheetFilter,
+    sheetState: SheetState,
+    onDismiss: () -> Unit
+) {
+    val vm      = viewModel<SubscriptionViewModel>()
+    val context = LocalContext.current
+    val allSubs by vm.subscriptions.collectAsState()
+
+    val title = when (filter) {
+        SheetFilter.MONTHLY -> "Monthly Subscriptions"
+        SheetFilter.YEARLY  -> "Yearly Cost Breakdown"
+        SheetFilter.ACTIVE  -> "Active Subscriptions"
+        SheetFilter.PAUSED  -> "Paused Subscriptions"
+        SheetFilter.NONE    -> ""
+    }
+
+    val subs = when (filter) {
+        SheetFilter.MONTHLY, SheetFilter.YEARLY -> allSubs.filter { it.isActive }
+        SheetFilter.ACTIVE  -> allSubs.filter { it.isActive }
+        SheetFilter.PAUSED  -> allSubs.filter { !it.isActive }
+        SheetFilter.NONE    -> emptyList()
+    }
+
+    val total = when (filter) {
+        SheetFilter.MONTHLY -> subs.sumOf { monthlyAmount(it) }
+        SheetFilter.YEARLY  -> subs.sumOf { monthlyAmount(it) * 12 }
+        else                -> subs.sumOf { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 }
+    }
+
+    ModalBottomSheet(
+        onDismissRequest  = onDismiss,
+        sheetState        = sheetState,
+        containerColor    = Color(0xFF120D2E),
+        dragHandle        = {
+            Box(Modifier.fillMaxWidth().padding(vertical = 10.dp), Alignment.Center) {
+                Box(Modifier.width(40.dp).height(4.dp).clip(RoundedCornerShape(2.dp)).background(BorderIdle))
+            }
+        }
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 32.dp)
+        ) {
+            Row(
+                Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment     = Alignment.CenterVertically
+            ) {
+                Text(title, color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                IconButton(onClick = onDismiss, Modifier.size(32.dp)) {
+                    Icon(Icons.Default.Close, "Close", tint = Muted, modifier = Modifier.size(18.dp))
+                }
+            }
+
+            Text(
+                when (filter) {
+                    SheetFilter.MONTHLY -> "Total: KES ${"%.2f".format(total)} / mo"
+                    SheetFilter.YEARLY  -> "Total: KES ${"%.2f".format(total)} / yr"
+                    else                -> "${subs.size} subscription${if (subs.size != 1) "s" else ""}"
+                },
+                color = TealAccent, fontSize = 13.sp, fontFamily = FontFamily.Monospace,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            if (subs.isEmpty()) {
+                Box(Modifier.fillMaxWidth().padding(vertical = 32.dp), Alignment.Center) {
+                    Text("No subscriptions here yet.", color = Muted, fontFamily = FontFamily.Monospace)
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding      = PaddingValues(bottom = 16.dp)
+                ) {
+                    items(items = subs, key = { it.id }) { sub ->
+                        SwipeToDismissCard(
+                            onDelete = { vm.deleteSubscription(sub.id, context) }
+                        ) {
+                            SubscriptionCard(
+                                subscription  = sub,
+                                onDelete      = { ctx -> vm.deleteSubscription(sub.id, ctx) },
+                                onUpdate      = { updated, ctx -> vm.updateSubscription(updated, ctx) },
+                                onRenew       = { vm.renewSubscription(sub, context) },
+                                onTogglePause = { vm.toggleActive(sub, context) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SwipeToDismissCard(onDelete: () -> Unit, content: @Composable () -> Unit) {
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    val threshold = -220f
+
+    Box(Modifier.fillMaxWidth()) {
+        if (offsetX < -60f) {
+            Box(
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .width(72.dp)
+                    .height(72.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Crimson),
+                Alignment.Center
+            ) {
+                Icon(Icons.Default.Delete, "Delete", tint = Color.White, modifier = Modifier.size(22.dp))
+            }
+        }
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .offset(x = offsetX.coerceAtLeast(threshold).dp)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            if (offsetX < threshold) {
+                                onDelete()
+                            }
+                            offsetX = 0f
+                        },
+                        onHorizontalDrag = { _, delta ->
+                            offsetX = (offsetX + delta).coerceIn(threshold * 1.1f, 0f)
+                        }
+                    )
+                }
+        ) { content() }
     }
 }
 
@@ -124,26 +293,21 @@ private fun NavPill(item: NavItem, selected: Boolean, modifier: Modifier = Modif
 }
 
 @Composable
-fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) {
+fun DashboardTab(
+    navController: NavController,
+    onViewSubscriptions: () -> Unit,
+    onStatCardTap: (SheetFilter) -> Unit = {}
+) {
     val vm      = viewModel<SubscriptionViewModel>()
     val context = LocalContext.current
     val subs    by vm.subscriptions.collectAsState()
     val activeSubs = subs.filter { it.isActive }
 
-    val monthlyTotal = activeSubs.sumOf { sub ->
-        val amt = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
-        when (sub.billingCycle) {
-            "Weekly"    -> amt * 4.33
-            "Quarterly" -> amt / 3.0
-            "Yearly"    -> amt / 12.0
-            else        -> amt
-        }
-    }
+    val monthlyTotal = activeSubs.sumOf { monthlyAmount(it) }
     val annualTotal  = monthlyTotal * 12
     val amounts      = activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }
         .mapValues { e -> e.value.sumOf { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 } }
     val counts       = activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }.mapValues { it.value.size }
-
 
     val upcoming = activeSubs
         .mapNotNull { sub ->
@@ -161,7 +325,6 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             .padding(top = 10.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             Box(
                 Modifier.size(56.dp).background(Brush.linearGradient(listOf(Gold, Crimson)), RoundedCornerShape(12.dp)),
@@ -173,14 +336,12 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             }
         }
 
-
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            SummaryCard(Modifier.weight(1f), "Active",   "${activeSubs.size}",             Gold)
-            SummaryCard(Modifier.weight(1f), "Monthly",  "KES ${"%.0f".format(monthlyTotal)}", TealAccent)
-            SummaryCard(Modifier.weight(1f), "Yearly",   "KES ${"%.0f".format(annualTotal)}",  Color(0xFFFF6D00))
-            SummaryCard(Modifier.weight(1f), "Paused",   "${subs.size - activeSubs.size}", Muted)
+            TappableSummaryCard(Modifier.weight(1f), "Active",   "${activeSubs.size}",                    Gold,               { onStatCardTap(SheetFilter.ACTIVE) })
+            TappableSummaryCard(Modifier.weight(1f), "Monthly",  "KES ${"%.0f".format(monthlyTotal)}",   TealAccent,         { onStatCardTap(SheetFilter.MONTHLY) })
+            TappableSummaryCard(Modifier.weight(1f), "Yearly",   "KES ${"%.0f".format(annualTotal)}",    Color(0xFFFF6D00),  { onStatCardTap(SheetFilter.YEARLY) })
+            TappableSummaryCard(Modifier.weight(1f), "Paused",   "${subs.size - activeSubs.size}",       Muted,              { onStatCardTap(SheetFilter.PAUSED) })
         }
-
 
         if (upcoming.isNotEmpty()) {
             SectionCard("⏰  Renewing soon") {
@@ -196,7 +357,6 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
                 }
             }
         }
-
 
         SectionCard("Spend by category") {
             if (counts.isEmpty()) {
@@ -215,7 +375,6 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             }
         }
 
-
         if (counts.isNotEmpty()) {
             SectionCard("Category share") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -232,18 +391,17 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
             }
         }
 
-
         SectionCard("Quick actions") {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(
-                    onClick = { navController.navigate(ROUTE_ADD_SUBSCRIPTION) },
+                    onClick  = { navController.navigate(ROUTE_ADD_SUBSCRIPTION) },
                     modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Crimson)
+                    colors   = ButtonDefaults.buttonColors(containerColor = Crimson)
                 ) { Text("+ Add", color = Gold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) }
                 OutlinedButton(
-                    onClick = onViewSubscriptions, modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(10.dp), border = BorderStroke(1.dp, BorderIdle),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold)
+                    onClick  = onViewSubscriptions, modifier = Modifier.weight(1f),
+                    shape    = RoundedCornerShape(10.dp), border = BorderStroke(1.dp, BorderIdle),
+                    colors   = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold)
                 ) { Text("View All", fontFamily = FontFamily.Monospace) }
             }
         }
@@ -254,11 +412,40 @@ fun DashboardTab(navController: NavController, onViewSubscriptions: () -> Unit) 
 }
 
 @Composable
+fun TappableSummaryCard(modifier: Modifier, label: String, value: String, accent: Color, onClick: () -> Unit) {
+    Card(
+        onClick    = onClick,
+        modifier   = modifier,
+        shape      = RoundedCornerShape(12.dp),
+        colors     = CardDefaults.cardColors(containerColor = CardBg.copy(alpha = 0.85f)),
+        elevation  = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(label, color = Muted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+            Text(value, color = accent, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Icon(Icons.Default.ChevronRight, null, tint = accent.copy(alpha = 0.45f), modifier = Modifier.size(10.dp).align(Alignment.End))
+        }
+    }
+}
+
+@Composable
+fun SummaryCard(modifier: Modifier = Modifier, label: String, value: String, accent: Color) {
+    Box(modifier.background(CardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp)).padding(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(label, color = Muted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+            Text(value, color = accent, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+}
+
+@Composable
 fun UpcomingRenewalRow(sub: SubscriptionModel, daysLeft: Int, onRenew: () -> Unit) {
     val urgencyColor = when {
-        daysLeft <= 3  -> Color(0xFFE53935)
-        daysLeft <= 7  -> Color(0xFFFF6D00)
-        else           -> TealAccent
+        daysLeft <= 3 -> Color(0xFFE53935)
+        daysLeft <= 7 -> Color(0xFFFF6D00)
+        else          -> TealAccent
     }
     val label = when (daysLeft) {
         0    -> "Today!"
@@ -271,7 +458,7 @@ fun UpcomingRenewalRow(sub: SubscriptionModel, daysLeft: Int, onRenew: () -> Uni
             .background(urgencyColor.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment     = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
             Text(sub.subscriptionName, color = Color.White, fontFamily = FontFamily.Monospace,
@@ -290,17 +477,6 @@ fun UpcomingRenewalRow(sub: SubscriptionModel, daysLeft: Int, onRenew: () -> Uni
             ) {
                 Text("Mark renewed", color = TealAccent, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
             }
-        }
-    }
-}
-
-@Composable
-fun SummaryCard(modifier: Modifier = Modifier, label: String, value: String, accent: Color) {
-    Box(modifier.background(CardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp)).padding(10.dp)) {
-        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-            Text(label, color = Muted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-            Text(value, color = accent, fontSize = 13.sp, fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
