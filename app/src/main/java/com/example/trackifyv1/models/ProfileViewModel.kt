@@ -33,7 +33,6 @@ class ProfileViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-
     private var profileListener: ValueEventListener? = null
     private var profileRef: DatabaseReference? = null
 

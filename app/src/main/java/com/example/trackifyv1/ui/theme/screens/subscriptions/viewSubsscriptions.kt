@@ -155,7 +155,6 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
-
                 Row(
                     Modifier.padding(horizontal = 16.dp).padding(bottom = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -184,7 +183,6 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                         color = SubMuted, fontFamily = FontFamily.Monospace, fontSize = 11.sp,
                         modifier = Modifier.align(Alignment.CenterVertically))
                 }
-
 
                 if (displayed.isEmpty()) {
                     Column(
@@ -279,7 +277,6 @@ fun SubscriptionCard(
                 }
             }
 
-
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (subscription.category.isNotBlank()) {
                     Box(Modifier.clip(RoundedCornerShape(20.dp)).background(chipColor.copy(alpha = 0.18f)).padding(horizontal = 8.dp, vertical = 2.dp)) {
@@ -297,7 +294,6 @@ fun SubscriptionCard(
             SubDetailRow("Expiry",   subscription.expiryDate.ifBlank { "—" },
                 valueColor = urgencyColor ?: Color.White)
             SubDetailRow("Reminder", subscription.reminderDate.ifBlank { "—" })
-
 
             AnimatedVisibility(visible = urgencyColor != null, enter = expandVertically(), exit = shrinkVertically()) {
                 Row(
@@ -320,7 +316,6 @@ fun SubscriptionCard(
             }
         }
     }
-
 
     if (showEditDialog) {
         var editName    by remember { mutableStateOf(subscription.subscriptionName) }
@@ -397,7 +392,6 @@ fun SubscriptionCard(
             }
         )
     }
-
 
     if (showDeleteDialog) {
         AlertDialog(

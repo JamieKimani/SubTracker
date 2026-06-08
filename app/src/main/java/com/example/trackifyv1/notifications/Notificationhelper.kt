@@ -119,7 +119,6 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-
     fun scheduleForSubscription(
         subscriptionId: String,
         subscriptionName: String,
@@ -137,7 +136,6 @@ class NotificationHelper(private val context: Context) {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
-
 
             if (cal.timeInMillis <= now.timeInMillis) {
 

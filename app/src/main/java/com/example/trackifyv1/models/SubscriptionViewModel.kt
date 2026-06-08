@@ -30,35 +30,40 @@ class SubscriptionViewModel : ViewModel() {
     private var listener: ValueEventListener? = null
 
     private val authStateListener = FirebaseAuth.AuthStateListener { fa ->
-        if (fa.currentUser != null && listener == null) fetchSubscriptions()
+        if (fa.currentUser != null && listener == null) attach()
         else if (fa.currentUser == null) {
-            listener?.let { userRef()?.removeEventListener(it) }
-            listener = null
+            detach()
             _subscriptions.value = emptyList()
         }
     }
 
     init {
         auth.addAuthStateListener(authStateListener)
-        if (auth.currentUser != null) fetchSubscriptions()
+        if (auth.currentUser != null) attach()
     }
 
     private fun userRef() = auth.currentUser?.uid?.let { db.child("Subscriptions").child(it) }
 
-    private fun fetchSubscriptions() {
+    private fun attach() {
         val ref = userRef() ?: return
         if (listener != null) return
+        ref.keepSynced(true)
         _isLoading.value = true
         listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                _subscriptions.value = snapshot.children.mapNotNull { child ->
+            override fun onDataChange(snap: DataSnapshot) {
+                _subscriptions.value = snap.children.mapNotNull { child ->
                     child.getValue(SubscriptionModel::class.java)?.copy(id = child.key ?: "")
                 }
                 _isLoading.value = false
             }
-            override fun onCancelled(error: DatabaseError) { _isLoading.value = false }
+            override fun onCancelled(e: DatabaseError) { _isLoading.value = false }
         }
         ref.addValueEventListener(listener!!)
+    }
+
+    private fun detach() {
+        listener?.let { userRef()?.removeEventListener(it) }
+        listener = null
     }
 
     fun addSubscription(
@@ -72,37 +77,37 @@ class SubscriptionViewModel : ViewModel() {
         billingCycle: String = "Monthly",
         onSuccess: () -> Unit = {}
     ) {
-        val ref = userRef()
-        if (ref == null) {
-            Toast.makeText(context, "You must be logged in to add subscriptions.", Toast.LENGTH_LONG).show()
-            return
-        }
+        val ref = userRef() ?: run { toast(context, "You must be logged in."); return }
         when {
-            subscriptionName.isBlank() -> { Toast.makeText(context, "Please enter a subscription name.", Toast.LENGTH_SHORT).show(); return }
-            subscriptionAmount.isBlank() -> { Toast.makeText(context, "Please enter an amount.", Toast.LENGTH_SHORT).show(); return }
-            subscriptionAmount.toDoubleOrNull() == null -> { Toast.makeText(context, "Amount must be a valid number (e.g. 500 or 9.99).", Toast.LENGTH_SHORT).show(); return }
-            subscriptionAmount.toDouble() < 0 -> { Toast.makeText(context, "Amount cannot be negative.", Toast.LENGTH_SHORT).show(); return }
+            subscriptionName.isBlank()              -> { toast(context, "Please enter a subscription name."); return }
+            subscriptionAmount.isBlank()            -> { toast(context, "Please enter an amount."); return }
+            subscriptionAmount.toDoubleOrNull() == null -> { toast(context, "Amount must be a valid number."); return }
+            (subscriptionAmount.toDoubleOrNull() ?: 0.0) < 0 -> { toast(context, "Amount cannot be negative."); return }
         }
-        val id = ref.push().key ?: run {
-            Toast.makeText(context, "Failed to generate ID. Check your connection.", Toast.LENGTH_LONG).show(); return
-        }
+        val id  = ref.push().key ?: run { toast(context, "Connection error. Try again."); return }
         val sub = SubscriptionModel(
-            id, subscriptionName.trim(), subscriptionAmount.trim(),
-            subscriptionDate, expiryDate, reminderDate, category, billingCycle, true
+            id                 = id,
+            subscriptionName   = subscriptionName.trim(),
+            subscriptionAmount = subscriptionAmount.trim(),
+            subscriptionDate   = subscriptionDate,
+            expiryDate         = expiryDate,
+            reminderDate       = reminderDate,
+            category           = category,
+            billingCycle       = billingCycle,
+            isActive           = true
         )
         ref.child(id).setValue(sub)
             .addOnSuccessListener {
                 if (reminderDate.isNotBlank())
                     NotificationHelper(context).scheduleForSubscription(id, subscriptionName.trim(), reminderDate)
-                Toast.makeText(context, "\"${subscriptionName.trim()}\" added successfully!", Toast.LENGTH_SHORT).show()
+                toast(context, "\"${subscriptionName.trim()}\" added!")
                 onSuccess()
             }
             .addOnFailureListener { e ->
-                val msg = when {
-                    e.message?.contains("Permission denied", true) == true -> "Permission denied. Log out and log in again."
-                    else -> "Failed to save: ${e.message ?: "Check your connection."}"
-                }
-                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                val msg = if (e.message?.contains("Permission denied", true) == true)
+                    "Permission denied. Log out and log in again."
+                else "Failed to save. Check your connection."
+                toast(context, msg)
             }
     }
 
@@ -110,35 +115,33 @@ class SubscriptionViewModel : ViewModel() {
         if (id.isBlank()) return
         context?.let { NotificationHelper(it).cancelScheduledNotification(id.hashCode()) }
         userRef()?.child(id)?.removeValue()
-            ?.addOnSuccessListener { context?.let { Toast.makeText(it, "Subscription deleted.", Toast.LENGTH_SHORT).show() } }
-            ?.addOnFailureListener { context?.let { Toast.makeText(it, "Could not delete. Please try again.", Toast.LENGTH_SHORT).show() } }
+            ?.addOnSuccessListener { context?.let { toast(it, "Subscription deleted.") } }
+            ?.addOnFailureListener { context?.let { toast(it, "Could not delete. Try again.") } }
     }
 
-    fun updateSubscription(subscription: SubscriptionModel, context: Context? = null) {
-        if (subscription.id.isBlank()) return
-        userRef()?.child(subscription.id)?.setValue(subscription)
+    fun updateSubscription(sub: SubscriptionModel, context: Context? = null) {
+        if (sub.id.isBlank()) return
+        userRef()?.child(sub.id)?.setValue(sub)
             ?.addOnSuccessListener {
                 context?.let { ctx ->
-                    val helper = NotificationHelper(ctx)
-                    helper.cancelScheduledNotification(subscription.id.hashCode())
-                    if (subscription.reminderDate.isNotBlank())
-                        helper.scheduleForSubscription(subscription.id, subscription.subscriptionName, subscription.reminderDate)
-                    Toast.makeText(ctx, "Subscription updated!", Toast.LENGTH_SHORT).show()
+                    val h = NotificationHelper(ctx)
+                    h.cancelScheduledNotification(sub.id.hashCode())
+                    if (sub.reminderDate.isNotBlank())
+                        h.scheduleForSubscription(sub.id, sub.subscriptionName, sub.reminderDate)
+                    toast(ctx, "Subscription updated!")
                 }
             }
-            ?.addOnFailureListener { context?.let { Toast.makeText(it, "Could not update. Please try again.", Toast.LENGTH_SHORT).show() } }
+            ?.addOnFailureListener { context?.let { toast(it, "Could not update. Try again.") } }
     }
 
-
-    fun renewSubscription(subscription: SubscriptionModel, context: Context) {
+    fun renewSubscription(sub: SubscriptionModel, context: Context) {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        fun advanceDate(dateStr: String, cycle: String): String {
+        fun advance(dateStr: String): String {
             if (dateStr.isBlank()) return dateStr
             return try {
                 val cal = Calendar.getInstance().apply { time = sdf.parse(dateStr)!! }
-                when (cycle) {
+                when (sub.billingCycle) {
                     "Weekly"    -> cal.add(Calendar.WEEK_OF_YEAR, 1)
-                    "Monthly"   -> cal.add(Calendar.MONTH, 1)
                     "Quarterly" -> cal.add(Calendar.MONTH, 3)
                     "Yearly"    -> cal.add(Calendar.YEAR, 1)
                     else        -> cal.add(Calendar.MONTH, 1)
@@ -146,21 +149,17 @@ class SubscriptionViewModel : ViewModel() {
                 sdf.format(cal.time)
             } catch (_: Exception) { dateStr }
         }
-        val renewed = subscription.copy(
-            expiryDate   = advanceDate(subscription.expiryDate,   subscription.billingCycle),
-            reminderDate = advanceDate(subscription.reminderDate, subscription.billingCycle)
-        )
-        updateSubscription(renewed, context)
+        updateSubscription(sub.copy(expiryDate = advance(sub.expiryDate), reminderDate = advance(sub.reminderDate)), context)
     }
 
-
-    fun toggleActive(subscription: SubscriptionModel, context: Context) {
-        updateSubscription(subscription.copy(isActive = !subscription.isActive), context)
-    }
+    fun toggleActive(sub: SubscriptionModel, context: Context) =
+        updateSubscription(sub.copy(isActive = !sub.isActive), context)
 
     override fun onCleared() {
         super.onCleared()
         auth.removeAuthStateListener(authStateListener)
-        listener?.let { userRef()?.removeEventListener(it) }
+        detach()
     }
+
+    private fun toast(context: Context, msg: String) = Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 }

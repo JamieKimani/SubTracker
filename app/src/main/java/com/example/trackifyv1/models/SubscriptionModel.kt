@@ -1,7 +1,11 @@
 package com.example.trackifyv1.models
 
+import com.google.firebase.database.Exclude
+import com.google.firebase.database.IgnoreExtraProperties
+
+@IgnoreExtraProperties
 data class SubscriptionModel(
-    val id: String = "",
+    @get:Exclude val id: String = "",
     val subscriptionName: String = "",
     val subscriptionAmount: String = "",
     val subscriptionDate: String = "",
