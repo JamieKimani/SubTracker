@@ -1,6 +1,9 @@
 package com.example.trackifyv1.ui.theme.screens.login
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +43,14 @@ fun LoginScreen(navController: NavController) {
     var password        by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
+    val googleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            viewModel.handleGoogleSignInResult(result.data, navController, context)
+        }
+    }
+
     val fieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Gold, unfocusedBorderColor = BorderIdle,
         focusedTextColor = Color.White, unfocusedTextColor = Color.White,
@@ -72,9 +83,11 @@ fun LoginScreen(navController: NavController) {
         ) {
             Text("Your Information", color = Gold, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace)
 
-            OutlinedTextField(value = email, onValueChange = { email = it },
+            OutlinedTextField(
+                value = email, onValueChange = { email = it },
                 label = { Text("Email") }, singleLine = true,
-                modifier = Modifier.fillMaxWidth(), colors = fieldColors, enabled = !isLoading)
+                modifier = Modifier.fillMaxWidth(), colors = fieldColors, enabled = !isLoading
+            )
 
             OutlinedTextField(
                 value = password, onValueChange = { password = it },
@@ -82,8 +95,11 @@ fun LoginScreen(navController: NavController) {
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (passwordVisible) "Hide" else "Show", tint = Gold)
+                        Icon(
+                            if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (passwordVisible) "Hide" else "Show",
+                            tint = Gold
+                        )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(), colors = fieldColors, enabled = !isLoading
@@ -93,17 +109,19 @@ fun LoginScreen(navController: NavController) {
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { viewModel.login(email, password, navController, context) },
+            onClick  = { viewModel.login(email, password, navController, context) },
             modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Crimson),
-            enabled = !isLoading
+            shape    = RoundedCornerShape(12.dp),
+            colors   = ButtonDefaults.buttonColors(containerColor = Crimson),
+            enabled  = !isLoading
         ) {
-            if (isLoading) CircularProgressIndicator(color = Gold, modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
-            else Text("Login", color = Gold, fontSize = 16.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+            if (isLoading)
+                CircularProgressIndicator(color = Gold, modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+            else
+                Text("Login", color = Gold, fontSize = 16.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             HorizontalDivider(Modifier.weight(1f), color = BorderIdle.copy(alpha = 0.5f))
@@ -111,15 +129,15 @@ fun LoginScreen(navController: NavController) {
             HorizontalDivider(Modifier.weight(1f), color = BorderIdle.copy(alpha = 0.5f))
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
         OutlinedButton(
-            onClick = { viewModel.signInWithGoogle(navController, context) },
+            onClick  = { googleLauncher.launch(viewModel.getGoogleSignInIntent(context)) },
             modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderIdle),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = CardBg, contentColor = Color.White),
-            enabled = !isLoading
+            shape    = RoundedCornerShape(12.dp),
+            border   = androidx.compose.foundation.BorderStroke(1.dp, BorderIdle),
+            colors   = ButtonDefaults.outlinedButtonColors(containerColor = CardBg, contentColor = Color.White),
+            enabled  = !isLoading
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("G", color = Color(0xFF4285F4), fontSize = 20.sp, fontWeight = FontWeight.Bold)

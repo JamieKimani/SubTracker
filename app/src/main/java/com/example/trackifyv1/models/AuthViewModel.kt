@@ -1,19 +1,17 @@
 package com.example.trackifyv1.models
 
 import android.content.Context
+import android.content.Intent
 import android.util.Patterns
 import android.widget.Toast
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.trackifyv1.navigation.ROUTE_DASHBOARD
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -41,14 +39,62 @@ class AuthViewModel : ViewModel() {
         const val WEB_CLIENT_ID = "1012390110692-5fffhm18to5qfbp8cd4di964v1rhaa2f.apps.googleusercontent.com"
     }
 
+    fun getGoogleSignInIntent(context: Context): Intent {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(WEB_CLIENT_ID)
+            .requestEmail()
+            .requestProfile()
+            .build()
+        val client = GoogleSignIn.getClient(context, gso)
+        client.signOut()
+        return client.signInIntent
+    }
+
+    fun handleGoogleSignInResult(intent: Intent?, navController: NavController, context: Context) {
+        _isLoading.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val task    = GoogleSignIn.getSignedInAccountFromIntent(intent)
+                val account = task.getResult(ApiException::class.java)
+                val idToken = account.idToken ?: throw Exception("No ID token received from Google.")
+                val credential  = GoogleAuthProvider.getCredential(idToken, null)
+                val authResult  = auth.signInWithCredential(credential).await()
+                val user        = authResult.user ?: throw Exception("Firebase user is null after sign-in.")
+                val isNew       = authResult.additionalUserInfo?.isNewUser == true
+                if (isNew) {
+                    usersRef.child(user.uid).setValue(
+                        UserModel(id = user.uid, name = user.displayName ?: "", email = user.email ?: "")
+                    ).await()
+                }
+                val firstName = user.displayName?.split(" ")?.firstOrNull() ?: ""
+                launch(Dispatchers.Main) {
+                    toast(context, "Welcome${if (isNew) "" else " back"}${if (firstName.isNotBlank()) ", $firstName" else ""}!")
+                    navController.navigate(ROUTE_DASHBOARD) { popUpTo(ROUTE_LOGIN) { inclusive = true } }
+                }
+            } catch (e: ApiException) {
+                val msg = when (e.statusCode) {
+                    12501 -> "Google Sign-In was cancelled."
+                    12502 -> "Google Sign-In is currently in progress."
+                    10    -> "Developer error: check SHA-1 fingerprint in Firebase Console."
+                    else  -> "Google Sign-In failed (code ${e.statusCode}). Try again."
+                }
+                launch(Dispatchers.Main) { toast(context, msg) }
+            } catch (e: Exception) {
+                launch(Dispatchers.Main) { toast(context, "Sign-in failed: ${e.message ?: "Unknown error"}") }
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun register(name: String, email: String, password: String, confirmPassword: String, navController: NavController, context: Context) {
         when {
-            name.isBlank()                -> { toast(context, "Enter your name"); return }
-            email.isBlank()               -> { toast(context, "Enter your email"); return }
+            name.isBlank()                           -> { toast(context, "Enter your name"); return }
+            email.isBlank()                          -> { toast(context, "Enter your email"); return }
             !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> { toast(context, "Enter a valid email address"); return }
-            password.isBlank()            -> { toast(context, "Enter a password"); return }
-            password.length < 6           -> { toast(context, "Password must be at least 6 characters"); return }
-            password != confirmPassword   -> { toast(context, "Passwords do not match"); return }
+            password.isBlank()                       -> { toast(context, "Enter a password"); return }
+            password.length < 6                      -> { toast(context, "Password must be at least 6 characters"); return }
+            password != confirmPassword              -> { toast(context, "Passwords do not match"); return }
         }
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
@@ -65,7 +111,7 @@ class AuthViewModel : ViewModel() {
                     is FirebaseAuthWeakPasswordException       -> "Password is too weak."
                     is FirebaseAuthUserCollisionException      -> "An account with this email already exists."
                     is FirebaseAuthInvalidCredentialsException -> "Invalid email address."
-                    else -> "Registration failed. Check your connection."
+                    else                                       -> "Registration failed. Check your connection."
                 }
                 launch(Dispatchers.Main) { toast(context, msg) }
             } finally { _isLoading.value = false }
@@ -89,49 +135,9 @@ class AuthViewModel : ViewModel() {
                 val msg = when (e) {
                     is FirebaseAuthInvalidUserException        -> "No account found with this email."
                     is FirebaseAuthInvalidCredentialsException -> "Incorrect password."
-                    else -> "Login failed. Check your connection."
+                    else                                       -> "Login failed. Check your connection."
                 }
                 launch(Dispatchers.Main) { toast(context, msg) }
-            } finally { _isLoading.value = false }
-        }
-    }
-
-    fun signInWithGoogle(navController: NavController, context: Context) {
-        
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                val credentialManager = CredentialManager.create(context)
-                val googleIdOption    = GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(WEB_CLIENT_ID)
-                    .setAutoSelectEnabled(false)
-                    .build()
-                val request  = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
-                val result   = credentialManager.getCredential(context = context, request = request)
-                val credential = result.credential
-                if (credential is CustomCredential &&
-                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-                ) {
-                    val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                    val firebaseCredential = GoogleAuthProvider.getCredential(googleCredential.idToken, null)
-                    val authResult = auth.signInWithCredential(firebaseCredential).await()
-                    val user = authResult.user ?: return@launch
-                    val isNew = authResult.additionalUserInfo?.isNewUser == true
-                    if (isNew) {
-                        usersRef.child(user.uid).setValue(
-                            UserModel(id = user.uid, name = user.displayName ?: "", email = user.email ?: "")
-                        ).await()
-                    }
-                    toast(context, "Welcome${if (isNew) "" else " back"}, ${user.displayName?.split(" ")?.firstOrNull() ?: ""}!")
-                    navController.navigate(ROUTE_DASHBOARD) { popUpTo(ROUTE_LOGIN) { inclusive = true } }
-                } else {
-                    toast(context, "Unexpected credential type. Try again.")
-                }
-            } catch (e: GetCredentialException) {
-                toast(context, "Google Sign-In cancelled or unavailable.")
-            } catch (e: Exception) {
-                toast(context, "Google Sign-In failed: ${e.message ?: "Unknown error"}")
             } finally { _isLoading.value = false }
         }
     }

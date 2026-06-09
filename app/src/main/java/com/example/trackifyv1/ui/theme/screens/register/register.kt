@@ -1,6 +1,9 @@
 package com.example.trackifyv1.ui.theme.screens.register
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,8 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import com.example.trackifyv1.ui.theme.TealAccent
-import com.example.trackifyv1.ui.theme.CardBg
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,53 +40,54 @@ fun RegisterScreen(navController: NavController) {
     val viewModel        = viewModel<AuthViewModel>()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
-    var name           by remember { mutableStateOf("") }
-    var email          by remember { mutableStateOf("") }
-    var password       by remember { mutableStateOf("") }
-    var confirmPw      by remember { mutableStateOf("") }
-    var showPw         by remember { mutableStateOf(false) }
-    var showConfirmPw  by remember { mutableStateOf(false) }
+    var name          by remember { mutableStateOf("") }
+    var email         by remember { mutableStateOf("") }
+    var password      by remember { mutableStateOf("") }
+    var confirmPw     by remember { mutableStateOf("") }
+    var showPw        by remember { mutableStateOf(false) }
+    var showConfirmPw by remember { mutableStateOf(false) }
 
     val pwMismatch = confirmPw.isNotBlank() && confirmPw != password
 
+    val googleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            viewModel.handleGoogleSignInResult(result.data, navController, context)
+        }
+    }
+
     val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor      = Gold,         unfocusedBorderColor    = BorderIdle,
-        focusedTextColor        = Color.White,  unfocusedTextColor      = Color.White,
-        focusedContainerColor   = Color.Transparent, unfocusedContainerColor = Color.Transparent,
-        cursorColor             = Gold,         focusedLabelColor       = Gold,
-        unfocusedLabelColor     = Muted
+        focusedBorderColor = Gold, unfocusedBorderColor = BorderIdle,
+        focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+        focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
+        cursorColor = Gold, focusedLabelColor = Gold, unfocusedLabelColor = Muted
     )
 
     Column(
-        modifier            = Modifier.fillMaxSize().background(AppGradient)
+        modifier = Modifier.fillMaxSize().background(AppGradient)
             .statusBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(20.dp))
 
         Box(
-            modifier         = Modifier.size(80.dp)
+            modifier = Modifier.size(80.dp)
                 .background(Brush.linearGradient(listOf(Gold, Crimson)), RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
         ) { Text("TK", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold) }
 
         Spacer(Modifier.height(12.dp))
-
-        Text("Create Account", fontSize = 24.sp, fontWeight = FontWeight.Bold,
-            color = Gold, fontFamily = FontFamily.Monospace)
-        Text("Sign up to start tracking", fontSize = 14.sp, color = Muted,
-            fontFamily = FontFamily.Monospace)
-
+        Text("Create Account", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Gold, fontFamily = FontFamily.Monospace)
+        Text("Sign up to start tracking", fontSize = 14.sp, color = Muted, fontFamily = FontFamily.Monospace)
         Spacer(Modifier.height(20.dp))
 
         Column(
             modifier = Modifier.fillMaxWidth()
-                .background(CardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
-                .padding(16.dp),
+                .background(CardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp)).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Personal Details", color = Gold, fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Monospace)
+            Text("Personal Details", color = Gold, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace)
 
             OutlinedTextField(value = name, onValueChange = { name = it },
                 label = { Text("Full Name") }, singleLine = true,
@@ -136,11 +138,10 @@ fun RegisterScreen(navController: NavController) {
             if (isLoading)
                 CircularProgressIndicator(color = Gold, modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
             else
-                Text("Register", color = Gold, fontSize = 16.sp,
-                    fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                Text("Register", color = Gold, fontSize = 16.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             HorizontalDivider(Modifier.weight(1f), color = BorderIdle.copy(alpha = 0.5f))
@@ -148,15 +149,15 @@ fun RegisterScreen(navController: NavController) {
             HorizontalDivider(Modifier.weight(1f), color = BorderIdle.copy(alpha = 0.5f))
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
         OutlinedButton(
-            onClick = { viewModel.signInWithGoogle(navController, context) },
+            onClick  = { googleLauncher.launch(viewModel.getGoogleSignInIntent(context)) },
             modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderIdle),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = CardBg, contentColor = Color.White),
-            enabled = !isLoading
+            shape    = RoundedCornerShape(12.dp),
+            border   = androidx.compose.foundation.BorderStroke(1.dp, BorderIdle),
+            colors   = ButtonDefaults.outlinedButtonColors(containerColor = CardBg, contentColor = Color.White),
+            enabled  = !isLoading
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("G", color = Color(0xFF4285F4), fontSize = 20.sp, fontWeight = FontWeight.Bold)
