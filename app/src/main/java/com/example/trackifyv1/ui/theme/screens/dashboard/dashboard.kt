@@ -35,22 +35,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.trackifyv1.models.SubscriptionModel
 import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
+import com.example.trackifyv1.ui.theme.AppGradient
+import com.example.trackifyv1.ui.theme.BorderIdle
+import com.example.trackifyv1.ui.theme.CardBg
+import com.example.trackifyv1.ui.theme.Crimson
+import com.example.trackifyv1.ui.theme.DarkGreen
+import com.example.trackifyv1.ui.theme.DarkPurple
+import com.example.trackifyv1.ui.theme.DarkYellow
+import com.example.trackifyv1.ui.theme.Gold
+import com.example.trackifyv1.ui.theme.Muted
+import com.example.trackifyv1.ui.theme.NavBg
+import com.example.trackifyv1.ui.theme.TealAccent
 import com.example.trackifyv1.ui.theme.screens.profile.ProfileScreen
 import com.example.trackifyv1.ui.theme.screens.subscriptions.SubscriptionCard
 import com.example.trackifyv1.ui.theme.screens.subscriptions.ViewSubscriptionsScreen
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-val Gold        = Color(0xFFD4A017)
-val Crimson     = Color(0xFF8B0000)
-val DarkPurple  = Color(0xFF1A0533)
-val DarkGreen   = Color(0xFF0D2B1A)
-val DarkYellow  = Color(0xFF1A1A00)
-val CardBg      = Color(0xFF1C1C1C)
-val Muted       = Color(0xFF9E9E9E)
-val BorderIdle  = Color(0xFF4A3F6B)
-val TealAccent  = Color(0xFF00C8A0)
-val AppGradient = Brush.verticalGradient(listOf(Color(0xFF1A0533), Color(0xFF0D2B1A), Color(0xFF1A1A00)))
 val categoryColors = listOf(
     Color(0xFFD4A017), Color(0xFF8B0000), Color(0xFF00BCD4), Color(0xFF7C4DFF),
     Color(0xFF00E676), Color(0xFFFF6D00), Color(0xFFE91E63), Color(0xFF1DE9B6)
@@ -111,7 +112,7 @@ fun DashboardScreen(navController: NavController) {
                 .fillMaxWidth().height(62.dp)
                 .shadow(12.dp, RoundedCornerShape(31.dp))
                 .clip(RoundedCornerShape(31.dp))
-                .background(Color(0xFF120D2E))
+                .background(NavBg)
         ) {
             Row(Modifier.fillMaxSize().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 NavPill(navItems[0], tab == 0, Modifier.weight(1f)) { tab = 0 }
@@ -176,7 +177,7 @@ fun SubscriptionDetailSheet(
     ModalBottomSheet(
         onDismissRequest  = onDismiss,
         sheetState        = sheetState,
-        containerColor    = Color(0xFF120D2E),
+        containerColor    = NavBg,
         dragHandle        = {
             Box(Modifier.fillMaxWidth().padding(vertical = 10.dp), Alignment.Center) {
                 Box(Modifier.width(40.dp).height(4.dp).clip(RoundedCornerShape(2.dp)).background(BorderIdle))

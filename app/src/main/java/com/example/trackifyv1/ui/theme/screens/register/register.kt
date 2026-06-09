@@ -1,7 +1,6 @@
 package com.example.trackifyv1.ui.theme.screens.register
 
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -30,69 +29,60 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.trackifyv1.models.AuthViewModel
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
+import com.example.trackifyv1.ui.theme.*
 
 @Composable
 fun RegisterScreen(navController: NavController) {
     val context: Context = LocalContext.current
-    val viewModel: AuthViewModel = viewModel()
+    val viewModel        = viewModel<AuthViewModel>()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
-    var name            by remember { mutableStateOf("") }
-    var email           by remember { mutableStateOf("") }
-    var password        by remember { mutableStateOf("") }
-    var confirmpassword by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var confirmVisible  by remember { mutableStateOf(false) }
+    var name           by remember { mutableStateOf("") }
+    var email          by remember { mutableStateOf("") }
+    var password       by remember { mutableStateOf("") }
+    var confirmPw      by remember { mutableStateOf("") }
+    var showPw         by remember { mutableStateOf(false) }
+    var showConfirmPw  by remember { mutableStateOf(false) }
+
+    val pwMismatch = confirmPw.isNotBlank() && confirmPw != password
 
     val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor      = Color(0xFFD4A017),
-        unfocusedBorderColor    = Color(0xFF4A3F6B),
-        focusedTextColor        = Color.White,
-        unfocusedTextColor      = Color.White,
-        focusedContainerColor   = Color.Transparent,
-        unfocusedContainerColor = Color.Transparent,
-        cursorColor             = Color(0xFFD4A017),
-        focusedLabelColor       = Color(0xFFD4A017),
-        unfocusedLabelColor     = Color(0xFF9E9E9E)
+        focusedBorderColor      = Gold,         unfocusedBorderColor    = BorderIdle,
+        focusedTextColor        = Color.White,  unfocusedTextColor      = Color.White,
+        focusedContainerColor   = Color.Transparent, unfocusedContainerColor = Color.Transparent,
+        cursorColor             = Gold,         focusedLabelColor       = Gold,
+        unfocusedLabelColor     = Muted
     )
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFF1A0533), Color(0xFF0D2B1A), Color(0xFF1A1A00))))
-            .statusBarsPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+        modifier            = Modifier.fillMaxSize().background(AppGradient)
+            .statusBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(20.dp))
 
         Box(
-            modifier = Modifier
-                .size(80.dp)
-                .background(Brush.linearGradient(listOf(Color(0xFFD4A017), Color(0xFF8B0000))), RoundedCornerShape(16.dp)),
+            modifier         = Modifier.size(80.dp)
+                .background(Brush.linearGradient(listOf(Gold, Crimson)), RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.Center
-        ) {
-            Text("TK", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
-        }
+        ) { Text("TK", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold) }
 
         Spacer(Modifier.height(12.dp))
 
         Text("Create Account", fontSize = 24.sp, fontWeight = FontWeight.Bold,
-            color = Color(0xFFD4A017), fontFamily = FontFamily.Monospace)
-        Text("Sign up to start tracking", fontSize = 14.sp, color = Color(0xFF9E9E9E),
+            color = Gold, fontFamily = FontFamily.Monospace)
+        Text("Sign up to start tracking", fontSize = 14.sp, color = Muted,
             fontFamily = FontFamily.Monospace)
 
         Spacer(Modifier.height(20.dp))
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF1C1C1C).copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+            modifier = Modifier.fillMaxWidth()
+                .background(CardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Personal Details", color = Color(0xFFD4A017), fontWeight = FontWeight.SemiBold,
+            Text("Personal Details", color = Gold, fontWeight = FontWeight.SemiBold,
                 fontFamily = FontFamily.Monospace)
 
             OutlinedTextField(value = name, onValueChange = { name = it },
@@ -106,29 +96,26 @@ fun RegisterScreen(navController: NavController) {
             OutlinedTextField(
                 value = password, onValueChange = { password = it },
                 label = { Text("Password") }, singleLine = true,
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (showPw) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (passwordVisible) "Hide" else "Show", tint = Color(0xFFD4A017))
+                    IconButton(onClick = { showPw = !showPw }) {
+                        Icon(if (showPw) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (showPw) "Hide" else "Show", tint = Gold)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(), colors = fieldColors, enabled = !isLoading
             )
 
             OutlinedTextField(
-                value = confirmpassword, onValueChange = { confirmpassword = it },
+                value = confirmPw, onValueChange = { confirmPw = it },
                 label = { Text("Confirm Password") }, singleLine = true,
-                visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                isError = confirmpassword.isNotBlank() && confirmpassword != password,
-                supportingText = {
-                    if (confirmpassword.isNotBlank() && confirmpassword != password)
-                        Text("Passwords do not match", color = Color(0xFFFF6D6D))
-                },
+                visualTransformation = if (showConfirmPw) VisualTransformation.None else PasswordVisualTransformation(),
+                isError = pwMismatch,
+                supportingText = { if (pwMismatch) Text("Passwords do not match", color = Color(0xFFFF6D6D)) },
                 trailingIcon = {
-                    IconButton(onClick = { confirmVisible = !confirmVisible }) {
-                        Icon(if (confirmVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = if (confirmVisible) "Hide" else "Show", tint = Color(0xFFD4A017))
+                    IconButton(onClick = { showConfirmPw = !showConfirmPw }) {
+                        Icon(if (showConfirmPw) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (showConfirmPw) "Hide" else "Show", tint = Gold)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(), colors = fieldColors, enabled = !isLoading
@@ -138,35 +125,32 @@ fun RegisterScreen(navController: NavController) {
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { viewModel.register(name, email, password, confirmpassword, navController, context) },
+            onClick  = { viewModel.register(name, email, password, confirmPw, navController, context) },
             modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B0000)),
-            enabled = !isLoading
+            shape    = RoundedCornerShape(12.dp),
+            colors   = ButtonDefaults.buttonColors(containerColor = Crimson),
+            enabled  = !isLoading && !pwMismatch
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(color = Color(0xFFD4A017), modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
-            } else {
-                Text("Register", color = Color(0xFFD4A017), fontSize = 16.sp,
+            if (isLoading)
+                CircularProgressIndicator(color = Gold, modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+            else
+                Text("Register", color = Gold, fontSize = 16.sp,
                     fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-            }
         }
 
         Spacer(Modifier.height(12.dp))
 
         OutlinedButton(
-            onClick = { navController.navigate(ROUTE_LOGIN) },
+            onClick  = { navController.navigate(ROUTE_LOGIN) },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            border = BorderStroke(1.dp, Color(0xFF4A3F6B)),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFF1A0533), contentColor = Color(0xFFD4A017)),
-            enabled = !isLoading
-        ) {
-            Text("Already have an account? Login", color = Color(0xFFD4A017), fontFamily = FontFamily.Monospace)
-        }
+            shape    = RoundedCornerShape(12.dp),
+            border   = androidx.compose.foundation.BorderStroke(1.dp, BorderIdle),
+            colors   = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
+            enabled  = !isLoading
+        ) { Text("Already have an account? Login", color = Gold, fontFamily = FontFamily.Monospace) }
 
         Spacer(Modifier.height(20.dp))
-        Text("© 2026 Trackify", fontSize = 11.sp, color = Color(0xFF4A3F6B))
+        Text("© 2026 Trackify", fontSize = 11.sp, color = BorderIdle)
     }
 }
 
