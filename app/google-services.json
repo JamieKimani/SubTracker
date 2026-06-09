@@ -1,9 +1,9 @@
 {
   "project_info": {
     "project_number": "1012390110692",
+    "firebase_url": "https://trackify-aab65-default-rtdb.firebaseio.com",
     "project_id": "trackify-aab65",
-    "storage_bucket": "trackify-aab65.firebasestorage.app",
-    "firebase_url": "https://trackify-aab65-default-rtdb.firebaseio.com"
+    "storage_bucket": "trackify-aab65.firebasestorage.app"
   },
   "client": [
     {
@@ -13,7 +13,12 @@
           "package_name": "com.example.trackifyv1"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1012390110692-5fffhm18to5qfbp8cd4di964v1rhaa2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA55HlJY64Sk5lepuq8y-PTEdNpXT2Tqps"
@@ -21,10 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        },
-        "firebase_database": {
-          "rules_file": "database.rules.json"
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1012390110692-5fffhm18to5qfbp8cd4di964v1rhaa2f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

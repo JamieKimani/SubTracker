@@ -38,7 +38,7 @@ class AuthViewModel : ViewModel() {
     val isLoading: StateFlow<Boolean> = _isLoading
 
     companion object {
-        const val WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID_HERE"
+        const val WEB_CLIENT_ID = "1012390110692-5fffhm18to5qfbp8cd4di964v1rhaa2f.apps.googleusercontent.com"
     }
 
     fun register(name: String, email: String, password: String, confirmPassword: String, navController: NavController, context: Context) {
@@ -97,10 +97,7 @@ class AuthViewModel : ViewModel() {
     }
 
     fun signInWithGoogle(navController: NavController, context: Context) {
-        if (WEB_CLIENT_ID == "YOUR_WEB_CLIENT_ID_HERE") {
-            toast(context, "Google Sign-In not configured yet. See Firebase Console.")
-            return
-        }
+        
         viewModelScope.launch {
             _isLoading.value = true
             try {
