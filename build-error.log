@@ -1,0 +1,41 @@
+
+Welcome to Gradle 9.4.1!
+
+Here are the highlights of this release:
+ - Java 26 support
+ - Non-class-based JVM tests
+ - Enhanced console progress bar
+
+For more details see https://docs.gradle.org/9.4.1/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+
+[Incubating] Problems report is available at: file:///home/runner/work/SubTracker/SubTracker/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+org.gradle.api.InvalidUserDataException: Invalid TOML catalog definition:
+  - In version catalog libs, on alias 'googleid' notation '1.1.1' is not a valid plugin notation.
+    
+    Reason: When using a string to declare plugin coordinates, you must use a valid plugin notation.
+    
+    Possible solution: Make sure that the coordinates consist of 2 parts separated by colons, eg: my.plugin.id:1.2.
+    
+    For more information, please refer to https://docs.gradle.org/9.4.1/userguide/version_catalog_problems.html#invalid_plugin_notation in the Gradle documentation.
+> Invalid TOML catalog definition:
+    - In version catalog libs, on alias 'googleid' notation '1.1.1' is not a valid plugin notation.
+      
+      Reason: When using a string to declare plugin coordinates, you must use a valid plugin notation.
+      
+      Possible solution: Make sure that the coordinates consist of 2 parts separated by colons, eg: my.plugin.id:1.2.
+      
+      For more information, please refer to https://docs.gradle.org/9.4.1/userguide/version_catalog_problems.html#invalid_plugin_notation in the Gradle documentation.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 9s
