@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import com.example.trackifyv1.ui.theme.TealAccent
+import com.example.trackifyv1.ui.theme.CardBg
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -140,14 +142,33 @@ fun RegisterScreen(navController: NavController) {
 
         Spacer(Modifier.height(12.dp))
 
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            HorizontalDivider(Modifier.weight(1f), color = BorderIdle.copy(alpha = 0.5f))
+            Text("  or  ", color = Muted, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+            HorizontalDivider(Modifier.weight(1f), color = BorderIdle.copy(alpha = 0.5f))
+        }
+
+        Spacer(Modifier.height(12.dp))
+
         OutlinedButton(
-            onClick  = { navController.navigate(ROUTE_LOGIN) },
-            modifier = Modifier.fillMaxWidth(),
-            shape    = RoundedCornerShape(12.dp),
-            border   = androidx.compose.foundation.BorderStroke(1.dp, BorderIdle),
-            colors   = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
-            enabled  = !isLoading
-        ) { Text("Already have an account? Login", color = Gold, fontFamily = FontFamily.Monospace) }
+            onClick = { viewModel.signInWithGoogle(navController, context) },
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = androidx.compose.foundation.BorderStroke(1.dp, BorderIdle),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = CardBg, contentColor = Color.White),
+            enabled = !isLoading
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("G", color = Color(0xFF4285F4), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("Continue with Google", color = Color.White, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        TextButton(onClick = { navController.navigate(ROUTE_LOGIN) }, enabled = !isLoading) {
+            Text("Already have an account? Login", color = TealAccent, fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+        }
 
         Spacer(Modifier.height(20.dp))
         Text("© 2026 Trackify", fontSize = 11.sp, color = BorderIdle)

@@ -29,16 +29,13 @@ class SubscriptionViewModel : ViewModel() {
 
     private var listener: ValueEventListener? = null
 
-    private val authStateListener = FirebaseAuth.AuthStateListener { fa ->
+    private val authListener = FirebaseAuth.AuthStateListener { fa ->
         if (fa.currentUser != null && listener == null) attach()
-        else if (fa.currentUser == null) {
-            detach()
-            _subscriptions.value = emptyList()
-        }
+        else if (fa.currentUser == null) { detach(); _subscriptions.value = emptyList() }
     }
 
     init {
-        auth.addAuthStateListener(authStateListener)
+        auth.addAuthStateListener(authListener)
         if (auth.currentUser != null) attach()
     }
 
@@ -79,22 +76,17 @@ class SubscriptionViewModel : ViewModel() {
     ) {
         val ref = userRef() ?: run { toast(context, "You must be logged in."); return }
         when {
-            subscriptionName.isBlank()              -> { toast(context, "Please enter a subscription name."); return }
-            subscriptionAmount.isBlank()            -> { toast(context, "Please enter an amount."); return }
-            subscriptionAmount.toDoubleOrNull() == null -> { toast(context, "Amount must be a valid number."); return }
+            subscriptionName.isBlank()                       -> { toast(context, "Enter a subscription name."); return }
+            subscriptionAmount.isBlank()                     -> { toast(context, "Enter an amount."); return }
+            subscriptionAmount.toDoubleOrNull() == null      -> { toast(context, "Amount must be a valid number."); return }
             (subscriptionAmount.toDoubleOrNull() ?: 0.0) < 0 -> { toast(context, "Amount cannot be negative."); return }
         }
         val id  = ref.push().key ?: run { toast(context, "Connection error. Try again."); return }
         val sub = SubscriptionModel(
-            id                 = id,
-            subscriptionName   = subscriptionName.trim(),
-            subscriptionAmount = subscriptionAmount.trim(),
-            subscriptionDate   = subscriptionDate,
-            expiryDate         = expiryDate,
-            reminderDate       = reminderDate,
-            category           = category,
-            billingCycle       = billingCycle,
-            isActive           = true
+            id = id, subscriptionName = subscriptionName.trim(),
+            subscriptionAmount = subscriptionAmount.trim(), subscriptionDate = subscriptionDate,
+            expiryDate = expiryDate, reminderDate = reminderDate,
+            category = category, billingCycle = billingCycle, isActive = true
         )
         ref.child(id).setValue(sub)
             .addOnSuccessListener {
@@ -104,23 +96,24 @@ class SubscriptionViewModel : ViewModel() {
                 onSuccess()
             }
             .addOnFailureListener { e ->
-                val msg = if (e.message?.contains("Permission denied", true) == true)
-                    "Permission denied. Log out and log in again."
-                else "Failed to save. Check your connection."
-                toast(context, msg)
+                toast(context, if (e.message?.contains("Permission denied", true) == true)
+                    "Permission denied. Log out and back in." else "Failed to save. Check connection.")
             }
     }
 
     fun deleteSubscription(id: String, context: Context? = null) {
         if (id.isBlank()) return
+        _subscriptions.value = _subscriptions.value.filter { it.id != id }
         context?.let { NotificationHelper(it).cancelScheduledNotification(id.hashCode()) }
         userRef()?.child(id)?.removeValue()
-            ?.addOnSuccessListener { context?.let { toast(it, "Subscription deleted.") } }
-            ?.addOnFailureListener { context?.let { toast(it, "Could not delete. Try again.") } }
+            ?.addOnFailureListener {
+                context?.let { toast(it, "Could not delete from server. Try again.") }
+            }
     }
 
     fun updateSubscription(sub: SubscriptionModel, context: Context? = null) {
         if (sub.id.isBlank()) return
+        _subscriptions.value = _subscriptions.value.map { if (it.id == sub.id) sub else it }
         userRef()?.child(sub.id)?.setValue(sub)
             ?.addOnSuccessListener {
                 context?.let { ctx ->
@@ -128,7 +121,7 @@ class SubscriptionViewModel : ViewModel() {
                     h.cancelScheduledNotification(sub.id.hashCode())
                     if (sub.reminderDate.isNotBlank())
                         h.scheduleForSubscription(sub.id, sub.subscriptionName, sub.reminderDate)
-                    toast(ctx, "Subscription updated!")
+                    toast(ctx, "Updated!")
                 }
             }
             ?.addOnFailureListener { context?.let { toast(it, "Could not update. Try again.") } }
@@ -136,10 +129,10 @@ class SubscriptionViewModel : ViewModel() {
 
     fun renewSubscription(sub: SubscriptionModel, context: Context) {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        fun advance(dateStr: String): String {
-            if (dateStr.isBlank()) return dateStr
+        fun advance(d: String): String {
+            if (d.isBlank()) return d
             return try {
-                val cal = Calendar.getInstance().apply { time = sdf.parse(dateStr)!! }
+                val cal = Calendar.getInstance().apply { time = sdf.parse(d)!! }
                 when (sub.billingCycle) {
                     "Weekly"    -> cal.add(Calendar.WEEK_OF_YEAR, 1)
                     "Quarterly" -> cal.add(Calendar.MONTH, 3)
@@ -147,7 +140,7 @@ class SubscriptionViewModel : ViewModel() {
                     else        -> cal.add(Calendar.MONTH, 1)
                 }
                 sdf.format(cal.time)
-            } catch (_: Exception) { dateStr }
+            } catch (_: Exception) { d }
         }
         updateSubscription(sub.copy(expiryDate = advance(sub.expiryDate), reminderDate = advance(sub.reminderDate)), context)
     }
@@ -157,9 +150,9 @@ class SubscriptionViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        auth.removeAuthStateListener(authStateListener)
+        auth.removeAuthStateListener(authListener)
         detach()
     }
 
-    private fun toast(context: Context, msg: String) = Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    private fun toast(ctx: Context, msg: String) = Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
 }
