@@ -30,6 +30,11 @@ jobs:
       - name: Install SDK platform 36
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
+      - name: Install debug keystore
+        run: |
+          mkdir -p ~/.android
+          cp keystore/debug.keystore ~/.android/debug.keystore
+
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -54,8 +59,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Last 100 lines" >> $GITHUB_STEP_SUMMARY
           tail -100 build.log >> $GITHUB_STEP_SUMMARY || true
-
-          # Also commit to repo
           git config user.email "ci@trackify.build"
           git config user.name "CI Bot"
           tail -200 build.log > build-error.log
