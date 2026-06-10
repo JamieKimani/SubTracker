@@ -1,6 +1,5 @@
 package com.example.trackifyv1.ui.theme.screens.register
 
-import android.app.Activity.RESULT_OK
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -52,9 +51,7 @@ fun RegisterScreen(navController: NavController) {
     val googleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            viewModel.handleGoogleSignInResult(result.data, navController, context)
-        }
+        viewModel.handleGoogleSignInResult(result.data, navController, context)
     }
 
     val fieldColors = OutlinedTextFieldDefaults.colors(

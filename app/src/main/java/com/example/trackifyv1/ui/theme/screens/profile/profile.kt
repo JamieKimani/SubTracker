@@ -253,6 +253,12 @@ fun ProfileScreen(navController: NavController) {
             confirmButton = {
                 Button(onClick = {
                     profileVm.logout()
+                    com.google.android.gms.auth.api.signin.GoogleSignIn
+                        .getClient(context,
+                            com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(
+                                com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN
+                            ).build()
+                        ).signOut()
                     navController.navigate(ROUTE_LOGIN) { popUpTo(0) { inclusive = true } }
                 }, colors = ButtonDefaults.buttonColors(containerColor = Crimson), shape = RoundedCornerShape(8.dp)) {
                     Text("Log Out", color = Gold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
