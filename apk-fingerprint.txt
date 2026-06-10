@@ -1,3 +1,10 @@
-APK_SHA1=
-KEYSTORE_SHA1=7B:10:0E:4B:FF:2E:45:BD:98:C7:3C:31:F6:B3:96:4E:65:8B:5D:F7
-RUN=33
+=== Full apksigner output ===
+V2 Signer: certificate DN: CN=Android Debug, O=Android, C=US
+V2 Signer: certificate SHA-256 digest: 4e696ff6487af6d76b1b3d58051bb0b4c7220441e74af767bd59d97a22af4cca
+V2 Signer: certificate SHA-1 digest: 7b100e4bff2e45bd98c73c31f6b3964e658b5df7
+V2 Signer: certificate MD5 digest: 4d79b619add7f2cd6aa37bf4d4d348e3
+
+=== Keystore ===
+	 SHA1: 7B:10:0E:4B:FF:2E:45:BD:98:C7:3C:31:F6:B3:96:4E:65:8B:5D:F7
+	 SHA256: 4E:69:6F:F6:48:7A:F6:D7:6B:1B:3D:58:05:1B:B0:B4:C7:22:04:41:E7:4A:F7:67:BD:59:D9:7A:22:AF:4C:CA
+RUN=34
