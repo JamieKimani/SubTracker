@@ -54,14 +54,14 @@ jobs:
       - name: Write APK fingerprint to repo
         run: |
           BUILD_TOOLS=$(ls $ANDROID_HOME/build-tools/ | sort -V | tail -1)
-          APK_SHA1=$($ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner verify --print-certs \
-            app/build/outputs/apk/debug/app-debug.apk 2>/dev/null \
-            | grep "Signer #1 certificate SHA-1" | awk '{print $NF}')
-          KS_SHA1=$(keytool -list -v -keystore keystore/debug.keystore \
+          echo "=== Full apksigner output ===" > apk-fingerprint.txt
+          $ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner verify --print-certs \
+            app/build/outputs/apk/debug/app-debug.apk >> apk-fingerprint.txt 2>&1
+          echo "" >> apk-fingerprint.txt
+          echo "=== Keystore ===" >> apk-fingerprint.txt
+          keytool -list -v -keystore keystore/debug.keystore \
             -alias androiddebugkey -storepass android -keypass android 2>&1 \
-            | grep "SHA1:" | awk '{print $2}')
-          echo "APK_SHA1=$APK_SHA1" > apk-fingerprint.txt
-          echo "KEYSTORE_SHA1=$KS_SHA1" >> apk-fingerprint.txt
+            | grep -E "SHA1:|SHA256:" >> apk-fingerprint.txt
           echo "RUN=${{ github.run_number }}" >> apk-fingerprint.txt
           git config user.email "ci@trackify.build"
           git config user.name "CI Bot"
@@ -79,7 +79,7 @@ jobs:
           git config user.name "CI Bot"
           tail -200 build.log > build-error.log
           git add build-error.log
-          git diff --cached --quiet || git commit -m "ci: build error log run ${{ github.run_number }} [skip ci]"
+          git diff --cached --quiet || git commit -m "ci: build error log [skip ci]"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main || true
 
       - name: Upload APK
