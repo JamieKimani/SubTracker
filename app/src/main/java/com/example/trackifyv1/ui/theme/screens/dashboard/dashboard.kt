@@ -1,5 +1,14 @@
 package com.example.trackifyv1.ui.theme.screens.dashboard
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
+import com.example.trackifyv1.ui.theme.DashboardSkeleton
+import com.example.trackifyv1.ui.theme.SubscriptionListSkeleton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -95,14 +104,24 @@ fun DashboardScreen(navController: NavController) {
 
     Box(Modifier.fillMaxSize().background(AppGradient)) {
         Box(Modifier.fillMaxSize().padding(bottom = 90.dp)) {
-            when (tab) {
-                0 -> DashboardTab(
-                    navController      = navController,
-                    onViewSubscriptions = { tab = 1 },
-                    onStatCardTap      = { sheetFilter = it }
-                )
-                1 -> ViewSubscriptionsScreen(navController, isStandalone = false)
-                2 -> ProfileScreen(navController)
+            AnimatedContent(
+                targetState   = tab,
+                transitionSpec = {
+                    val forward = targetState > initialState
+                    (fadeIn(tween(260)) + slideInVertically(tween(260)) { if (forward) 40 else -40 })
+                        .togetherWith(fadeOut(tween(160)))
+                },
+                label = "tabContent"
+            ) { currentTab ->
+                when (currentTab) {
+                    0 -> DashboardTab(
+                        navController       = navController,
+                        onViewSubscriptions = { tab = 1 },
+                        onStatCardTap       = { sheetFilter = it }
+                    )
+                    1 -> ViewSubscriptionsScreen(navController, isStandalone = false)
+                    2 -> ProfileScreen(navController)
+                }
             }
         }
         Box(
@@ -299,10 +318,16 @@ fun DashboardTab(
     onViewSubscriptions: () -> Unit,
     onStatCardTap: (SheetFilter) -> Unit = {}
 ) {
-    val vm      = viewModel<SubscriptionViewModel>()
-    val context = LocalContext.current
-    val subs    by vm.subscriptions.collectAsState()
+    val vm        = viewModel<SubscriptionViewModel>()
+    val context   = LocalContext.current
+    val subs      by vm.subscriptions.collectAsState()
+    val isLoading by vm.isLoading.collectAsState()
     val activeSubs = subs.filter { it.isActive }
+
+    if (isLoading && subs.isEmpty()) {
+        DashboardSkeleton()
+        return
+    }
 
     val monthlyTotal = activeSubs.sumOf { monthlyAmount(it) }
     val annualTotal  = monthlyTotal * 12
@@ -337,11 +362,16 @@ fun DashboardTab(
             }
         }
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            TappableSummaryCard(Modifier.weight(1f), "Active",   "${activeSubs.size}",                    Gold,               { onStatCardTap(SheetFilter.ACTIVE) })
-            TappableSummaryCard(Modifier.weight(1f), "Monthly",  "KES ${"%.0f".format(monthlyTotal)}",   TealAccent,         { onStatCardTap(SheetFilter.MONTHLY) })
-            TappableSummaryCard(Modifier.weight(1f), "Yearly",   "KES ${"%.0f".format(annualTotal)}",    Color(0xFFFF6D00),  { onStatCardTap(SheetFilter.YEARLY) })
-            TappableSummaryCard(Modifier.weight(1f), "Paused",   "${subs.size - activeSubs.size}",       Muted,              { onStatCardTap(SheetFilter.PAUSED) })
+        AnimatedVisibility(
+            visible       = true,
+            enter         = fadeIn(tween(400)) + slideInVertically(tween(400)) { 30 }
+        ) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                TappableSummaryCard(Modifier.weight(1f), "Active",   "${activeSubs.size}",                    Gold,               { onStatCardTap(SheetFilter.ACTIVE) })
+                TappableSummaryCard(Modifier.weight(1f), "Monthly",  "KES ${"%.0f".format(monthlyTotal)}",   TealAccent,         { onStatCardTap(SheetFilter.MONTHLY) })
+                TappableSummaryCard(Modifier.weight(1f), "Yearly",   "KES ${"%.0f".format(annualTotal)}",    Color(0xFFFF6D00),  { onStatCardTap(SheetFilter.YEARLY) })
+                TappableSummaryCard(Modifier.weight(1f), "Paused",   "${subs.size - activeSubs.size}",       Muted,              { onStatCardTap(SheetFilter.PAUSED) })
+            }
         }
 
         if (upcoming.isNotEmpty()) {
