@@ -9,28 +9,133 @@ Here are the highlights of this release:
 For more details see https://docs.gradle.org/9.4.1/release-notes.html
 
 Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugResources
+> Task :app:processDebugGoogleServices
+> Task :app:packageDebugResources
+> Task :app:processDebugNavigationResources
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:javaPreCompileDebug
+> Task :app:parseDebugLocalResources
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:generateDebugRFile
+> Task :app:generateDebugGlobalSynthetics
+> Task :app:desugarDebugFileDependencies
+> Task :app:checkDebugDuplicateClasses
+> Task :app:checkDebugAarMetadata
 
-[Incubating] Problems report is available at: file:///home/runner/work/SubTracker/SubTracker/build/reports/problems/problems-report.html
+> Task :app:compileDebugKotlin
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:537:23 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:537:23 Not enough information to infer type argument for 'T'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:538:19 Unresolved reference 'Calendar'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:539:22 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:539:22 Not enough information to infer type argument for 'R'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:539:26 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:540:36 Unresolved reference 'Calendar'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:541:19 Unresolved reference 'Calendar'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:541:35 Too many arguments for 'fun WindowInsets.add(insets: WindowInsets): WindowInsets'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:542:67 Unresolved reference 'time'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:542:73 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:542:73 Not enough information to infer type argument for 'B'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:546:18 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:547:27 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:547:27 Function 'component1()' is ambiguous for this expression: 
+fun <T> Array<out T>.component1(): T
+fun ByteArray.component1(): Byte
+fun ShortArray.component1(): Short
+fun IntArray.component1(): Int
+fun LongArray.component1(): Long
+fun FloatArray.component1(): Float
+fun DoubleArray.component1(): Double
+fun BooleanArray.component1(): Boolean
+fun CharArray.component1(): Char
+fun <T> List<T>.component1(): T
+fun <K, V> Map.Entry<K, V>.component1(): K
+fun UIntArray.component1(): UInt
+fun ULongArray.component1(): ULong
+fun UByteArray.component1(): UByte
+fun UShortArray.component1(): UShort.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:547:27 Function 'component2()' is ambiguous for this expression: 
+fun <T> Array<out T>.component2(): T
+fun ByteArray.component2(): Byte
+fun ShortArray.component2(): Short
+fun IntArray.component2(): Int
+fun LongArray.component2(): Long
+fun FloatArray.component2(): Float
+fun DoubleArray.component2(): Double
+fun BooleanArray.component2(): Boolean
+fun CharArray.component2(): Char
+fun <T> List<T>.component2(): T
+fun <K, V> Map.Entry<K, V>.component2(): V
+fun UIntArray.component2(): UInt
+fun ULongArray.component2(): ULong
+fun UByteArray.component2(): UByte
+fun UShortArray.component2(): UShort.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:548:38 Unresolved reference 'clone'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:548:49 Unresolved reference 'Calendar'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:548:59 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:548:59 Unresolved reference. None of the following candidates is applicable because of a receiver type mismatch:
+fun <T> T.apply(block: T.() -> Unit): T
+    [R|Contract description]
+     <
+        CallsInPlace(block, EXACTLY_ONCE)
+    >
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:548:65 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:549:21 Unresolved reference 'Calendar'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:549:44 Unresolved reference 'getActualMaximum'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:549:61 Unresolved reference 'Calendar'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:554:52 Unresolved reference 'time'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:569:37 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:569:40 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:572:17 @Composable invocations can only happen from the context of a @Composable function
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:574:35 'operator' modifier is required on 'FirNamedFunctionSymbol kotlin/compareTo' in 'compareTo'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:589:42 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:589:45 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:589:45 Function 'component1()' is ambiguous for this expression: 
+fun <T> Array<out T>.component1(): T
+fun ByteArray.component1(): Byte
+fun ShortArray.component1(): Short
+fun IntArray.component1(): Int
+fun LongArray.component1(): Long
+fun FloatArray.component1(): Float
+fun DoubleArray.component1(): Double
+fun BooleanArray.component1(): Boolean
+fun CharArray.component1(): Char
+fun <T> List<T>.component1(): T
+fun <K, V> Map.Entry<K, V>.component1(): K
+fun UIntArray.component1(): UInt
+fun ULongArray.component1(): ULong
+fun UByteArray.component1(): UByte
+fun UShortArray.component1(): UShort.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:589:45 Function 'component2()' is ambiguous for this expression: 
+fun <T> Array<out T>.component2(): T
+fun ByteArray.component2(): Byte
+fun ShortArray.component2(): Short
+fun IntArray.component2(): Int
+fun LongArray.component2(): Long
+fun FloatArray.component2(): Float
+fun DoubleArray.component2(): Double
+fun BooleanArray.component2(): Boolean
+fun CharArray.component2(): Char
+fun <T> List<T>.component2(): T
+fun <K, V> Map.Entry<K, V>.component2(): V
+fun UIntArray.component2(): UInt
+fun ULongArray.component2(): ULong
+fun UByteArray.component2(): UByte
+fun UShortArray.component2(): UShort.
+
+> Task :app:mergeExtDexDebug
+> Task :app:compileDebugKotlin FAILED
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-org.gradle.api.InvalidUserDataException: Invalid TOML catalog definition:
-  - In version catalog libs, on alias 'googleid' notation '1.1.1' is not a valid plugin notation.
-    
-    Reason: When using a string to declare plugin coordinates, you must use a valid plugin notation.
-    
-    Possible solution: Make sure that the coordinates consist of 2 parts separated by colons, eg: my.plugin.id:1.2.
-    
-    For more information, please refer to https://docs.gradle.org/9.4.1/userguide/version_catalog_problems.html#invalid_plugin_notation in the Gradle documentation.
-> Invalid TOML catalog definition:
-    - In version catalog libs, on alias 'googleid' notation '1.1.1' is not a valid plugin notation.
-      
-      Reason: When using a string to declare plugin coordinates, you must use a valid plugin notation.
-      
-      Possible solution: Make sure that the coordinates consist of 2 parts separated by colons, eg: my.plugin.id:1.2.
-      
-      For more information, please refer to https://docs.gradle.org/9.4.1/userguide/version_catalog_problems.html#invalid_plugin_notation in the Gradle documentation.
+Execution failed for task ':app:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
 
 * Try:
 > Run with --stacktrace option to get the stack trace.
@@ -38,4 +143,5 @@ org.gradle.api.InvalidUserDataException: Invalid TOML catalog definition:
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 9s
+BUILD FAILED in 2m 6s
+15 actionable tasks: 15 executed
