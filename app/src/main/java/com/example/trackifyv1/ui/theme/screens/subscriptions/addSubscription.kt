@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -60,6 +61,8 @@ fun AddSubscriptionScreen(navController: NavController) {
     var categoryExpanded   by remember { mutableStateOf(false) }
     var cycleExpanded      by remember { mutableStateOf(false) }
     var amountError        by remember { mutableStateOf(false) }
+    var isTrial            by remember { mutableStateOf(false) }
+    var trialEndDate       by remember { mutableStateOf("") }
 
     val context  = LocalContext.current
     val calendar = Calendar.getInstance()
@@ -70,9 +73,10 @@ fun AddSubscriptionScreen(navController: NavController) {
         calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
     )
 
-    val startPicker    = remember { makePicker { subscriptionDate = it } }
-    val expiryPicker   = remember { makePicker { expiryDate = it } }
-    val reminderPicker = remember { makePicker { reminderDate = it } }
+    val startPicker     = remember { makePicker { subscriptionDate = it } }
+    val expiryPicker    = remember { makePicker { expiryDate = it } }
+    val reminderPicker  = remember { makePicker { reminderDate = it } }
+    val trialEndPicker  = remember { makePicker { trialEndDate = it } }
 
     val fieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor      = AddGold,        unfocusedBorderColor    = AddBorderIdle,
@@ -177,6 +181,33 @@ fun AddSubscriptionScreen(navController: NavController) {
                         color = AddGold.copy(alpha = 0.8f), fontFamily = FontFamily.Monospace, fontSize = 11.sp
                     )
                 }
+
+                HorizontalDivider(color = AddBorderIdle.copy(alpha = 0.4f), thickness = 0.5.dp)
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment     = Alignment.CenterVertically
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Free Trial", color = AddGold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Text("Track this as a free trial with an urgent reminder", color = AddMuted, fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    }
+                    Switch(
+                        checked = isTrial, onCheckedChange = { isTrial = it },
+                        colors = SwitchDefaults.colors(checkedThumbColor = AddGold, checkedTrackColor = AddGold.copy(alpha = 0.4f))
+                    )
+                }
+
+                if (isTrial) {
+                    AddDateField("Trial Ends", trialEndDate, fieldColors) { trialEndPicker.show() }
+                    if (trialEndDate.isNotBlank()) {
+                        Text(
+                            "⏳ You'll get an urgent reminder as the trial ends on $trialEndDate.",
+                            color = Color(0xFFFF6D00), fontFamily = FontFamily.Monospace, fontSize = 11.sp
+                        )
+                    }
+                }
             }
 
             Spacer(Modifier.height(20.dp))
@@ -187,6 +218,7 @@ fun AddSubscriptionScreen(navController: NavController) {
                     vm.addSubscription(
                         subscriptionName, subscriptionAmount, subscriptionDate,
                         expiryDate, reminderDate, context, selectedCategory, selectedCycle,
+                        isTrial = isTrial, trialEndDate = trialEndDate,
                         onSuccess = { navController.navigateUp() }
                     )
                 },

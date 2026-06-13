@@ -18,6 +18,7 @@ foundationLayout = "1.11.0"
 googleid = "1.1.1"
 credentialsPlayServicesAuth = "1.3.0"
 googlePlayServicesAuth = "21.3.0"
+datastorePreferences = "1.1.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ google-identity-googleid = { group = "com.google.android.libraries.identity.goog
 google-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "googlePlayServicesAuth" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentialsPlayServicesAuth" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

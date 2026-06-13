@@ -37,6 +37,7 @@ import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
 import com.example.trackifyv1.ui.theme.screens.dashboard.categoryColors
 import com.example.trackifyv1.ui.theme.screens.dashboard.daysUntil
+import com.example.trackifyv1.ui.theme.logoFor
 
 private val SubGold        = Color(0xFFD4A017)
 private val SubCrimson     = Color(0xFF8B0000)
@@ -252,6 +253,13 @@ fun SubscriptionCard(
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val logo = logoFor(subscription.subscriptionName.ifBlank { "?" })
+                    Box(
+                        Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)).background(logo.color.copy(alpha = 0.18f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(logo.emoji, fontSize = 15.sp)
+                    }
                     Text(
                         subscription.subscriptionName.ifBlank { "Unnamed" },
                         color = if (subscription.isActive) SubGold else SubMuted,
@@ -287,6 +295,11 @@ fun SubscriptionCard(
                 Box(Modifier.clip(RoundedCornerShape(20.dp)).background(SubBorderIdle.copy(alpha = 0.25f)).padding(horizontal = 8.dp, vertical = 2.dp)) {
                     Text(subscription.billingCycle.ifBlank { "Monthly" }, color = SubMuted, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
                 }
+                if (subscription.isTrial) {
+                    Box(Modifier.clip(RoundedCornerShape(20.dp)).background(Color(0xFFFF6D00).copy(alpha = 0.18f)).padding(horizontal = 8.dp, vertical = 2.dp)) {
+                        Text("TRIAL", color = Color(0xFFFF6D00), fontFamily = FontFamily.Monospace, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
 
             HorizontalDivider(color = SubBorderIdle.copy(alpha = 0.4f), thickness = 0.5.dp)
@@ -295,6 +308,27 @@ fun SubscriptionCard(
             SubDetailRow("Expiry",   subscription.expiryDate.ifBlank { "—" },
                 valueColor = urgencyColor ?: Color.White)
             SubDetailRow("Reminder", subscription.reminderDate.ifBlank { "—" })
+            if (subscription.isTrial && subscription.trialEndDate.isNotBlank()) {
+                SubDetailRow("Trial ends", subscription.trialEndDate, valueColor = Color(0xFFFF6D00))
+            }
+
+            val trialDaysLeft = if (subscription.isTrial) daysUntil(subscription.trialEndDate) else null
+            AnimatedVisibility(visible = trialDaysLeft != null && trialDaysLeft in 0..7, enter = expandVertically(), exit = shrinkVertically()) {
+                Row(
+                    Modifier.fillMaxWidth().background(Color(0xFFFF6D00).copy(alpha = 0.1f), RoundedCornerShape(8.dp)).padding(horizontal = 10.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment     = Alignment.CenterVertically
+                ) {
+                    Text(
+                        when (trialDaysLeft) {
+                            0    -> "⏳ Trial ends today!"
+                            1    -> "⏳ Trial ends tomorrow"
+                            else -> "⏳ Trial ends in $trialDaysLeft days"
+                        },
+                        color = Color(0xFFFF6D00), fontFamily = FontFamily.Monospace, fontSize = 11.sp, fontWeight = FontWeight.Bold
+                    )
+                }
+            }
 
             AnimatedVisibility(visible = urgencyColor != null, enter = expandVertically(), exit = shrinkVertically()) {
                 Row(
@@ -323,6 +357,8 @@ fun SubscriptionCard(
         var editAmount  by remember { mutableStateOf(subscription.subscriptionAmount) }
         var editCat     by remember { mutableStateOf(subscription.category) }
         var editCycle   by remember { mutableStateOf(subscription.billingCycle.ifBlank { "Monthly" }) }
+        var editIsTrial by remember { mutableStateOf(subscription.isTrial) }
+        var editTrialEnd by remember { mutableStateOf(subscription.trialEndDate) }
         var amountErr   by remember { mutableStateOf(false) }
         var catExpanded by remember { mutableStateOf(false) }
         var cycleExpanded by remember { mutableStateOf(false) }
@@ -373,13 +409,39 @@ fun SubscriptionCard(
                             }
                         }
                     }
+
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Free Trial", color = SubGold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Switch(checked = editIsTrial, onCheckedChange = { editIsTrial = it },
+                            colors = SwitchDefaults.colors(checkedThumbColor = SubGold, checkedTrackColor = SubGold.copy(alpha = 0.4f)))
+                    }
+                    if (editIsTrial) {
+                        val ctx2 = context
+                        val cal2 = java.util.Calendar.getInstance()
+                        val trialPicker = remember {
+                            android.app.DatePickerDialog(
+                                ctx2, { _, y, m, d -> editTrialEnd = "%02d/%02d/%04d".format(d, m + 1, y) },
+                                cal2.get(java.util.Calendar.YEAR), cal2.get(java.util.Calendar.MONTH), cal2.get(java.util.Calendar.DAY_OF_MONTH)
+                            )
+                        }
+                        OutlinedTextField(
+                            value = editTrialEnd, onValueChange = {}, readOnly = true, label = { Text("Trial Ends") },
+                            placeholder = { Text("DD/MM/YYYY", color = SubMuted) },
+                            trailingIcon = { IconButton(onClick = { trialPicker.show() }) { Icon(Icons.Default.DateRange, "Pick trial end date", tint = SubGold) } },
+                            colors = fColors, modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             },
             confirmButton = {
                 Button(onClick = {
                     if (amountErr) return@Button
                     if (editName.isBlank()) { Toast.makeText(context, "Name cannot be empty.", Toast.LENGTH_SHORT).show(); return@Button }
-                    onUpdate(subscription.copy(subscriptionName = editName.trim(), subscriptionAmount = editAmount.trim(), category = editCat, billingCycle = editCycle), context)
+                    onUpdate(subscription.copy(
+                        subscriptionName = editName.trim(), subscriptionAmount = editAmount.trim(),
+                        category = editCat, billingCycle = editCycle,
+                        isTrial = editIsTrial, trialEndDate = if (editIsTrial) editTrialEnd else ""
+                    ), context)
                     showEditDialog = false
                 }, colors = ButtonDefaults.buttonColors(containerColor = SubGold), shape = RoundedCornerShape(8.dp)) {
                     Text("Save", color = SubDarkPurple, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)

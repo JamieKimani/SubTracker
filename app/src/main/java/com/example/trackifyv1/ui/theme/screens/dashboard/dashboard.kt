@@ -45,6 +45,7 @@ import com.example.trackifyv1.models.SubscriptionModel
 import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
 import com.example.trackifyv1.ui.theme.AppGradient
+import com.example.trackifyv1.ui.theme.LocalAppPalette
 import com.example.trackifyv1.ui.theme.BorderIdle
 import com.example.trackifyv1.ui.theme.CardBg
 import com.example.trackifyv1.ui.theme.Crimson
@@ -102,7 +103,8 @@ fun DashboardScreen(navController: NavController) {
     var sheetFilter by remember { mutableStateOf(SheetFilter.NONE) }
     val sheetState  = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Box(Modifier.fillMaxSize().background(AppGradient)) {
+    val palette = LocalAppPalette.current
+    Box(Modifier.fillMaxSize().background(palette.background)) {
         Box(Modifier.fillMaxSize().padding(bottom = 90.dp)) {
             AnimatedContent(
                 targetState   = tab,
@@ -389,6 +391,12 @@ fun DashboardTab(
             }
         }
 
+        if (activeSubs.isNotEmpty()) {
+            SectionCard("Spending trend (6 months)") {
+                SpendingTrendChart(activeSubs, monthlyTotal)
+            }
+        }
+
         SectionCard("Spend by category") {
             if (counts.isEmpty()) {
                 Text("No subscriptions yet.\nTap + to add your first one.",
@@ -520,6 +528,73 @@ fun SectionCard(title: String, content: @Composable ColumnScope.() -> Unit) {
     ) {
         Text(title, color = Gold, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
         content()
+    }
+}
+
+@Composable
+fun SpendingTrendChart(activeSubs: List<SubscriptionModel>, currentMonthlyTotal: Double) {
+    val sdf = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+    val monthLabels = remember {
+        val cal = Calendar.getInstance()
+        (5 downTo 0).map { offset ->
+            val c = cal.clone() as Calendar
+            c.add(Calendar.MONTH, -offset)
+            SimpleDateFormat("MMM", Locale.getDefault()).format(c.time) to c
+        }
+    }
+
+    val values = remember(activeSubs) {
+        monthLabels.map { (_, monthCal) ->
+            val monthEnd = (monthCal.clone() as Calendar).apply {
+                set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+            }
+            activeSubs.sumOf { sub ->
+                val started = try {
+                    val d = sdf.parse(sub.subscriptionDate)
+                    d != null && !d.after(monthEnd.time)
+                } catch (_: Exception) { true }
+                if (started) monthlyAmount(sub) else 0.0
+            }
+        }
+    }
+
+    val maxVal = (values.maxOrNull() ?: 0.0).coerceAtLeast(1.0)
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            Modifier.fillMaxWidth().height(110.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment     = Alignment.Bottom
+        ) {
+            values.forEachIndexed { i, value ->
+                val fraction = (value / maxVal).toFloat().coerceIn(0.04f, 1f)
+                val isLast   = i == values.lastIndex
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom, modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    Text(
+                        if (value >= 1000) "%.1fk".format(value / 1000) else "%.0f".format(value),
+                        color = if (isLast) TealAccent else Muted, fontSize = 9.sp, fontFamily = FontFamily.Monospace
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Box(
+                        Modifier
+                            .width(22.dp)
+                            .fillMaxHeight(fraction)
+                            .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .background(if (isLast) TealAccent else BorderIdle.copy(alpha = 0.5f))
+                    )
+                }
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            monthLabels.forEachIndexed { i, (label, _) ->
+                Text(label, color = if (i == monthLabels.lastIndex) TealAccent else Muted,
+                    fontSize = 10.sp, fontFamily = FontFamily.Monospace, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            }
+        }
+        Text(
+            "Projected monthly cost based on active subscriptions and their start dates.",
+            color = Muted, fontSize = 10.sp, fontFamily = FontFamily.Monospace
+        )
     }
 }
 

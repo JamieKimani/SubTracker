@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.google.identity.googleid)
     implementation(libs.google.play.services.auth)
     implementation(libs.androidx.credentials)

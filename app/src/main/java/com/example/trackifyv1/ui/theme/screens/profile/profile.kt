@@ -31,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.trackifyv1.models.ProfileViewModel
+import com.example.trackifyv1.models.ThemeViewModel
 import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
 import com.example.trackifyv1.ui.theme.screens.dashboard.SheetFilter
@@ -51,6 +52,8 @@ fun ProfileScreen(navController: NavController) {
     val context       = LocalContext.current
     val profileVm     = viewModel<ProfileViewModel>()
     val subscriptionVm = viewModel<SubscriptionViewModel>()
+    val themeVm        = viewModel<ThemeViewModel>()
+    val isDarkMode     by themeVm.isDarkMode.collectAsState()
 
     val profile       by profileVm.profile.collectAsState()
     val isLoading     by profileVm.isLoading.collectAsState()
@@ -157,6 +160,27 @@ fun ProfileScreen(navController: NavController) {
             SettingRow(Icons.Default.Email,   "Email Address",   profile.email.ifBlank { "Not set" }) { showEditEmail = true }
             HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
             SettingRow(Icons.Default.Lock,    "Change Password", "••••••••")                          { showChangePassword = true }
+            HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                    contentDescription = "Theme", tint = Gold, modifier = Modifier.size(18.dp)
+                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Appearance", color = Muted, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                    Text(if (isDarkMode) "Dark" else "Light", color = Color.White, fontSize = 13.sp,
+                        fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Medium)
+                }
+                Switch(
+                    checked = isDarkMode,
+                    onCheckedChange = { themeVm.toggle(context) },
+                    colors = SwitchDefaults.colors(checkedThumbColor = Gold, checkedTrackColor = Gold.copy(alpha = 0.4f))
+                )
+            }
         }
 
         Button(

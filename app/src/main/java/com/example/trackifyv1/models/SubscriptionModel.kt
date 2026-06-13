@@ -13,5 +13,7 @@ data class SubscriptionModel(
     val reminderDate: String = "",
     val category: String = "",
     val billingCycle: String = "Monthly",
-    val isActive: Boolean = true
+    val isActive: Boolean = true,
+    val isTrial: Boolean = false,
+    val trialEndDate: String = ""
 )

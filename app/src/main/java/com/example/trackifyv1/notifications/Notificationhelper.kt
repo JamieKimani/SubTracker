@@ -162,6 +162,50 @@ class NotificationHelper(private val context: Context) {
         } catch (_: Exception) { false }
     }
 
+    fun scheduleTrialEndingNotification(
+        subscriptionId: String,
+        subscriptionName: String,
+        trialEndDateStr: String
+    ): Boolean {
+        if (trialEndDateStr.isBlank()) return false
+        return try {
+            val sdf  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val date = sdf.parse(trialEndDateStr) ?: return false
+            val now  = Calendar.getInstance()
+            val cal  = Calendar.getInstance().apply {
+                time = date
+                set(Calendar.HOUR_OF_DAY, TRIAL_REMINDER_HOUR)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            cal.add(Calendar.DAY_OF_YEAR, -1)
+
+            val requestCode = ("trial_" + subscriptionId).hashCode()
+
+            if (cal.timeInMillis <= now.timeInMillis) {
+                val isToday = cal.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+                        cal.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
+                if (isToday) {
+                    sendNotification(
+                        title   = "⏳ Trial ending: $subscriptionName",
+                        message = "Your free trial for \"$subscriptionName\" ends on $trialEndDateStr. Cancel now if you don't want to be charged!"
+                    )
+                    return true
+                }
+                return false
+            }
+
+            scheduleNotification(
+                title              = "⏳ Trial ending: $subscriptionName",
+                message            = "Your free trial for \"$subscriptionName\" ends tomorrow ($trialEndDateStr). Cancel now if you don't want to be charged!",
+                reminderTimeMillis = cal.timeInMillis,
+                requestCode        = requestCode
+            )
+            true
+        } catch (_: Exception) { false }
+    }
+
     fun cancelScheduledNotification(requestCode: Int) {
         val intent = Intent(context, ReminderBroadcastReceiver::class.java)
         val pending = PendingIntent.getBroadcast(
@@ -180,5 +224,6 @@ class NotificationHelper(private val context: Context) {
         const val EXTRA_TITLE   = "title"
         const val EXTRA_MESSAGE = "message"
         const val REMINDER_HOUR = 9
+        const val TRIAL_REMINDER_HOUR = 9
     }
 }

@@ -7,7 +7,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.trackifyv1.models.ThemeViewModel
 import com.example.trackifyv1.navigation.AppNavHost
+import com.example.trackifyv1.ui.theme.DarkAppPalette
+import com.example.trackifyv1.ui.theme.LightAppPalette
+import com.example.trackifyv1.ui.theme.LocalAppPalette
 import com.example.trackifyv1.ui.theme.Trackifyv1Theme
 
 class MainActivity : ComponentActivity() {
@@ -23,8 +31,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            Trackifyv1Theme {
-                AppNavHost()
+            val themeVm = viewModel<ThemeViewModel>()
+            val isDark by themeVm.isDarkMode.collectAsState()
+            val context = this
+
+            androidx.compose.runtime.LaunchedEffect(Unit) {
+                themeVm.init(context)
+            }
+
+            val palette = if (isDark) DarkAppPalette else LightAppPalette
+
+            Trackifyv1Theme(darkTheme = isDark) {
+                CompositionLocalProvider(LocalAppPalette provides palette) {
+                    AppNavHost()
+                }
             }
         }
 

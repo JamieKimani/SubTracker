@@ -72,6 +72,8 @@ class SubscriptionViewModel : ViewModel() {
         context: Context,
         category: String = "",
         billingCycle: String = "Monthly",
+        isTrial: Boolean = false,
+        trialEndDate: String = "",
         onSuccess: () -> Unit = {}
     ) {
         val ref = userRef() ?: run { toast(context, "You must be logged in."); return }
@@ -86,12 +88,16 @@ class SubscriptionViewModel : ViewModel() {
             id = id, subscriptionName = subscriptionName.trim(),
             subscriptionAmount = subscriptionAmount.trim(), subscriptionDate = subscriptionDate,
             expiryDate = expiryDate, reminderDate = reminderDate,
-            category = category, billingCycle = billingCycle, isActive = true
+            category = category, billingCycle = billingCycle, isActive = true,
+            isTrial = isTrial, trialEndDate = trialEndDate
         )
         ref.child(id).setValue(sub)
             .addOnSuccessListener {
+                val helper = NotificationHelper(context)
                 if (reminderDate.isNotBlank())
-                    NotificationHelper(context).scheduleForSubscription(id, subscriptionName.trim(), reminderDate)
+                    helper.scheduleForSubscription(id, subscriptionName.trim(), reminderDate)
+                if (isTrial && trialEndDate.isNotBlank())
+                    helper.scheduleTrialEndingNotification(id, subscriptionName.trim(), trialEndDate)
                 toast(context, "\"${subscriptionName.trim()}\" added!")
                 onSuccess()
             }
@@ -119,8 +125,11 @@ class SubscriptionViewModel : ViewModel() {
                 context?.let { ctx ->
                     val h = NotificationHelper(ctx)
                     h.cancelScheduledNotification(sub.id.hashCode())
+                    h.cancelScheduledNotification(("trial_" + sub.id).hashCode())
                     if (sub.reminderDate.isNotBlank())
                         h.scheduleForSubscription(sub.id, sub.subscriptionName, sub.reminderDate)
+                    if (sub.isTrial && sub.trialEndDate.isNotBlank())
+                        h.scheduleTrialEndingNotification(sub.id, sub.subscriptionName, sub.trialEndDate)
                     toast(ctx, "Updated!")
                 }
             }
