@@ -136,7 +136,7 @@ class SubscriptionViewModel : ViewModel() {
             ?.addOnFailureListener { context?.let { toast(it, "Could not update. Try again.") } }
     }
 
-    fun renewSubscription(sub: SubscriptionModel, context: Context) {
+    fun renewSubscription(sub: SubscriptionModel, context: Context, newAmount: String? = null) {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         fun advance(d: String): String {
             if (d.isBlank()) return d
@@ -151,7 +151,32 @@ class SubscriptionViewModel : ViewModel() {
                 sdf.format(cal.time)
             } catch (_: Exception) { d }
         }
-        updateSubscription(sub.copy(expiryDate = advance(sub.expiryDate), reminderDate = advance(sub.reminderDate)), context)
+
+        val today = sdf.format(Calendar.getInstance().time)
+        val priceChanged = newAmount != null && newAmount.isNotBlank() &&
+            newAmount.toDoubleOrNull() != null &&
+            newAmount.trim() != sub.subscriptionAmount.trim()
+
+        val updatedHistory = if (priceChanged) {
+            sub.priceHistory + (today to sub.subscriptionAmount)
+        } else sub.priceHistory
+
+        updateSubscription(
+            sub.copy(
+                expiryDate         = advance(sub.expiryDate),
+                reminderDate       = advance(sub.reminderDate),
+                subscriptionAmount = if (priceChanged) newAmount!!.trim() else sub.subscriptionAmount,
+                priceHistory       = updatedHistory
+            ),
+            context
+        )
+
+        if (priceChanged) {
+            val old = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
+            val new = newAmount!!.toDoubleOrNull() ?: 0.0
+            val direction = if (new > old) "increased" else "decreased"
+            toast(context, "Price $direction: KES ${sub.subscriptionAmount} → KES ${newAmount.trim()}")
+        }
     }
 
     fun toggleActive(sub: SubscriptionModel, context: Context) =

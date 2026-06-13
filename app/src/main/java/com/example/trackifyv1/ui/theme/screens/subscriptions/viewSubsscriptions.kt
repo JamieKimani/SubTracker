@@ -37,7 +37,8 @@ import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
 import com.example.trackifyv1.ui.theme.screens.dashboard.categoryColors
 import com.example.trackifyv1.ui.theme.screens.dashboard.daysUntil
-import com.example.trackifyv1.ui.theme.logoFor
+import com.example.trackifyv1.ui.theme.ServiceIcon
+import com.example.trackifyv1.ui.theme.screens.dashboard.RenewalConfirmDialog
 
 private val SubGold        = Color(0xFFD4A017)
 private val SubCrimson     = Color(0xFF8B0000)
@@ -62,6 +63,7 @@ private fun catColor(category: String): Color {
 fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean = true) {
     val vm: SubscriptionViewModel    = viewModel()
     val context                      = LocalContext.current
+    var renewalTarget by remember { mutableStateOf<SubscriptionModel?>(null) }
     val allSubs by vm.subscriptions.collectAsState()
 
     var query       by remember { mutableStateOf("") }
@@ -210,7 +212,7 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                                 subscription = sub,
                                 onDelete     = { ctx -> vm.deleteSubscription(sub.id, ctx) },
                                 onUpdate     = { updated, ctx -> vm.updateSubscription(updated, ctx) },
-                                onRenew      = { vm.renewSubscription(sub, context) },
+                                onRenew      = { renewalTarget = sub },
                                 onTogglePause = { vm.toggleActive(sub, context) }
                             )
                         }
@@ -218,6 +220,17 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                 }
             }
         }
+    }
+
+    renewalTarget?.let { sub ->
+        RenewalConfirmDialog(
+            sub       = sub,
+            onDismiss = { renewalTarget = null },
+            onConfirm = { newAmount ->
+                vm.renewSubscription(sub, context, newAmount)
+                renewalTarget = null
+            }
+        )
     }
 }
 
@@ -253,13 +266,7 @@ fun SubscriptionCard(
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val logo = logoFor(subscription.subscriptionName.ifBlank { "?" })
-                    Box(
-                        Modifier.size(32.dp).clip(RoundedCornerShape(8.dp)).background(logo.color.copy(alpha = 0.18f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(logo.emoji, fontSize = 15.sp)
-                    }
+                    ServiceIcon(subscription.subscriptionName.ifBlank { "?" }, size = 36.dp)
                     Text(
                         subscription.subscriptionName.ifBlank { "Unnamed" },
                         color = if (subscription.isActive) SubGold else SubMuted,

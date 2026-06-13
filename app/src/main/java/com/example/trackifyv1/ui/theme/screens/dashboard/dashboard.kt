@@ -46,6 +46,7 @@ import com.example.trackifyv1.models.SubscriptionModel
 import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
 import com.example.trackifyv1.ui.theme.AppGradient
+import com.example.trackifyv1.ui.theme.ServiceIcon
 import com.example.trackifyv1.ui.theme.LocalAppPalette
 import com.example.trackifyv1.ui.theme.BorderIdle
 import com.example.trackifyv1.ui.theme.CardBg
@@ -175,6 +176,7 @@ fun SubscriptionDetailSheet(
     val vm      = viewModel<SubscriptionViewModel>()
     val context = LocalContext.current
     val allSubs by vm.subscriptions.collectAsState()
+    var renewalTarget by remember { mutableStateOf<SubscriptionModel?>(null) }
 
     val title = when (filter) {
         SheetFilter.MONTHLY -> "Monthly Subscriptions"
@@ -251,7 +253,7 @@ fun SubscriptionDetailSheet(
                                 subscription  = sub,
                                 onDelete      = { ctx -> vm.deleteSubscription(sub.id, ctx) },
                                 onUpdate      = { updated, ctx -> vm.updateSubscription(updated, ctx) },
-                                onRenew       = { vm.renewSubscription(sub, context) },
+                                onRenew       = { renewalTarget = sub },
                                 onTogglePause = { vm.toggleActive(sub, context) }
                             )
                         }
@@ -259,6 +261,17 @@ fun SubscriptionDetailSheet(
                 }
             }
         }
+    }
+
+    renewalTarget?.let { sub ->
+        RenewalConfirmDialog(
+            sub       = sub,
+            onDismiss = { renewalTarget = null },
+            onConfirm = { newAmount ->
+                vm.renewSubscription(sub, context, newAmount)
+                renewalTarget = null
+            }
+        )
     }
 }
 
@@ -346,6 +359,8 @@ fun DashboardTab(
         }
         .sortedBy { it.second }
 
+    var renewalTarget by remember { mutableStateOf<SubscriptionModel?>(null) }
+
     Column(
         Modifier
             .fillMaxSize()
@@ -382,7 +397,7 @@ fun DashboardTab(
             SectionCard("⏰  Renewing soon") {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     upcoming.take(5).forEach { (sub, days) ->
-                        UpcomingRenewalRow(sub, days, onRenew = { vm.renewSubscription(sub, context) })
+                        UpcomingRenewalRow(sub, days, onRenew = { renewalTarget = sub })
                     }
                     if (upcoming.size > 5) {
                         Text("+${upcoming.size - 5} more", color = Muted,
@@ -450,6 +465,17 @@ fun DashboardTab(
         Text("© 2026 Trackify", fontSize = 11.sp, color = BorderIdle,
             fontFamily = FontFamily.Monospace, modifier = Modifier.fillMaxWidth().wrapContentWidth())
     }
+
+    renewalTarget?.let { sub ->
+        RenewalConfirmDialog(
+            sub       = sub,
+            onDismiss = { renewalTarget = null },
+            onConfirm = { newAmount ->
+                vm.renewSubscription(sub, context, newAmount)
+                renewalTarget = null
+            }
+        )
+    }
 }
 
 @Composable
@@ -482,6 +508,71 @@ fun SummaryCard(modifier: Modifier = Modifier, label: String, value: String, acc
 }
 
 @Composable
+fun RenewalConfirmDialog(
+    sub: SubscriptionModel,
+    onDismiss: () -> Unit,
+    onConfirm: (newAmount: String?) -> Unit
+) {
+    var amount by remember { mutableStateOf(sub.subscriptionAmount) }
+    val changed = amount.trim() != sub.subscriptionAmount.trim() && amount.toDoubleOrNull() != null
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor    = CardBg,
+        titleContentColor = Gold,
+        title = {
+            Text("Renew \"${sub.subscriptionName}\"?", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    "Confirm the amount for this ${sub.billingCycle.lowercase()} cycle. If the price changed, update it below.",
+                    color = Muted, fontFamily = FontFamily.Monospace, fontSize = 12.sp
+                )
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it.filter { c -> c.isDigit() || c == '.' } },
+                    label = { Text("Amount (KES)") },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Gold, unfocusedBorderColor = BorderIdle,
+                        focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                        focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
+                        cursorColor = Gold, focusedLabelColor = Gold, unfocusedLabelColor = Muted
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                if (changed) {
+                    val old = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
+                    val new = amount.toDoubleOrNull() ?: 0.0
+                    val arrow = if (new > old) "↑ increased" else "↓ decreased"
+                    val color = if (new > old) Color(0xFFE53935) else TealAccent
+                    Text(
+                        "Price $arrow from KES ${sub.subscriptionAmount} to KES ${amount.trim()}",
+                        color = color, fontFamily = FontFamily.Monospace, fontSize = 11.sp, fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(if (changed) amount.trim() else null) },
+                colors = ButtonDefaults.buttonColors(containerColor = Crimson),
+                shape  = RoundedCornerShape(8.dp)
+            ) { Text("Confirm Renewal", color = Gold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                border  = BorderStroke(1.dp, BorderIdle),
+                colors  = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
+                shape   = RoundedCornerShape(8.dp)
+            ) { Text("Cancel", fontFamily = FontFamily.Monospace) }
+        }
+    )
+}
+
+@Composable
 fun UpcomingRenewalRow(sub: SubscriptionModel, daysLeft: Int, onRenew: () -> Unit) {
     val urgencyColor = when {
         daysLeft <= 3 -> Color(0xFFE53935)
@@ -501,6 +592,8 @@ fun UpcomingRenewalRow(sub: SubscriptionModel, daysLeft: Int, onRenew: () -> Uni
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment     = Alignment.CenterVertically
     ) {
+        ServiceIcon(sub.subscriptionName, size = 34.dp)
+        Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
             Text(sub.subscriptionName, color = Color.White, fontFamily = FontFamily.Monospace,
                 fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)

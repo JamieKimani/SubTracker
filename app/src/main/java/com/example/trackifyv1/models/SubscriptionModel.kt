@@ -15,5 +15,6 @@ data class SubscriptionModel(
     val billingCycle: String = "Monthly",
     val isActive: Boolean = true,
     val isTrial: Boolean = false,
-    val trialEndDate: String = ""
+    val trialEndDate: String = "",
+    val priceHistory: Map<String, String> = emptyMap()
 )
