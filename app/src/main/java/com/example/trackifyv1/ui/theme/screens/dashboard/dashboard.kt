@@ -34,6 +34,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -534,24 +535,29 @@ fun SectionCard(title: String, content: @Composable ColumnScope.() -> Unit) {
 @Composable
 fun SpendingTrendChart(activeSubs: List<SubscriptionModel>, currentMonthlyTotal: Double) {
     val sdf = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    val monthLabels = remember {
-        val cal = Calendar.getInstance()
-        (5 downTo 0).map { offset ->
-            val c = cal.clone() as Calendar
-            c.add(Calendar.MONTH, -offset)
-            SimpleDateFormat("MMM", Locale.getDefault()).format(c.time) to c
+    val monthFmt = remember { SimpleDateFormat("MMM", Locale.getDefault()) }
+
+    data class MonthBucket(val label: String, val endOfMonthMillis: Long)
+
+    val monthBuckets: List<MonthBucket> = remember {
+        val list = mutableListOf<MonthBucket>()
+        for (offset in 5 downTo 0) {
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.MONTH, -offset)
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+            cal.set(Calendar.HOUR_OF_DAY, 23)
+            cal.set(Calendar.MINUTE, 59)
+            list.add(MonthBucket(monthFmt.format(cal.time), cal.timeInMillis))
         }
+        list
     }
 
-    val values = remember(activeSubs) {
-        monthLabels.map { (_, monthCal) ->
-            val monthEnd = (monthCal.clone() as Calendar).apply {
-                set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
-            }
+    val values: List<Double> = remember(activeSubs) {
+        monthBuckets.map { bucket ->
             activeSubs.sumOf { sub ->
                 val started = try {
                     val d = sdf.parse(sub.subscriptionDate)
-                    d != null && !d.after(monthEnd.time)
+                    d == null || d.time <= bucket.endOfMonthMillis
                 } catch (_: Exception) { true }
                 if (started) monthlyAmount(sub) else 0.0
             }
@@ -586,9 +592,9 @@ fun SpendingTrendChart(activeSubs: List<SubscriptionModel>, currentMonthlyTotal:
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            monthLabels.forEachIndexed { i, (label, _) ->
-                Text(label, color = if (i == monthLabels.lastIndex) TealAccent else Muted,
-                    fontSize = 10.sp, fontFamily = FontFamily.Monospace, modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            monthBuckets.forEachIndexed { i, bucket ->
+                Text(bucket.label, color = if (i == monthBuckets.lastIndex) TealAccent else Muted,
+                    fontSize = 10.sp, fontFamily = FontFamily.Monospace, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
             }
         }
         Text(
