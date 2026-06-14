@@ -192,27 +192,28 @@ class SubscriptionViewModel : ViewModel() {
         val subs = _subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to export."); return }
         try {
-            val q    = """
-            val nl   = "\n"
             val fileName = "trackify_${System.currentTimeMillis()}.csv"
-            val dir  = android.os.Environment.getExternalStoragePublicDirectory(
+            val dir = android.os.Environment.getExternalStoragePublicDirectory(
                 android.os.Environment.DIRECTORY_DOWNLOADS
             )
             dir.mkdirs()
             val file   = java.io.File(dir, fileName)
-            val writer = file.bufferedWriter()
-            writer.write("Name,Amount,Cycle,Category,Start,Expiry,Status,Trial,Trial End,Price History$nl")
+            val sb     = StringBuilder()
+            sb.appendLine("Name,Amount,Cycle,Category,Start,Expiry,Status,Trial,Trial End,Price History")
             subs.forEach { sub ->
                 val history = sub.priceHistory.entries
-                    .sortedByDescending { it.key }
-                    .joinToString("; ") { e -> "${e.key}:${e.value}" }
+                    .sortedByDescending { entry -> entry.key }
+                    .joinToString("; ") { entry -> "${entry.key}:${entry.value}" }
                 val status  = if (sub.isActive) "Active" else "Paused"
                 val trial   = if (sub.isTrial) "Yes" else "No"
-                val line    = "${q}${sub.subscriptionName}${q},${sub.subscriptionAmount},${sub.billingCycle},${q}${sub.category}${q},${sub.subscriptionDate},${sub.expiryDate},${status},${trial},${sub.trialEndDate},${q}${history}${q}$nl"
-                writer.write(line)
+                sb.append("\"${sub.subscriptionName}\",")
+                sb.append("${sub.subscriptionAmount},${sub.billingCycle},")
+                sb.append("\"${sub.category}\",")
+                sb.append("${sub.subscriptionDate},${sub.expiryDate},")
+                sb.append("${status},${trial},${sub.trialEndDate},")
+                sb.appendLine("\"${history}\"")
             }
-            writer.flush()
-            writer.close()
+            file.writeText(sb.toString())
             val uri = androidx.core.content.FileProvider.getUriForFile(
                 context, "com.example.trackifyv1.provider", file
             )
@@ -223,9 +224,10 @@ class SubscriptionViewModel : ViewModel() {
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             context.startActivity(android.content.Intent.createChooser(shareIntent, "Share CSV"))
-            toast(context, "Exported ${subs.size} subscription${if (subs.size != 1) "s" else ""}!")
-        } catch (e: Exception) {
-            toast(context, "Export failed: ${e.message}")
+            val count = subs.size
+            toast(context, "Exported $count subscription${if (count != 1) "s" else ""}!")
+        } catch (ex: Exception) {
+            toast(context, "Export failed: ${ex.message}")
         }
     }
     private fun toast(ctx: Context, msg: String) = Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
