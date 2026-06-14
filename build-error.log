@@ -18,24 +18,77 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugNavigationResources
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebug
-> Task :app:mergeDebugAssets
 > Task :app:parseDebugLocalResources
+> Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
 > Task :app:generateDebugRFile
 > Task :app:generateDebugGlobalSynthetics
 > Task :app:desugarDebugFileDependencies
 > Task :app:checkDebugDuplicateClasses
 > Task :app:checkDebugAarMetadata
-> Task :app:compileDebugKotlin
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:545:23 Unresolved reference 'Calendar'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:546:21 Unresolved reference 'Calendar'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:547:21 Unresolved reference 'Calendar'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:547:65 Unresolved reference 'Calendar'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:548:21 Unresolved reference 'Calendar'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:549:21 Unresolved reference 'Calendar'.
+> Task :app:mapDebugSourceSetPaths
+> Task :app:mergeLibDexDebug
+> Task :app:compileDebugNavigationResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
+> Task :app:mergeDebugJniLibFolders
+> Task :app:mergeDebugResources
+> Task :app:mergeDebugNativeLibs
+> Task :app:processDebugResources
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:stripDebugDebugSymbols
+> Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugKotlin FAILED
-> Task :app:mergeExtDexDebug
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:200:20 None of the following candidates is applicable:
+fun write(p0: CharArray!, p1: Int, p2: Int): Unit
+fun write(p0: Int): Unit
+fun write(p0: String!, p1: Int, p2: Int): Unit
+fun write(p0: CharArray!): Unit
+fun write(p0: String!): Unit
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:200:135 Syntax error: Expecting '"'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:200:135 Syntax error: Expecting ','.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:201:3 Syntax error: Expecting '"'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:202:13 Unresolved reference 'subs'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:202:17 Syntax error: Expecting an element.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:202:28 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:203:35 Unresolved reference 'priceHistory'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:203:77 Unresolved reference 'it'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:204:46 Unresolved reference 'it'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:204:56 Unresolved reference 'it'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:24 None of the following candidates is applicable:
+fun write(p0: CharArray!, p1: Int, p2: Int): Unit
+fun write(p0: Int): Unit
+fun write(p0: String!, p1: Int, p2: Int): Unit
+fun write(p0: CharArray!): Unit
+fun write(p0: String!): Unit
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:32 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:38 Unresolved reference 'subscriptionName'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:55 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:119 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:206:3 Syntax error: Expecting '"'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:19 Syntax error: Expecting an element.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:20 Unresolved reference 'flush'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:26 Syntax error: Expecting an expression.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:27 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:267:26 'if' must have both main and 'else' branches when used as an expression.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:267:72 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:267:83 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:268:25 Unresolved reference 'color'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:268:38 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:3:36 Conflicting import: imported name 'BorderStroke' is ambiguous.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:13:36 Conflicting import: imported name 'BorderStroke' is ambiguous.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:60:9 Conflicting declarations:
+local val subscriptions: List<SubscriptionModel>
+local val subscriptions: List<SubscriptionModel>
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:71:9 Conflicting declarations:
+local val subscriptions: List<SubscriptionModel>
+local val subscriptions: List<SubscriptionModel>
 
 FAILURE: Build failed with an exception.
 
@@ -50,5 +103,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 2m 9s
-15 actionable tasks: 15 executed
+BUILD FAILED in 35s
+31 actionable tasks: 31 executed
