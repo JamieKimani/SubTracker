@@ -18,16 +18,16 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugNavigationResources
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebug
-> Task :app:parseDebugLocalResources
 > Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
-> Task :app:generateDebugRFile
+> Task :app:parseDebugLocalResources
 > Task :app:generateDebugGlobalSynthetics
-> Task :app:desugarDebugFileDependencies
+> Task :app:generateDebugRFile
 > Task :app:checkDebugDuplicateClasses
-> Task :app:checkDebugAarMetadata
-> Task :app:mapDebugSourceSetPaths
+> Task :app:desugarDebugFileDependencies
 > Task :app:mergeLibDexDebug
+> Task :app:mapDebugSourceSetPaths
+> Task :app:checkDebugAarMetadata
 > Task :app:compileDebugNavigationResources
 > Task :app:createDebugCompatibleScreenManifests
 > Task :app:extractDeepLinksDebug
@@ -45,42 +45,41 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:mergeExtDexDebug
 
 > Task :app:compileDebugKotlin FAILED
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:200:20 None of the following candidates is applicable:
-fun write(p0: CharArray!, p1: Int, p2: Int): Unit
-fun write(p0: Int): Unit
-fun write(p0: String!, p1: Int, p2: Int): Unit
-fun write(p0: CharArray!): Unit
-fun write(p0: String!): Unit
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:200:135 Syntax error: Expecting '"'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:200:135 Syntax error: Expecting ','.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:201:3 Syntax error: Expecting '"'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:202:13 Unresolved reference 'subs'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:202:17 Syntax error: Expecting an element.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:202:28 Cannot infer type for this parameter. Specify it explicitly.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:203:35 Unresolved reference 'priceHistory'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:203:77 Unresolved reference 'it'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:204:46 Unresolved reference 'it'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:204:56 Unresolved reference 'it'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:24 None of the following candidates is applicable:
-fun write(p0: CharArray!, p1: Int, p2: Int): Unit
-fun write(p0: Int): Unit
-fun write(p0: String!, p1: Int, p2: Int): Unit
-fun write(p0: CharArray!): Unit
-fun write(p0: String!): Unit
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:32 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:38 Unresolved reference 'subscriptionName'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:55 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:205:119 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:206:3 Syntax error: Expecting '"'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:19 Syntax error: Expecting an element.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:20 Unresolved reference 'flush'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:26 Syntax error: Expecting an expression.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:27 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:267:26 'if' must have both main and 'else' branches when used as an expression.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:267:72 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:267:83 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:268:25 Unresolved reference 'color'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/dashboard/dashboard.kt:268:38 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:79:38 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:81:67 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:82:67 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:83:67 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:84:67 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:86:43 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:101:17 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:105:17 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:116:32 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:133:21 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:136:53 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:178:13 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:193:31 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:204:104 Unresolved reference 'nl'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:51 Unresolved reference 'e'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:208:60 Unresolved reference 'e'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:34 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:38 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:61 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:66 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:92 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:112 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:116 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:131 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:136 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:160 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:178 Unresolved reference 'status'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:188 Unresolved reference 'trial'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:197 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:217 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:221 Unresolved reference 'history'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:231 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:234 Unresolved reference 'nl'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:46 Unresolved reference 'e'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:1 Syntax error: Expecting '"'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:3:36 Conflicting import: imported name 'BorderStroke' is ambiguous.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:13:36 Conflicting import: imported name 'BorderStroke' is ambiguous.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:60:9 Conflicting declarations:
@@ -103,5 +102,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 35s
+BUILD FAILED in 37s
 31 actionable tasks: 31 executed
