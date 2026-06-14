@@ -19,6 +19,7 @@ import com.example.trackifyv1.ui.theme.screens.profile.ProfileScreen
 import com.example.trackifyv1.ui.theme.screens.register.RegisterScreen
 import com.example.trackifyv1.ui.theme.screens.splash.SplashScreen
 import com.example.trackifyv1.ui.theme.screens.subscriptions.AddSubscriptionScreen
+import com.example.trackifyv1.ui.theme.screens.history.NotificationHistoryScreen
 import com.example.trackifyv1.ui.theme.screens.subscriptions.ViewSubscriptionsScreen
 import com.google.firebase.auth.FirebaseAuth
 
@@ -79,5 +80,10 @@ fun AppNavHost(
 
         composable(ROUTE_VIEW_SUBSCRIPTIONS) { ViewSubscriptionsScreen(navController) }
         composable(ROUTE_PROFILE)            { ProfileScreen(navController) }
+        composable(
+            route           = ROUTE_NOTIFICATION_HISTORY,
+            enterTransition = { slideInHorizontally(tween(ANIM_MS)) { it } + fadeIn(tween(ANIM_MS)) },
+            popExitTransition = { slideOutHorizontally(tween(ANIM_MS)) { it } + fadeOut(tween(ANIM_MS / 2)) }
+        ) { NotificationHistoryScreen(navController) }
     }
 }

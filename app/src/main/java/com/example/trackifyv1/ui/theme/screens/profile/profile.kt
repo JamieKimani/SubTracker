@@ -1,5 +1,7 @@
 package com.example.trackifyv1.ui.theme.screens.profile
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,12 +32,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import android.widget.Toast
 import com.example.trackifyv1.models.ProfileViewModel
 import com.example.trackifyv1.models.ThemeViewModel
 import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.models.BudgetViewModel
+import com.example.trackifyv1.models.RecentlyDeletedViewModel
 import com.example.trackifyv1.ui.theme.screens.dashboard.monthlyAmount
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
+import android.net.Uri
+import com.example.trackifyv1.navigation.ROUTE_NOTIFICATION_HISTORY
 import com.example.trackifyv1.ui.theme.screens.dashboard.SheetFilter
 import com.example.trackifyv1.ui.theme.screens.dashboard.SubscriptionDetailSheet
 
@@ -53,12 +59,38 @@ fun ProfileScreen(navController: NavController) {
     val context       = LocalContext.current
     val profileVm     = viewModel<ProfileViewModel>()
     val subscriptionVm = viewModel<SubscriptionViewModel>()
-    val themeVm        = viewModel<ThemeViewModel>()
-    val isDarkMode     by themeVm.isDarkMode.collectAsState()
-    val subscriptions  by subscriptionVm.subscriptions.collectAsState()
-    val budgetVm       = viewModel<BudgetViewModel>()
+    val themeVm          = viewModel<ThemeViewModel>()
+    val isDarkMode       by themeVm.isDarkMode.collectAsState()
+    val subscriptions    by subscriptionVm.subscriptions.collectAsState()
+    val budgetVm         = viewModel<BudgetViewModel>()
+    val deletedVm        = viewModel<RecentlyDeletedViewModel>()
+    val recentlyDeleted  by deletedVm.deleted.collectAsState()
+    var showDeletedSheet by remember { mutableStateOf(false) }
+    var showRestoreInfo  by remember { mutableStateOf(false) }
+
+    val jsonPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        try {
+            val json = context.contentResolver.openInputStream(uri)
+                ?.bufferedReader()?.readText() ?: ""
+            if (json.isNotBlank()) subscriptionVm.restoreFromJson(context, json)
+            else android.widget.Toast.makeText(context, "Empty file.", android.widget.Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            android.widget.Toast.makeText(context, "Could not read file.", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
     val budgets        by budgetVm.budgets.collectAsState()
     var showBudgetDialog by remember { mutableStateOf(false) }
+
+    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            val text = context.contentResolver.openInputStream(it)?.bufferedReader()?.readText()
+            if (!text.isNullOrBlank()) subscriptionVm.importJson(context, text)
+            else Toast.makeText(context, "Could not read file.", Toast.LENGTH_SHORT).show()
+        }
+    }
     var budgetCategory   by remember { mutableStateOf("") }
     var budgetAmount     by remember { mutableStateOf("") }
     val categories = subscriptions.map { it.category.ifBlank { "Uncategorized" } }.distinct().sorted()
@@ -69,6 +101,8 @@ fun ProfileScreen(navController: NavController) {
     var showEditEmail      by remember { mutableStateOf(false) }
     var showChangePassword by remember { mutableStateOf(false) }
     var showLogoutConfirm  by remember { mutableStateOf(false) }
+    var showClearConfirm1  by remember { mutableStateOf(false) }
+    var showClearConfirm2  by remember { mutableStateOf(false) }
     var sheetFilter        by remember { mutableStateOf(SheetFilter.NONE) }
     val sheetState         = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -167,6 +201,8 @@ fun ProfileScreen(navController: NavController) {
             HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
             SettingRow(Icons.Default.Lock,    "Change Password", "••••••••")                          { showChangePassword = true }
             HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
+            SettingRow(Icons.Default.Notifications, "Notification History", "View recent alerts") { navController.navigate(ROUTE_NOTIFICATION_HISTORY) }
+            HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -245,27 +281,92 @@ fun ProfileScreen(navController: NavController) {
             }
         }
 
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(
+                onClick  = { subscriptionVm.exportJson(context) },
+                modifier = Modifier.weight(1f).height(48.dp),
+                shape    = RoundedCornerShape(10.dp),
+                border   = BorderStroke(1.dp, TealAccent),
+                colors   = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent, contentColor = TealAccent)
+            ) {
+                Icon(Icons.Default.FileDownload, "Backup", modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Backup", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+            }
+            OutlinedButton(
+                onClick  = { importLauncher.launch("application/json") },
+                modifier = Modifier.weight(1f).height(48.dp),
+                shape    = RoundedCornerShape(10.dp),
+                border   = BorderStroke(1.dp, Color(0xFFFF6D00)),
+                colors   = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent, contentColor = Color(0xFFFF6D00))
+            ) {
+                Icon(Icons.Default.FileUpload, "Restore", modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Restore", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+            }
+        }
         OutlinedButton(
             onClick  = { subscriptionVm.exportToCsv(context) },
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape    = RoundedCornerShape(12.dp),
-            border   = BorderStroke(1.dp, TealAccent),
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape    = RoundedCornerShape(10.dp),
+            border   = BorderStroke(1.dp, TealAccent.copy(alpha = 0.6f)),
             colors   = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent, contentColor = TealAccent)
         ) {
-            Icon(Icons.Default.FileDownload, "Export", modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(8.dp))
-            Text("Export to CSV", fontSize = 15.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+            Icon(Icons.Default.TableChart, "CSV", modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(6.dp))
+            Text("Export to CSV", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
         }
 
         Spacer(Modifier.height(4.dp))
 
-        Button(
-            onClick  = { showLogoutConfirm = true },
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape    = RoundedCornerShape(12.dp),
-            colors   = ButtonDefaults.buttonColors(containerColor = Crimson)
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .background(Color(0xFF1A0808).copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text("Log Out", color = Gold, fontSize = 15.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+            Text(
+                "Danger Zone",
+                color = Color(0xFFE53935),
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                fontSize = 13.sp
+            )
+            HorizontalDivider(color = Color(0xFFE53935).copy(alpha = 0.25f), thickness = 0.5.dp)
+            Text(
+                "These actions are permanent and cannot be undone.",
+                color = Muted,
+                fontFamily = FontFamily.Monospace,
+                fontSize = 11.sp
+            )
+            OutlinedButton(
+                onClick  = { showClearConfirm1 = true },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape    = RoundedCornerShape(10.dp),
+                border   = BorderStroke(1.dp, Color(0xFFE53935)),
+                colors   = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color(0xFFE53935).copy(alpha = 0.08f),
+                    contentColor   = Color(0xFFE53935)
+                )
+            ) {
+                Icon(Icons.Default.DeleteForever, "Clear", modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Clear all subscription data", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            }
+            OutlinedButton(
+                onClick  = { showLogoutConfirm = true },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape    = RoundedCornerShape(10.dp),
+                border   = BorderStroke(1.dp, Crimson),
+                colors   = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Crimson.copy(alpha = 0.08f),
+                    contentColor   = Color.White
+                )
+            ) {
+                Icon(Icons.Default.Logout, "Logout", modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Log Out", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            }
         }
 
         Text("© 2026 Trackify", fontSize = 11.sp, color = BorderIdle,
@@ -344,6 +445,55 @@ fun ProfileScreen(navController: NavController) {
         }
     }
 
+    if (showDeletedSheet) {
+        androidx.compose.material3.ModalBottomSheet(
+            onDismissRequest = { showDeletedSheet = false },
+            containerColor   = CardBg
+        ) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 32.dp)) {
+                Text("Recently Deleted", color = Gold, fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+                    modifier = Modifier.padding(bottom = 4.dp))
+                Text("Subscriptions are permanently erased after 7 days.",
+                    color = Muted, fontFamily = FontFamily.Monospace, fontSize = 12.sp,
+                    modifier = Modifier.padding(bottom = 12.dp))
+                recentlyDeleted.forEach { deleted ->
+                    val daysLeft = ((deleted.deletedAt + 7L * 24 * 60 * 60 * 1000 - System.currentTimeMillis()) /
+                        (1000 * 60 * 60 * 24)).toInt().coerceAtLeast(0)
+                    Row(
+                        Modifier.fillMaxWidth()
+                            .background(Color(0xFF1C1C1C).copy(alpha = 0.8f), RoundedCornerShape(10.dp))
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment     = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(deleted.subscriptionName, color = Color.White,
+                                fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text("KES ${deleted.subscriptionAmount} · ${deleted.billingCycle} · ${deleted.category}",
+                                color = Muted, fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                            Text("Expires in $daysLeft day${if (daysLeft != 1) "s" else ""}",
+                                color = if (daysLeft <= 1) Color(0xFFE53935) else Muted,
+                                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            IconButton(onClick = { subscriptionVm.restoreSubscription(deleted, context) },
+                                modifier = Modifier.size(36.dp)) {
+                                Icon(Icons.Default.Restore, "Restore", tint = TealAccent, modifier = Modifier.size(20.dp))
+                            }
+                            IconButton(onClick = { subscriptionVm.permanentlyDelete(deleted.id, context) },
+                                modifier = Modifier.size(36.dp)) {
+                                Icon(Icons.Default.DeleteForever, "Delete forever", tint = Color(0xFFE53935),
+                                    modifier = Modifier.size(20.dp))
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+
     if (showBudgetDialog) {
         AlertDialog(
             onDismissRequest = { showBudgetDialog = false },
@@ -380,6 +530,74 @@ fun ProfileScreen(navController: NavController) {
             dismissButton = {
                 OutlinedButton(
                     onClick = { showBudgetDialog = false },
+                    border  = BorderStroke(1.dp, BorderIdle),
+                    colors  = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
+                    shape   = RoundedCornerShape(8.dp)
+                ) { Text("Cancel", fontFamily = FontFamily.Monospace) }
+            }
+        )
+    }
+
+    if (showClearConfirm1) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirm1 = false },
+            containerColor   = CardBg, titleContentColor = Color(0xFFE53935),
+            title = { Text("Clear all data?", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) },
+            text  = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "This will permanently delete ALL ${subscriptions.size} subscription${if (subscriptions.size != 1) "s" else ""} from your account and from the database.",
+                        color = Muted, fontFamily = FontFamily.Monospace, fontSize = 13.sp
+                    )
+                    Text(
+                        "This cannot be undone. Are you sure?",
+                        color = Color(0xFFE53935), fontFamily = FontFamily.Monospace,
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showClearConfirm1 = false; showClearConfirm2 = true },
+                    colors  = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                    shape   = RoundedCornerShape(8.dp)
+                ) { Text("Yes, continue", color = Color.White, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showClearConfirm1 = false },
+                    border  = BorderStroke(1.dp, BorderIdle),
+                    colors  = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
+                    shape   = RoundedCornerShape(8.dp)
+                ) { Text("Cancel", fontFamily = FontFamily.Monospace) }
+            }
+        )
+    }
+
+    if (showClearConfirm2) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirm2 = false },
+            containerColor   = CardBg, titleContentColor = Color(0xFFE53935),
+            title = { Text("Final confirmation", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) },
+            text  = {
+                Text(
+                    "Tap ERASE NOW to permanently delete all your subscription data from this app and from Firebase. There is no going back.",
+                    color = Muted, fontFamily = FontFamily.Monospace, fontSize = 13.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showClearConfirm2 = false
+                        subscriptionVm.clearAllSubscriptions(context)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C)),
+                    shape  = RoundedCornerShape(8.dp)
+                ) { Text("ERASE NOW", color = Color.White, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp) }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showClearConfirm2 = false },
                     border  = BorderStroke(1.dp, BorderIdle),
                     colors  = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
                     shape   = RoundedCornerShape(8.dp)

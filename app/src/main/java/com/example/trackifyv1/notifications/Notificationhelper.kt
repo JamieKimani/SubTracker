@@ -2,6 +2,11 @@ package com.example.trackifyv1.notifications
 
 import android.Manifest
 import android.app.AlarmManager
+import com.example.trackifyv1.data.AppDatabase
+import com.example.trackifyv1.data.NotificationHistoryEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -39,8 +44,16 @@ class NotificationHelper(private val context: Context) {
                 description = "Alerts when free trials are about to end"
                 enableVibration(true); setShowBadge(true)
             }
+            val summaryChannel = NotificationChannel(
+                CHANNEL_SUMMARY, "Monthly Summary",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Monthly spending summary on the 1st of each month"
+                setShowBadge(true)
+            }
             notificationManager.createNotificationChannel(renewalChannel)
             notificationManager.createNotificationChannel(trialChannel)
+            notificationManager.createNotificationChannel(summaryChannel)
         }
     }
 
@@ -59,6 +72,11 @@ class NotificationHelper(private val context: Context) {
             .setAutoCancel(true)
             .build()
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        CoroutineScope(Dispatchers.IO).launch {
+            AppDatabase.get(context).notificationHistoryDao().insert(
+                NotificationHistoryEntity(title = title, message = message, channel = channel)
+            )
+        }
     }
 
     fun scheduleNotification(
@@ -164,6 +182,24 @@ class NotificationHelper(private val context: Context) {
         } catch (_: Exception) { false }
     }
 
+    fun scheduleMonthlySummary(totalSubs: Int, monthlyTotal: Double, renewingSoon: Int) {
+        val title   = "Trackify Monthly Summary"
+        val message = buildString {
+            append("You have $totalSubs active subscription${if (totalSubs != 1) "s" else ""} ")
+            append("costing KES ${"%.0f".format(monthlyTotal)}/mo.")
+            if (renewingSoon > 0) append(" $renewingSoon renew${if (renewingSoon != 1) "s" else ""} this week.")
+        }
+        val cal = Calendar.getInstance().apply {
+            add(Calendar.MONTH, 1)
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 9)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        scheduleNotification(title, message, cal.timeInMillis, SUMMARY_REQUEST_CODE, CHANNEL_SUMMARY)
+    }
+
     fun cancelScheduledNotification(requestCode: Int) {
         val intent = Intent(context, ReminderBroadcastReceiver::class.java)
         val pending = PendingIntent.getBroadcast(context, requestCode, intent,
@@ -175,11 +211,13 @@ class NotificationHelper(private val context: Context) {
     }
 
     companion object {
-        const val CHANNEL_RENEWALS  = "trackify_renewals"
-        const val CHANNEL_TRIALS    = "trackify_trials"
-        const val EXTRA_TITLE       = "title"
-        const val EXTRA_MESSAGE     = "message"
-        const val EXTRA_CHANNEL     = "channel"
-        const val REMINDER_HOUR     = 9
+        const val CHANNEL_RENEWALS    = "trackify_renewals"
+        const val CHANNEL_TRIALS      = "trackify_trials"
+        const val CHANNEL_SUMMARY     = "trackify_summary"
+        const val EXTRA_TITLE         = "title"
+        const val EXTRA_MESSAGE       = "message"
+        const val EXTRA_CHANNEL       = "channel"
+        const val REMINDER_HOUR       = 9
+        const val SUMMARY_REQUEST_CODE = 999001
     }
 }

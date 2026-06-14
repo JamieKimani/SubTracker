@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -67,6 +69,9 @@ fun AddSubscriptionScreen(navController: NavController) {
     val context  = LocalContext.current
     val calendar = Calendar.getInstance()
     val vm: SubscriptionViewModel = viewModel()
+    val existingSubs by vm.subscriptions.collectAsState()
+    val duplicateName = subscriptionName.isNotBlank() &&
+        existingSubs.any { it.subscriptionName.trim().lowercase() == subscriptionName.trim().lowercase() }
 
     fun makePicker(onDateSet: (String) -> Unit) = DatePickerDialog(
         context, { _, y, m, d -> onDateSet("%02d/%02d/%04d".format(d, m + 1, y)) },
@@ -215,6 +220,11 @@ fun AddSubscriptionScreen(navController: NavController) {
             Button(
                 onClick = {
                     if (amountError) return@Button
+                    if (duplicateName) {
+                        android.widget.Toast.makeText(context,
+                            "A subscription with this name already exists.", android.widget.Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
                     vm.addSubscription(
                         subscriptionName, subscriptionAmount, subscriptionDate,
                         expiryDate, reminderDate, context, selectedCategory, selectedCycle,

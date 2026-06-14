@@ -4,6 +4,8 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.example.trackifyv1.notifications.NotificationHelper
+import com.example.trackifyv1.models.toDeleted
+import com.example.trackifyv1.models.toSubscription
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -39,7 +41,8 @@ class SubscriptionViewModel : ViewModel() {
         if (auth.currentUser != null) attach()
     }
 
-    private fun userRef() = auth.currentUser?.uid?.let { db.child("Subscriptions").child(it) }
+    private fun userRef()    = auth.currentUser?.uid?.let { db.child("Subscriptions").child(it) }
+    private fun deletedRef() = auth.currentUser?.uid?.let { db.child("DeletedSubscriptions").child(it) }
 
     private fun attach() {
         val ref = userRef() ?: return
@@ -48,9 +51,10 @@ class SubscriptionViewModel : ViewModel() {
         _isLoading.value = true
         listener = object : ValueEventListener {
             override fun onDataChange(snap: DataSnapshot) {
-                _subscriptions.value = snap.children.mapNotNull { child ->
+                val list = snap.children.mapNotNull { child ->
                     child.getValue(SubscriptionModel::class.java)?.copy(id = child.key ?: "")
                 }
+                _subscriptions.value = list
                 _isLoading.value = false
             }
             override fun onCancelled(e: DatabaseError) { _isLoading.value = false }
@@ -78,10 +82,16 @@ class SubscriptionViewModel : ViewModel() {
     ) {
         val ref = userRef() ?: run { toast(context, "You must be logged in."); return }
         when {
-            subscriptionName.isBlank()                       -> { toast(context, "Enter a subscription name."); return }
-            subscriptionAmount.isBlank()                     -> { toast(context, "Enter an amount."); return }
-            subscriptionAmount.toDoubleOrNull() == null      -> { toast(context, "Amount must be a valid number."); return }
+            subscriptionName.isBlank()                        -> { toast(context, "Enter a subscription name."); return }
+            subscriptionAmount.isBlank()                      -> { toast(context, "Enter an amount."); return }
+            subscriptionAmount.toDoubleOrNull() == null       -> { toast(context, "Amount must be a valid number."); return }
             (subscriptionAmount.toDoubleOrNull() ?: 0.0) < 0 -> { toast(context, "Amount cannot be negative."); return }
+        }
+        val duplicate = _subscriptions.value.any {
+            it.subscriptionName.trim().equals(subscriptionName.trim(), ignoreCase = true)
+        }
+        if (duplicate) {
+            toast(context, "⚠️ You already have a subscription named "${subscriptionName.trim()}". Added anyway.")
         }
         val id  = ref.push().key ?: run { toast(context, "Connection error. Try again."); return }
         val sub = SubscriptionModel(
@@ -186,6 +196,219 @@ class SubscriptionViewModel : ViewModel() {
         super.onCleared()
         auth.removeAuthStateListener(authListener)
         detach()
+    }
+
+    fun clearAllSubscriptions(context: Context, onComplete: () -> Unit = {}) {
+        val current = _subscriptions.value
+        _subscriptions.value = emptyList()
+        current.forEach { sub ->
+            val helper = NotificationHelper(context)
+            helper.cancelScheduledNotification(sub.id.hashCode())
+            helper.cancelScheduledNotification(("trial_" + sub.id).hashCode())
+        }
+        userRef()?.removeValue()
+            ?.addOnSuccessListener {
+                toast(context, "All subscription data cleared.")
+                onComplete()
+            }
+            ?.addOnFailureListener {
+                toast(context, "Could not clear data. Try again.")
+            }
+    }
+
+    fun exportJson(context: Context) {
+        val subs = _subscriptions.value
+        if (subs.isEmpty()) { toast(context, "No subscriptions to export."); return }
+        try {
+            val sb = StringBuilder()
+            sb.append("[")
+            subs.forEachIndexed { i, sub ->
+                sb.append("{")
+                sb.append(""name":"${sub.subscriptionName}",")
+                sb.append(""amount":"${sub.subscriptionAmount}",")
+                sb.append(""startDate":"${sub.subscriptionDate}",")
+                sb.append(""expiryDate":"${sub.expiryDate}",")
+                sb.append(""reminderDate":"${sub.reminderDate}",")
+                sb.append(""category":"${sub.category}",")
+                sb.append(""billingCycle":"${sub.billingCycle}",")
+                sb.append(""isActive":${sub.isActive},")
+                sb.append(""isTrial":${sub.isTrial},")
+                sb.append(""trialEndDate":"${sub.trialEndDate}"")
+                sb.append("}")
+                if (i < subs.lastIndex) sb.append(",")
+            }
+            sb.append("]")
+
+            val fileName = "trackify_backup_${System.currentTimeMillis()}.json"
+            val dir  = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+            dir.mkdirs()
+            val file = java.io.File(dir, fileName)
+            file.writeText(sb.toString())
+
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context, "com.example.trackifyv1.provider", file
+            )
+            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "application/json"
+                putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                putExtra(android.content.Intent.EXTRA_SUBJECT, "Trackify Backup")
+                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(android.content.Intent.createChooser(shareIntent, "Save backup"))
+            toast(context, "Backup created with ${subs.size} subscriptions!")
+        } catch (ex: Exception) {
+            toast(context, "Backup failed: ${ex.message}")
+        }
+    }
+
+    fun importJson(context: Context, jsonText: String) {
+        val ref = userRef() ?: run { toast(context, "You must be logged in."); return }
+        try {
+            var imported = 0
+            val trimmed = jsonText.trim().removePrefix("[").removeSuffix("]")
+            val items = trimmed.split("},{")
+            items.forEach { rawItem ->
+                val item = rawItem.trim().removePrefix("{").removeSuffix("}")
+                fun field(key: String): String {
+                    val pattern = Regex(""$key":"([^"]*)"")
+                    return pattern.find(item)?.groupValues?.get(1) ?: ""
+                }
+                fun boolField(key: String): Boolean {
+                    val pattern = Regex(""$key":(true|false)")
+                    return pattern.find(item)?.groupValues?.get(1) == "true"
+                }
+                val name = field("name")
+                if (name.isBlank()) return@forEach
+                val id = ref.push().key ?: return@forEach
+                val sub = SubscriptionModel(
+                    id                 = id,
+                    subscriptionName   = name,
+                    subscriptionAmount = field("amount"),
+                    subscriptionDate   = field("startDate"),
+                    expiryDate         = field("expiryDate"),
+                    reminderDate       = field("reminderDate"),
+                    category           = field("category"),
+                    billingCycle       = field("billingCycle").ifBlank { "Monthly" },
+                    isActive           = boolField("isActive"),
+                    isTrial            = boolField("isTrial"),
+                    trialEndDate       = field("trialEndDate")
+                )
+                ref.child(id).setValue(sub)
+                imported++
+            }
+            toast(context, "Imported $imported subscriptions!")
+        } catch (ex: Exception) {
+            toast(context, "Import failed: ${ex.message}")
+        }
+    }
+
+    fun scheduleMonthlySummary(context: Context) {
+        val activeSubs   = _subscriptions.value.filter { it.isActive }
+        val monthlyTotal = activeSubs.sumOf { sub ->
+            val amt = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
+            when (sub.billingCycle) {
+                "Weekly"    -> amt * 4.33
+                "Quarterly" -> amt / 3.0
+                "Yearly"    -> amt / 12.0
+                else        -> amt
+            }
+        }
+        val now          = System.currentTimeMillis()
+        val sevenDays    = 7L * 24 * 60 * 60 * 1000
+        val renewingSoon = activeSubs.count { sub ->
+            try {
+                val sdf  = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                val date = sdf.parse(sub.expiryDate) ?: return@count false
+                val diff = date.time - now
+                diff in 0..sevenDays
+            } catch (_: Exception) { false }
+        }
+        com.example.trackifyv1.notifications.NotificationHelper(context)
+            .scheduleMonthlySummary(activeSubs.size, monthlyTotal, renewingSoon)
+    }
+
+    fun exportToJson(context: Context) {
+        val subs = _subscriptions.value
+        if (subs.isEmpty()) { toast(context, "No subscriptions to backup."); return }
+        try {
+            val sb = StringBuilder()
+            sb.append("[")
+            subs.forEachIndexed { index, sub ->
+                sb.append("{")
+                sb.append(""subscriptionName":"${sub.subscriptionName}",")
+                sb.append(""subscriptionAmount":"${sub.subscriptionAmount}",")
+                sb.append(""subscriptionDate":"${sub.subscriptionDate}",")
+                sb.append(""expiryDate":"${sub.expiryDate}",")
+                sb.append(""reminderDate":"${sub.reminderDate}",")
+                sb.append(""category":"${sub.category}",")
+                sb.append(""billingCycle":"${sub.billingCycle}",")
+                sb.append(""isActive":${sub.isActive},")
+                sb.append(""isTrial":${sub.isTrial},")
+                sb.append(""trialEndDate":"${sub.trialEndDate}"")
+                sb.append("}")
+                if (index < subs.lastIndex) sb.append(",")
+            }
+            sb.append("]")
+            val fileName = "trackify_backup_${System.currentTimeMillis()}.json"
+            val dir  = android.os.Environment.getExternalStoragePublicDirectory(
+                android.os.Environment.DIRECTORY_DOWNLOADS)
+            dir.mkdirs()
+            val file = java.io.File(dir, fileName)
+            file.writeText(sb.toString())
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context, "com.example.trackifyv1.provider", file)
+            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "application/json"
+                putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                putExtra(android.content.Intent.EXTRA_SUBJECT, "Trackify Backup")
+                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(android.content.Intent.createChooser(shareIntent, "Save backup"))
+            toast(context, "Backup of ${subs.size} subscriptions created!")
+        } catch (ex: Exception) {
+            toast(context, "Backup failed: ${ex.message}")
+        }
+    }
+
+    fun restoreFromJson(context: Context, jsonText: String) {
+        try {
+            val trimmed = jsonText.trim()
+            if (!trimmed.startsWith("[")) { toast(context, "Invalid backup file."); return }
+            val entries = trimmed.removePrefix("[").removeSuffix("]").split("},{")
+                .map { it.trim().removePrefix("{").removeSuffix("}") }
+            var imported = 0
+            entries.forEach { entry ->
+                fun field(key: String): String {
+                    val pattern = ""$key":"([^"]*)""
+                    val regex   = Regex(pattern)
+                    return regex.find(entry)?.groupValues?.getOrNull(1) ?: ""
+                }
+                fun boolField(key: String): Boolean {
+                    return entry.contains(""$key":true")
+                }
+                val name = field("subscriptionName")
+                if (name.isBlank()) return@forEach
+                val duplicate = _subscriptions.value.any {
+                    it.subscriptionName.trim().lowercase() == name.trim().lowercase()
+                }
+                if (duplicate) return@forEach
+                addSubscription(
+                    subscriptionName   = name,
+                    subscriptionAmount = field("subscriptionAmount"),
+                    subscriptionDate   = field("subscriptionDate"),
+                    expiryDate         = field("expiryDate"),
+                    reminderDate       = field("reminderDate"),
+                    context            = context,
+                    category           = field("category"),
+                    billingCycle       = field("billingCycle").ifBlank { "Monthly" },
+                    isTrial            = boolField("isTrial"),
+                    trialEndDate       = field("trialEndDate")
+                )
+            }
+            toast(context, "Restored $imported subscription${if (imported != 1) "s" else ""}!")
+        } catch (ex: Exception) {
+            toast(context, "Restore failed: ${ex.message}")
+        }
     }
 
     fun exportToCsv(context: Context) {

@@ -377,6 +377,10 @@ fun DashboardTab(
         return
     }
 
+    androidx.compose.runtime.LaunchedEffect(subs.size) {
+        if (subs.isNotEmpty()) vm.scheduleMonthlySummary(context)
+    }
+
     val monthlyTotal = activeSubs.sumOf { monthlyAmount(it) }
     val annualTotal  = monthlyTotal * 12
     val amounts      = activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }
