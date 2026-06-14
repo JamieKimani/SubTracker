@@ -63,12 +63,9 @@ fun ProfileScreen(navController: NavController) {
     var showBudgetDialog by remember { mutableStateOf(false) }
     var budgetCategory   by remember { mutableStateOf("") }
     var budgetAmount     by remember { mutableStateOf("") }
-
     val categories = subscriptions.map { it.category.ifBlank { "Uncategorized" } }.distinct().sorted()
-
     val profile       by profileVm.profile.collectAsState()
     val isLoading     by profileVm.isLoading.collectAsState()
-    val subscriptions by subscriptionVm.subscriptions.collectAsState()
 
     var showEditName       by remember { mutableStateOf(false) }
     var showEditEmail      by remember { mutableStateOf(false) }
