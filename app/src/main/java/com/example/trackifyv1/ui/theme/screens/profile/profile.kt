@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +38,6 @@ import com.example.trackifyv1.ui.theme.screens.dashboard.monthlyAmount
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
 import com.example.trackifyv1.ui.theme.screens.dashboard.SheetFilter
 import com.example.trackifyv1.ui.theme.screens.dashboard.SubscriptionDetailSheet
-import com.example.trackifyv1.ui.theme.screens.dashboard.monthlyAmount
 
 private val Gold       = Color(0xFFD4A017)
 private val Crimson    = Color(0xFF8B0000)
