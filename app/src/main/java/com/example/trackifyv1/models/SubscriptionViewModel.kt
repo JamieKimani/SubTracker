@@ -188,5 +188,40 @@ class SubscriptionViewModel : ViewModel() {
         detach()
     }
 
+    fun exportToCsv(context: Context) {
+        val subs = _subscriptions.value
+        if (subs.isEmpty()) { toast(context, "No subscriptions to export."); return }
+        try {
+            val fileName = "trackify_subscriptions_${System.currentTimeMillis()}.csv"
+            val dir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+            dir.mkdirs()
+            val file = java.io.File(dir, fileName)
+            val writer = file.bufferedWriter()
+            writer.write("Name,Amount (KES),Billing Cycle,Category,Start Date,Expiry Date,Status,Is Trial,Trial End Date,Price History
+")
+            subs.forEach { sub ->
+                val history = sub.priceHistory.entries.sortedByDescending { it.key }
+                    .joinToString("; ") { "${it.key}:${it.value}" }
+                writer.write(""${sub.subscriptionName}",${sub.subscriptionAmount},${sub.billingCycle},"${sub.category}",${sub.subscriptionDate},${sub.expiryDate},${if (sub.isActive) "Active" else "Paused"},${if (sub.isTrial) "Yes" else "No"},${sub.trialEndDate},"$history"
+")
+            }
+            writer.flush(); writer.close()
+
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context, "${context.packageName}.provider", file
+            )
+            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "text/csv"
+                putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                putExtra(android.content.Intent.EXTRA_SUBJECT, "Trackify Subscriptions Export")
+                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(android.content.Intent.createChooser(intent, "Share subscriptions CSV"))
+            toast(context, "Exported ${subs.size} subscription${if (subs.size != 1) "s" else ""}!")
+        } catch (e: Exception) {
+            toast(context, "Export failed: ${e.message}")
+        }
+    }
+
     private fun toast(ctx: Context, msg: String) = Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
 }

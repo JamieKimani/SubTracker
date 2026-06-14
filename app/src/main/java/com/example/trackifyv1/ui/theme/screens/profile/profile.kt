@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +34,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.trackifyv1.models.ProfileViewModel
 import com.example.trackifyv1.models.ThemeViewModel
 import com.example.trackifyv1.models.SubscriptionViewModel
+import com.example.trackifyv1.models.BudgetViewModel
+import com.example.trackifyv1.ui.theme.screens.dashboard.monthlyAmount
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
 import com.example.trackifyv1.ui.theme.screens.dashboard.SheetFilter
 import com.example.trackifyv1.ui.theme.screens.dashboard.SubscriptionDetailSheet
@@ -54,6 +57,14 @@ fun ProfileScreen(navController: NavController) {
     val subscriptionVm = viewModel<SubscriptionViewModel>()
     val themeVm        = viewModel<ThemeViewModel>()
     val isDarkMode     by themeVm.isDarkMode.collectAsState()
+    val subscriptions  by subscriptionVm.subscriptions.collectAsState()
+    val budgetVm       = viewModel<BudgetViewModel>()
+    val budgets        by budgetVm.budgets.collectAsState()
+    var showBudgetDialog by remember { mutableStateOf(false) }
+    var budgetCategory   by remember { mutableStateOf("") }
+    var budgetAmount     by remember { mutableStateOf("") }
+
+    val categories = subscriptions.map { it.category.ifBlank { "Uncategorized" } }.distinct().sorted()
 
     val profile       by profileVm.profile.collectAsState()
     val isLoading     by profileVm.isLoading.collectAsState()
@@ -183,6 +194,76 @@ fun ProfileScreen(navController: NavController) {
             }
         }
 
+        if (categories.isNotEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+                    .background(CardBg.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+                    .padding(4.dp)
+            ) {
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment     = Alignment.CenterVertically
+                ) {
+                    Text("Monthly Budgets", color = Gold, fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                    TextButton(onClick = {
+                        budgetCategory = categories.first(); budgetAmount = ""; showBudgetDialog = true
+                    }) {
+                        Text("Set budget", color = TealAccent, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    }
+                }
+                HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp)
+                categories.forEach { cat ->
+                    val budget = budgets[cat]
+                    val spent  = subscriptions.filter { it.isActive && it.category.ifBlank { "Uncategorized" } == cat }
+                        .sumOf { monthlyAmount(it) }
+                    val over   = budget != null && spent > budget
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment     = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(cat, color = if (over) Color(0xFFE53935) else Color.White,
+                                fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                            Text(
+                                if (budget != null) "KES ${"%.0f".format(spent)} / ${"%.0f".format(budget)} limit"
+                                else "KES ${"%.0f".format(spent)} / mo — no limit",
+                                color = if (over) Color(0xFFE53935) else Muted,
+                                fontFamily = FontFamily.Monospace, fontSize = 11.sp
+                            )
+                        }
+                        IconButton(onClick = {
+                            budgetCategory = cat
+                            budgetAmount   = budget?.let { "%.0f".format(it) } ?: ""
+                            showBudgetDialog = true
+                        }, Modifier.size(32.dp)) {
+                            Icon(Icons.Default.Edit, "Edit budget", tint = BorderIdle, modifier = Modifier.size(16.dp))
+                        }
+                    }
+                    if (cat != categories.last()) {
+                        HorizontalDivider(color = BorderIdle.copy(alpha = 0.2f), thickness = 0.5.dp,
+                            modifier = Modifier.padding(horizontal = 16.dp))
+                    }
+                }
+            }
+        }
+
+        OutlinedButton(
+            onClick  = { subscriptionVm.exportToCsv(context) },
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape    = RoundedCornerShape(12.dp),
+            border   = BorderStroke(1.dp, TealAccent),
+            colors   = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent, contentColor = TealAccent)
+        ) {
+            Icon(Icons.Default.FileDownload, "Export", modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text("Export to CSV", fontSize = 15.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+        }
+
+        Spacer(Modifier.height(4.dp))
+
         Button(
             onClick  = { showLogoutConfirm = true },
             modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -266,6 +347,50 @@ fun ProfileScreen(navController: NavController) {
                     colors = fColors, modifier = Modifier.fillMaxWidth())
             }
         }
+    }
+
+    if (showBudgetDialog) {
+        AlertDialog(
+            onDismissRequest = { showBudgetDialog = false },
+            containerColor    = CardBg, titleContentColor = Gold,
+            title = { Text("Budget for $budgetCategory", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Set a monthly spending limit for this category.", color = Muted, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    OutlinedTextField(
+                        value = budgetAmount, onValueChange = { budgetAmount = it.filter { c -> c.isDigit() || c == '.' } },
+                        label = { Text("Monthly limit (KES)") }, singleLine = true,
+                        placeholder = { Text("e.g. 2000", color = Muted) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Gold, unfocusedBorderColor = BorderIdle,
+                            focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                            focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
+                            cursorColor = Gold, focusedLabelColor = Gold, unfocusedLabelColor = Muted
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val amt = budgetAmount.toDoubleOrNull() ?: 0.0
+                        budgetVm.setBudget(budgetCategory, amt, context)
+                        showBudgetDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Crimson),
+                    shape  = RoundedCornerShape(8.dp)
+                ) { Text("Save", color = Gold, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold) }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showBudgetDialog = false },
+                    border  = BorderStroke(1.dp, BorderIdle),
+                    colors  = ButtonDefaults.outlinedButtonColors(containerColor = DarkPurple, contentColor = Gold),
+                    shape   = RoundedCornerShape(8.dp)
+                ) { Text("Cancel", fontFamily = FontFamily.Monospace) }
+            }
+        )
     }
 
     if (showLogoutConfirm) {

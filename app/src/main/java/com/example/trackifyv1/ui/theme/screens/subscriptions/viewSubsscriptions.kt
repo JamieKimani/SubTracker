@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,6 +38,7 @@ import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
 import com.example.trackifyv1.ui.theme.screens.dashboard.categoryColors
 import com.example.trackifyv1.ui.theme.screens.dashboard.daysUntil
+import android.view.HapticFeedbackConstants
 import com.example.trackifyv1.ui.theme.ServiceIcon
 import com.example.trackifyv1.ui.theme.screens.dashboard.RenewalConfirmDialog
 
@@ -63,6 +65,7 @@ private fun catColor(category: String): Color {
 fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean = true) {
     val vm: SubscriptionViewModel    = viewModel()
     val context                      = LocalContext.current
+    val view                         = LocalView.current
     var renewalTarget by remember { mutableStateOf<SubscriptionModel?>(null) }
     val allSubs by vm.subscriptions.collectAsState()
 
@@ -210,10 +213,10 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                         items(items = displayed, key = { it.id }) { sub ->
                             SubscriptionCard(
                                 subscription = sub,
-                                onDelete     = { ctx -> vm.deleteSubscription(sub.id, ctx) },
+                                onDelete     = { ctx -> view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS); vm.deleteSubscription(sub.id, ctx) },
                                 onUpdate     = { updated, ctx -> vm.updateSubscription(updated, ctx) },
                                 onRenew      = { renewalTarget = sub },
-                                onTogglePause = { vm.toggleActive(sub, context) }
+                                onTogglePause = { view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); vm.toggleActive(sub, context) }
                             )
                         }
                     }

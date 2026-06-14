@@ -11,18 +11,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-private val Context.themeDataStore by preferencesDataStore(name = "theme_prefs")
-private val KEY_DARK_MODE = booleanPreferencesKey("dark_mode")
+private val Context.appPrefs by preferencesDataStore(name = "app_prefs")
+private val KEY_DARK_MODE       = booleanPreferencesKey("dark_mode")
+private val KEY_ONBOARDING_SEEN = booleanPreferencesKey("onboarding_seen")
 
 class ThemeViewModel : ViewModel() {
 
     private val _isDarkMode = MutableStateFlow(true)
     val isDarkMode: StateFlow<Boolean> = _isDarkMode
 
+    private val _onboardingSeen = MutableStateFlow(true)
+    val onboardingSeen: StateFlow<Boolean> = _onboardingSeen
+
     fun init(context: Context) {
         viewModelScope.launch {
-            val stored = context.themeDataStore.data.first()[KEY_DARK_MODE]
-            _isDarkMode.value = stored ?: true
+            val prefs = context.appPrefs.data.first()
+            _isDarkMode.value      = prefs[KEY_DARK_MODE] ?: true
+            _onboardingSeen.value  = prefs[KEY_ONBOARDING_SEEN] ?: false
         }
     }
 
@@ -30,7 +35,14 @@ class ThemeViewModel : ViewModel() {
         val newValue = !_isDarkMode.value
         _isDarkMode.value = newValue
         viewModelScope.launch {
-            context.themeDataStore.edit { it[KEY_DARK_MODE] = newValue }
+            context.appPrefs.edit { it[KEY_DARK_MODE] = newValue }
+        }
+    }
+
+    fun markOnboardingSeen(context: Context) {
+        _onboardingSeen.value = true
+        viewModelScope.launch {
+            context.appPrefs.edit { it[KEY_ONBOARDING_SEEN] = true }
         }
     }
 }

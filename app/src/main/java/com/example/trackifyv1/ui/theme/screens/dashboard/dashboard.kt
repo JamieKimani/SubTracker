@@ -31,7 +31,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import android.view.HapticFeedbackConstants
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.trackifyv1.models.SubscriptionModel
+import com.example.trackifyv1.models.BudgetViewModel
 import com.example.trackifyv1.models.SubscriptionViewModel
 import com.example.trackifyv1.navigation.ROUTE_ADD_SUBSCRIPTION
 import com.example.trackifyv1.ui.theme.AppGradient
@@ -177,6 +180,7 @@ fun SubscriptionDetailSheet(
     val context = LocalContext.current
     val allSubs by vm.subscriptions.collectAsState()
     var renewalTarget by remember { mutableStateOf<SubscriptionModel?>(null) }
+    var sheetQuery    by remember { mutableStateOf("") }
 
     val title = when (filter) {
         SheetFilter.MONTHLY -> "Monthly Subscriptions"
@@ -186,12 +190,15 @@ fun SubscriptionDetailSheet(
         SheetFilter.NONE    -> ""
     }
 
-    val subs = when (filter) {
+    val baseSubs = when (filter) {
         SheetFilter.MONTHLY, SheetFilter.YEARLY -> allSubs.filter { it.isActive }
         SheetFilter.ACTIVE  -> allSubs.filter { it.isActive }
         SheetFilter.PAUSED  -> allSubs.filter { !it.isActive }
         SheetFilter.NONE    -> emptyList()
     }
+    val subs = if (sheetQuery.isBlank()) baseSubs
+    else baseSubs.filter { it.subscriptionName.contains(sheetQuery, ignoreCase = true) ||
+        it.category.contains(sheetQuery, ignoreCase = true) }
 
     val total = when (filter) {
         SheetFilter.MONTHLY -> subs.sumOf { monthlyAmount(it) }
@@ -236,9 +243,29 @@ fun SubscriptionDetailSheet(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
+            OutlinedTextField(
+                value           = sheetQuery,
+                onValueChange   = { sheetQuery = it },
+                placeholder     = { Text("Search subscriptions…", color = Muted, fontFamily = FontFamily.Monospace, fontSize = 13.sp) },
+                singleLine      = true,
+                leadingIcon     = { Icon(Icons.Default.Search, null, tint = Muted, modifier = Modifier.size(18.dp)) },
+                trailingIcon    = if (sheetQuery.isNotBlank()) {{ IconButton(onClick = { sheetQuery = "" }) {
+                    Icon(Icons.Default.Close, null, tint = Muted, modifier = Modifier.size(16.dp))
+                }}} else null,
+                modifier        = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                colors          = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Gold, unfocusedBorderColor = BorderIdle,
+                    focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+                    focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
+                    cursorColor = Gold
+                ),
+                shape = RoundedCornerShape(10.dp)
+            )
+
             if (subs.isEmpty()) {
                 Box(Modifier.fillMaxWidth().padding(vertical = 32.dp), Alignment.Center) {
-                    Text("No subscriptions here yet.", color = Muted, fontFamily = FontFamily.Monospace)
+                    Text(if (sheetQuery.isNotBlank()) "No results for "$sheetQuery"" else "No subscriptions here yet.",
+                        color = Muted, fontFamily = FontFamily.Monospace)
                 }
             } else {
                 LazyColumn(
@@ -294,6 +321,7 @@ fun SwipeToDismissCard(onDelete: () -> Unit, content: @Composable () -> Unit) {
                 Icon(Icons.Default.Delete, "Delete", tint = Color.White, modifier = Modifier.size(22.dp))
             }
         }
+        val view = LocalView.current
         Box(
             Modifier
                 .fillMaxWidth()
@@ -302,6 +330,7 @@ fun SwipeToDismissCard(onDelete: () -> Unit, content: @Composable () -> Unit) {
                     detectHorizontalDragGestures(
                         onDragEnd = {
                             if (offsetX < threshold) {
+                                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                                 onDelete()
                             }
                             offsetX = 0f
@@ -336,9 +365,11 @@ fun DashboardTab(
     onStatCardTap: (SheetFilter) -> Unit = {}
 ) {
     val vm        = viewModel<SubscriptionViewModel>()
+    val budgetVm  = viewModel<BudgetViewModel>()
     val context   = LocalContext.current
     val subs      by vm.subscriptions.collectAsState()
     val isLoading by vm.isLoading.collectAsState()
+    val budgets   by budgetVm.budgets.collectAsState()
     val activeSubs = subs.filter { it.isActive }
 
     if (isLoading && subs.isEmpty()) {
@@ -423,9 +454,12 @@ fun DashboardTab(
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     val total = amounts.values.sum()
                     counts.entries.forEachIndexed { i, (cat, count) ->
-                        CategoryBar(cat, count, amounts[cat] ?: 0.0,
-                            if (total > 0) ((amounts[cat] ?: 0.0) / total).toFloat() else 0f,
-                            categoryColors[i % categoryColors.size])
+                        val spent  = amounts[cat] ?: 0.0
+                        val budget = budgets[cat]
+                        CategoryBar(cat, count, spent,
+                            if (total > 0) (spent / total).toFloat() else 0f,
+                            categoryColors[i % categoryColors.size],
+                            budget = budget)
                     }
                 }
             }
@@ -699,15 +733,33 @@ fun SpendingTrendChart(activeSubs: List<SubscriptionModel>, currentMonthlyTotal:
 }
 
 @Composable
-fun CategoryBar(category: String, count: Int, amount: Double, fraction: Float, color: Color) {
+fun CategoryBar(category: String, count: Int, amount: Double, fraction: Float, color: Color, budget: Double? = null) {
+    val overBudget = budget != null && amount > budget
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(category, color = Color.White, fontFamily = FontFamily.Monospace, fontSize = 13.sp)
-            Text("KES %.2f  ($count)".format(amount), color = color,
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(category, color = Color.White, fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                if (overBudget) {
+                    Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFE53935).copy(alpha = 0.18f)).padding(horizontal = 5.dp, vertical = 1.dp)) {
+                        Text("OVER", color = Color(0xFFE53935), fontSize = 9.sp, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+            Text("KES %.2f  ($count)".format(amount), color = if (overBudget) Color(0xFFE53935) else color,
                 fontFamily = FontFamily.Monospace, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
         Box(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(BorderIdle)) {
-            Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(color))
+            Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).fillMaxHeight().clip(RoundedCornerShape(3.dp))
+                .background(if (overBudget) Color(0xFFE53935) else color))
+        }
+        if (budget != null) {
+            val budgetFraction = (amount / budget).toFloat().coerceIn(0f, 1f)
+            Text(
+                if (overBudget) "KES ${"%.0f".format(amount - budget)} over budget (limit: KES ${"%.0f".format(budget)}/mo)"
+                else "KES ${"%.0f".format(budget - amount)} remaining of KES ${"%.0f".format(budget)}/mo budget",
+                color = if (overBudget) Color(0xFFE53935) else Muted,
+                fontFamily = FontFamily.Monospace, fontSize = 10.sp
+            )
         }
     }
 }

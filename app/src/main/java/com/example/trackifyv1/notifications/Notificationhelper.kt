@@ -23,31 +23,34 @@ class NotificationHelper(private val context: Context) {
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    private fun createChannel() {
+    private fun createChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Subscription Reminders",
+            val renewalChannel = NotificationChannel(
+                CHANNEL_RENEWALS, "Subscription Renewals",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Reminders for upcoming subscription renewals"
-                enableVibration(true)
-                setShowBadge(true)
+                enableVibration(true); setShowBadge(true)
             }
-            notificationManager.createNotificationChannel(channel)
+            val trialChannel = NotificationChannel(
+                CHANNEL_TRIALS, "Free Trial Endings",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Alerts when free trials are about to end"
+                enableVibration(true); setShowBadge(true)
+            }
+            notificationManager.createNotificationChannel(renewalChannel)
+            notificationManager.createNotificationChannel(trialChannel)
         }
     }
 
-    fun sendNotification(title: String, message: String) {
-        createChannel()
-
+    fun sendNotification(title: String, message: String, channel: String = CHANNEL_RENEWALS) {
+        createChannels()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) return
+                != PackageManager.PERMISSION_GRANTED) return
         }
-
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
@@ -55,75 +58,50 @@ class NotificationHelper(private val context: Context) {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
-
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 
     fun scheduleNotification(
-        title: String,
-        message: String,
+        title: String, message: String,
         reminderTimeMillis: Long,
-        requestCode: Int = title.hashCode()
+        requestCode: Int = title.hashCode(),
+        channel: String = CHANNEL_RENEWALS
     ) {
-
         if (reminderTimeMillis <= System.currentTimeMillis()) return
-
         val intent = Intent(context, ReminderBroadcastReceiver::class.java).apply {
             putExtra(EXTRA_TITLE, title)
             putExtra(EXTRA_MESSAGE, message)
+            putExtra(EXTRA_CHANNEL, channel)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context, requestCode, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
-                    )
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent)
                 } else {
-
-                    alarmManager.setAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
-                    )
+                    alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent)
                     try {
-                        val settingsIntent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                        context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                        context.startActivity(settingsIntent)
+                        })
                     } catch (_: Exception) {
-                        Toast.makeText(
-                            context,
-                            "Grant 'Alarms & Reminders' permission in Settings for accurate reminders.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(context, "Grant 'Alarms & Reminders' for accurate reminders.", Toast.LENGTH_LONG).show()
                     }
                 }
             } else {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
-                )
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent)
             }
         } catch (e: SecurityException) {
-
-            try {
-                alarmManager.setAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent
-                )
-            } catch (_: Exception) {
-                Toast.makeText(context, "Could not schedule reminder: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+            try { alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, reminderTimeMillis, pendingIntent) }
+            catch (_: Exception) { Toast.makeText(context, "Could not schedule reminder.", Toast.LENGTH_SHORT).show() }
         }
     }
 
-    fun scheduleForSubscription(
-        subscriptionId: String,
-        subscriptionName: String,
-        reminderDateStr: String
-    ): Boolean {
+    fun scheduleForSubscription(subscriptionId: String, subscriptionName: String, reminderDateStr: String): Boolean {
         if (reminderDateStr.isBlank()) return false
         return try {
             val sdf  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -132,41 +110,28 @@ class NotificationHelper(private val context: Context) {
             val cal  = Calendar.getInstance().apply {
                 time = date
                 set(Calendar.HOUR_OF_DAY, REMINDER_HOUR)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+                set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
             }
-
             if (cal.timeInMillis <= now.timeInMillis) {
-
                 val isToday = cal.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
                         cal.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
-                val isPast  = cal.before(now)
-                if (isToday || isPast) {
-                    sendNotification(
-                        title   = "Reminder: $subscriptionName",
-                        message = "Your \"$subscriptionName\" subscription is due today!"
-                    )
+                if (isToday) {
+                    sendNotification("Reminder: $subscriptionName",
+                        "Your \"$subscriptionName\" subscription is due today!", CHANNEL_RENEWALS)
                     return true
                 }
                 return false
             }
-
             scheduleNotification(
-                title              = "Reminder: $subscriptionName",
-                message            = "Your \"$subscriptionName\" subscription is due soon!",
-                reminderTimeMillis = cal.timeInMillis,
-                requestCode        = subscriptionId.hashCode()
+                "Reminder: $subscriptionName",
+                "Your \"$subscriptionName\" subscription is due soon!",
+                cal.timeInMillis, subscriptionId.hashCode(), CHANNEL_RENEWALS
             )
             true
         } catch (_: Exception) { false }
     }
 
-    fun scheduleTrialEndingNotification(
-        subscriptionId: String,
-        subscriptionName: String,
-        trialEndDateStr: String
-    ): Boolean {
+    fun scheduleTrialEndingNotification(subscriptionId: String, subscriptionName: String, trialEndDateStr: String): Boolean {
         if (trialEndDateStr.isBlank()) return false
         return try {
             val sdf  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -174,33 +139,26 @@ class NotificationHelper(private val context: Context) {
             val now  = Calendar.getInstance()
             val cal  = Calendar.getInstance().apply {
                 time = date
-                set(Calendar.HOUR_OF_DAY, TRIAL_REMINDER_HOUR)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+                set(Calendar.HOUR_OF_DAY, REMINDER_HOUR)
+                set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
             }
             cal.add(Calendar.DAY_OF_YEAR, -1)
-
             val requestCode = ("trial_" + subscriptionId).hashCode()
-
             if (cal.timeInMillis <= now.timeInMillis) {
                 val isToday = cal.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
                         cal.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
                 if (isToday) {
-                    sendNotification(
-                        title   = "⏳ Trial ending: $subscriptionName",
-                        message = "Your free trial for \"$subscriptionName\" ends on $trialEndDateStr. Cancel now if you don't want to be charged!"
-                    )
+                    sendNotification("⏳ Trial ending: $subscriptionName",
+                        "Your free trial for \"$subscriptionName\" ends tomorrow. Cancel now if you don't want to be charged!",
+                        CHANNEL_TRIALS)
                     return true
                 }
                 return false
             }
-
             scheduleNotification(
-                title              = "⏳ Trial ending: $subscriptionName",
-                message            = "Your free trial for \"$subscriptionName\" ends tomorrow ($trialEndDateStr). Cancel now if you don't want to be charged!",
-                reminderTimeMillis = cal.timeInMillis,
-                requestCode        = requestCode
+                "⏳ Trial ending: $subscriptionName",
+                "Your free trial for \"$subscriptionName\" ends on $trialEndDateStr. Cancel now to avoid charges!",
+                cal.timeInMillis, requestCode, CHANNEL_TRIALS
             )
             true
         } catch (_: Exception) { false }
@@ -208,22 +166,20 @@ class NotificationHelper(private val context: Context) {
 
     fun cancelScheduledNotification(requestCode: Int) {
         val intent = Intent(context, ReminderBroadcastReceiver::class.java)
-        val pending = PendingIntent.getBroadcast(
-            context, requestCode, intent,
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pending = PendingIntent.getBroadcast(context, requestCode, intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
         pending?.let {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.cancel(it)
-            it.cancel()
+            alarmManager.cancel(it); it.cancel()
         }
     }
 
     companion object {
-        const val CHANNEL_ID    = "trackify_reminders"
-        const val EXTRA_TITLE   = "title"
-        const val EXTRA_MESSAGE = "message"
-        const val REMINDER_HOUR = 9
-        const val TRIAL_REMINDER_HOUR = 9
+        const val CHANNEL_RENEWALS  = "trackify_renewals"
+        const val CHANNEL_TRIALS    = "trackify_trials"
+        const val EXTRA_TITLE       = "title"
+        const val EXTRA_MESSAGE     = "message"
+        const val EXTRA_CHANNEL     = "channel"
+        const val REMINDER_HOUR     = 9
     }
 }
