@@ -18,8 +18,8 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:processDebugNavigationResources
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:javaPreCompileDebug
-> Task :app:mergeDebugAssets
 > Task :app:parseDebugLocalResources
+> Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
 > Task :app:generateDebugRFile
 > Task :app:generateDebugGlobalSynthetics
@@ -47,12 +47,6 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:compileDebugKotlin FAILED
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:3:36 Conflicting import: imported name 'BorderStroke' is ambiguous.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:13:36 Conflicting import: imported name 'BorderStroke' is ambiguous.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:60:9 Conflicting declarations:
-local val subscriptions: List<SubscriptionModel>
-local val subscriptions: List<SubscriptionModel>
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:71:9 Conflicting declarations:
-local val subscriptions: List<SubscriptionModel>
-local val subscriptions: List<SubscriptionModel>
 
 FAILURE: Build failed with an exception.
 
@@ -67,5 +61,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 34s
+BUILD FAILED in 35s
 31 actionable tasks: 31 executed
