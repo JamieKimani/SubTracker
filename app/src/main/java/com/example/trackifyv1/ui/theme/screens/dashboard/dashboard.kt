@@ -249,9 +249,9 @@ fun SubscriptionDetailSheet(
                 placeholder     = { Text("Search subscriptions…", color = Muted, fontFamily = FontFamily.Monospace, fontSize = 13.sp) },
                 singleLine      = true,
                 leadingIcon     = { Icon(Icons.Default.Search, null, tint = Muted, modifier = Modifier.size(18.dp)) },
-                trailingIcon    = if (sheetQuery.isNotBlank()) {{ IconButton(onClick = { sheetQuery = "" }) {
+                trailingIcon    = if (sheetQuery.isNotBlank()) { { IconButton(onClick = { sheetQuery = "" }) {
                     Icon(Icons.Default.Close, null, tint = Muted, modifier = Modifier.size(16.dp))
-                }}} else null,
+                } } } else null,
                 modifier        = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                 colors          = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Gold, unfocusedBorderColor = BorderIdle,
@@ -264,7 +264,7 @@ fun SubscriptionDetailSheet(
 
             if (subs.isEmpty()) {
                 Box(Modifier.fillMaxWidth().padding(vertical = 32.dp), Alignment.Center) {
-                    Text(if (sheetQuery.isNotBlank()) "No results for "$sheetQuery"" else "No subscriptions here yet.",
+                    Text(if (sheetQuery.isNotBlank()) "No results for \"$sheetQuery\"" else "No subscriptions here yet.",
                         color = Muted, fontFamily = FontFamily.Monospace)
                 }
             } else {
