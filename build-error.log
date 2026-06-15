@@ -9,22 +9,144 @@ Here are the highlights of this release:
 For more details see https://docs.gradle.org/9.4.1/release-notes.html
 
 Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugResources
+> Task :app:processDebugGoogleServices
+> Task :app:packageDebugResources
+> Task :app:processDebugNavigationResources
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:javaPreCompileDebug
+> Task :app:parseDebugLocalResources
+> Task :app:mergeDebugAssets
+> Task :app:compressDebugAssets
+> Task :app:generateDebugRFile
+> Task :app:generateDebugGlobalSynthetics
+> Task :app:desugarDebugFileDependencies
+> Task :app:checkDebugDuplicateClasses
+> Task :app:checkDebugAarMetadata
+> Task :app:compileDebugKotlin
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/MainActivity.kt:17:45 Unresolved reference 'MonthlySummaryWorker'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/MainActivity.kt:55:9 Unresolved reference 'MonthlySummaryWorker'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:94:71 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:94:72 Too many arguments for 'fun toast(ctx: Context, msg: String): Unit'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:94:97 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:29 Unresolved reference 'name'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:36 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:37 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:59 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:29 Unresolved reference 'amount'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:38 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:39 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:29 Unresolved reference 'startDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:41 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:42 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:64 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:29 Unresolved reference 'expiryDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:42 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:43 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:59 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:29 Unresolved reference 'reminderDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:44 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:29 Unresolved reference 'category'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:40 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:41 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:55 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:29 Unresolved reference 'billingCycle'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:44 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:234:29 Unresolved reference 'isActive'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:234:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:235:29 Unresolved reference 'isTrial'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:235:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:29 Unresolved reference 'trialEndDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:44 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:273:43 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:273:47 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:277:43 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:277:47 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:338:29 Unresolved reference 'subscriptionName'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:338:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:338:48 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:338:49 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:338:71 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:29 Unresolved reference 'subscriptionAmount'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:50 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:51 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:75 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:29 Unresolved reference 'subscriptionDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:48 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:49 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:71 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:29 Unresolved reference 'expiryDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:42 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:43 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:59 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:29 Unresolved reference 'reminderDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:44 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:29 Unresolved reference 'category'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:40 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:41 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:55 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:29 Unresolved reference 'billingCycle'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:44 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:345:29 Unresolved reference 'isActive'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:345:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:346:29 Unresolved reference 'isTrial'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:346:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:29 Unresolved reference 'trialEndDate'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:29 Literals must be surrounded by whitespace.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:44 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:382:37 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:387:45 Syntax error: Expecting ')'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:387:49 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:22:48 Unresolved reference 'history'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:87:13 Unresolved reference 'NotificationHistoryScreen'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:5:31 Unresolved reference 'data'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:6:31 Unresolved reference 'data'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:76:13 Unresolved reference 'AppDatabase'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:76:25 Cannot infer type for this parameter. Specify it explicitly.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:76:38 Unresolved reference 'notificationHistoryDao'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:77:17 Unresolved reference 'NotificationHistoryEntity'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:480:67 Unresolved reference 'restoreSubscription'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:484:67 Unresolved reference 'permanentlyDelete'.
+
+> Task :app:compileDebugKotlin FAILED
+> Task :app:mergeExtDexDebug
 
 FAILURE: Build failed with an exception.
 
-* Where:
-Build file '/home/runner/work/SubTracker/SubTracker/build.gradle.kts' line: 1
-
 * What went wrong:
-Plugin [id: 'com.google.devtools.ksp', version: '2.2.10-1.0.29', apply: false] was not found in any of the following sources:
-
-- Gradle Core Plugins (plugin is not in 'org.gradle' namespace)
-- Included Builds (No included builds contain this plugin)
-- Plugin Repositories (could not resolve plugin artifact 'com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.2.10-1.0.29')
-  Searched in the following repositories:
-    Google
-    MavenRepo
-    Gradle Central Plugin Repository
+Execution failed for task ':app:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
 
 * Try:
 > Run with --stacktrace option to get the stack trace.
@@ -32,4 +154,5 @@ Plugin [id: 'com.google.devtools.ksp', version: '2.2.10-1.0.29', apply: false] w
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 20s
+BUILD FAILED in 2m 11s
+15 actionable tasks: 15 executed
