@@ -27,15 +27,13 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:generateDebugGlobalSynthetics
 > Task :app:desugarDebugFileDependencies
 > Task :app:checkDebugDuplicateClasses
-> Task :app:compileDebugKotlin
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:83:31 Unresolved reference 'ROUTE_NOTIFICATION_HISTORY'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:86:13 Unresolved reference 'NotificationHistoryScreen'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:44:42 Unresolved reference 'ROUTE_NOTIFICATION_HISTORY'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:204:124 Unresolved reference 'ROUTE_NOTIFICATION_HISTORY'.
-
 > Task :app:checkDebugAarMetadata
-> Task :app:mergeExtDexDebug
+> Task :app:compileDebugKotlin
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:82:9 No value passed for parameter 'content'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:83:5 Syntax error: Expecting an expression.
+
 > Task :app:compileDebugKotlin FAILED
+> Task :app:mergeExtDexDebug
 
 FAILURE: Build failed with an exception.
 
@@ -50,5 +48,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 3m 16s
+BUILD FAILED in 2m 59s
 15 actionable tasks: 15 executed
