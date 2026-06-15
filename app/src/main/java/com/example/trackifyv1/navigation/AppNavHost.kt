@@ -19,7 +19,6 @@ import com.example.trackifyv1.ui.theme.screens.profile.ProfileScreen
 import com.example.trackifyv1.ui.theme.screens.register.RegisterScreen
 import com.example.trackifyv1.ui.theme.screens.splash.SplashScreen
 import com.example.trackifyv1.ui.theme.screens.subscriptions.AddSubscriptionScreen
-import com.example.trackifyv1.ui.theme.screens.history.NotificationHistoryScreen
 import com.example.trackifyv1.ui.theme.screens.subscriptions.ViewSubscriptionsScreen
 import com.google.firebase.auth.FirebaseAuth
 

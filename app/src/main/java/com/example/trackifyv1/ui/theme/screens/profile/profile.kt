@@ -87,7 +87,7 @@ fun ProfileScreen(navController: NavController) {
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             val text = context.contentResolver.openInputStream(it)?.bufferedReader()?.readText()
-            if (!text.isNullOrBlank()) subscriptionVm.importJson(context, text)
+            if (!text.isNullOrBlank()) if (!text.isNullOrBlank()) subscriptionVm.restoreFromJson(context, text)
             else Toast.makeText(context, "Could not read file.", Toast.LENGTH_SHORT).show()
         }
     }
@@ -283,7 +283,7 @@ fun ProfileScreen(navController: NavController) {
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
-                onClick  = { subscriptionVm.exportJson(context) },
+                onClick  = { subscriptionVm.exportToJson(context) },
                 modifier = Modifier.weight(1f).height(48.dp),
                 shape    = RoundedCornerShape(10.dp),
                 border   = BorderStroke(1.dp, TealAccent),

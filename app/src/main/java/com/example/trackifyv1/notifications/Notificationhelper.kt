@@ -2,8 +2,6 @@ package com.example.trackifyv1.notifications
 
 import android.Manifest
 import android.app.AlarmManager
-import com.example.trackifyv1.data.AppDatabase
-import com.example.trackifyv1.data.NotificationHistoryEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,9 +71,7 @@ class NotificationHelper(private val context: Context) {
             .build()
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
         CoroutineScope(Dispatchers.IO).launch {
-            AppDatabase.get(context).notificationHistoryDao().insert(
-                NotificationHistoryEntity(title = title, message = message, channel = channel)
-            )
+
         }
     }
 
