@@ -4,8 +4,6 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.example.trackifyv1.notifications.NotificationHelper
-import com.example.trackifyv1.models.toDeleted
-import com.example.trackifyv1.models.toSubscription
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -21,7 +19,8 @@ import java.util.Locale
 class SubscriptionViewModel : ViewModel() {
 
     private val auth = FirebaseAuth.getInstance()
-    private val db   = FirebaseDatabase.getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").reference
+    private val db   = FirebaseDatabase
+        .getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").reference
 
     private val _subscriptions = MutableStateFlow<List<SubscriptionModel>>(emptyList())
     val subscriptions: StateFlow<List<SubscriptionModel>> = _subscriptions.asStateFlow()
@@ -51,10 +50,9 @@ class SubscriptionViewModel : ViewModel() {
         _isLoading.value = true
         listener = object : ValueEventListener {
             override fun onDataChange(snap: DataSnapshot) {
-                val list = snap.children.mapNotNull { child ->
+                _subscriptions.value = snap.children.mapNotNull { child ->
                     child.getValue(SubscriptionModel::class.java)?.copy(id = child.key ?: "")
                 }
-                _subscriptions.value = list
                 _isLoading.value = false
             }
             override fun onCancelled(e: DatabaseError) { _isLoading.value = false }
@@ -119,12 +117,37 @@ class SubscriptionViewModel : ViewModel() {
 
     fun deleteSubscription(id: String, context: Context? = null) {
         if (id.isBlank()) return
+        val sub = _subscriptions.value.find { it.id == id }
         _subscriptions.value = _subscriptions.value.filter { it.id != id }
-        context?.let { NotificationHelper(it).cancelScheduledNotification(id.hashCode()) }
+        context?.let { ctx ->
+            NotificationHelper(ctx).cancelScheduledNotification(id.hashCode())
+            NotificationHelper(ctx).cancelScheduledNotification(("trial_" + id).hashCode())
+        }
+        if (sub != null) {
+            deletedRef()?.child(id)?.setValue(sub.toDeleted())
+        }
         userRef()?.child(id)?.removeValue()
             ?.addOnFailureListener {
-                context?.let { toast(it, "Could not delete from server. Try again.") }
+                context?.let { toast(it, "Could not delete. Try again.") }
             }
+    }
+
+    fun restoreSubscription(deleted: DeletedSubscriptionModel, context: Context) {
+        val ref = userRef() ?: return
+        val id  = ref.push().key ?: return
+        val sub = deleted.toSubscription().copy(id = id)
+        _subscriptions.value = _subscriptions.value + sub
+        ref.child(id).setValue(sub)
+            .addOnSuccessListener {
+                deletedRef()?.child(deleted.id)?.removeValue()
+                toast(context, "\"${sub.subscriptionName}\" restored!")
+            }
+            .addOnFailureListener { toast(context, "Could not restore. Try again.") }
+    }
+
+    fun permanentlyDelete(deletedId: String, context: Context) {
+        deletedRef()?.child(deletedId)?.removeValue()
+            ?.addOnSuccessListener { toast(context, "Permanently deleted.") }
     }
 
     fun updateSubscription(sub: SubscriptionModel, context: Context? = null) {
@@ -161,59 +184,41 @@ class SubscriptionViewModel : ViewModel() {
                 sdf.format(cal.time)
             } catch (_: Exception) { d }
         }
-
-        val today = sdf.format(Calendar.getInstance().time)
+        val today        = sdf.format(Calendar.getInstance().time)
         val priceChanged = newAmount != null && newAmount.isNotBlank() &&
             newAmount.toDoubleOrNull() != null &&
             newAmount.trim() != sub.subscriptionAmount.trim()
-
-        val updatedHistory = if (priceChanged) {
-            sub.priceHistory + (today to sub.subscriptionAmount)
-        } else sub.priceHistory
-
+        val updatedHistory = if (priceChanged) sub.priceHistory + (today to sub.subscriptionAmount)
+                             else sub.priceHistory
         updateSubscription(
             sub.copy(
                 expiryDate         = advance(sub.expiryDate),
                 reminderDate       = advance(sub.reminderDate),
                 subscriptionAmount = if (priceChanged) newAmount!!.trim() else sub.subscriptionAmount,
                 priceHistory       = updatedHistory
-            ),
-            context
+            ), context
         )
-
         if (priceChanged) {
-            val old = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
-            val new = newAmount!!.toDoubleOrNull() ?: 0.0
-            val direction = if (new > old) "increased" else "decreased"
-            toast(context, "Price $direction: KES ${sub.subscriptionAmount} → KES ${newAmount.trim()}")
+            val oldAmt = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
+            val newAmt = newAmount!!.toDoubleOrNull() ?: 0.0
+            toast(context, "Price ${if (newAmt > oldAmt) "increased" else "decreased"}: KES ${sub.subscriptionAmount} → KES ${newAmount.trim()}")
         }
     }
 
     fun toggleActive(sub: SubscriptionModel, context: Context) =
         updateSubscription(sub.copy(isActive = !sub.isActive), context)
 
-    override fun onCleared() {
-        super.onCleared()
-        auth.removeAuthStateListener(authListener)
-        detach()
-    }
-
     fun clearAllSubscriptions(context: Context, onComplete: () -> Unit = {}) {
         val current = _subscriptions.value
         _subscriptions.value = emptyList()
         current.forEach { sub ->
-            val helper = NotificationHelper(context)
-            helper.cancelScheduledNotification(sub.id.hashCode())
-            helper.cancelScheduledNotification(("trial_" + sub.id).hashCode())
+            val h = NotificationHelper(context)
+            h.cancelScheduledNotification(sub.id.hashCode())
+            h.cancelScheduledNotification(("trial_" + sub.id).hashCode())
         }
         userRef()?.removeValue()
-            ?.addOnSuccessListener {
-                toast(context, "All subscription data cleared.")
-                onComplete()
-            }
-            ?.addOnFailureListener {
-                toast(context, "Could not clear data. Try again.")
-            }
+            ?.addOnSuccessListener { toast(context, "All subscription data cleared."); onComplete() }
+            ?.addOnFailureListener { toast(context, "Could not clear data. Try again.") }
     }
 
     fun scheduleMonthlySummary(context: Context) {
@@ -231,35 +236,33 @@ class SubscriptionViewModel : ViewModel() {
         val sevenDays    = 7L * 24 * 60 * 60 * 1000
         val renewingSoon = activeSubs.count { sub ->
             try {
-                val sdf  = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                val sdf  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                 val date = sdf.parse(sub.expiryDate) ?: return@count false
                 val diff = date.time - now
                 diff in 0..sevenDays
             } catch (_: Exception) { false }
         }
-        com.example.trackifyv1.notifications.NotificationHelper(context)
-            .scheduleMonthlySummary(activeSubs.size, monthlyTotal, renewingSoon)
+        NotificationHelper(context).scheduleMonthlySummary(activeSubs.size, monthlyTotal, renewingSoon)
     }
 
     fun exportToJson(context: Context) {
         val subs = _subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to backup."); return }
         try {
-            val q  = """
             val sb = StringBuilder()
             sb.append("[")
             subs.forEachIndexed { index, sub ->
                 sb.append("{")
-                sb.append("${q}subscriptionName${q}:${q}${sub.subscriptionName}${q},")
-                sb.append("${q}subscriptionAmount${q}:${q}${sub.subscriptionAmount}${q},")
-                sb.append("${q}subscriptionDate${q}:${q}${sub.subscriptionDate}${q},")
-                sb.append("${q}expiryDate${q}:${q}${sub.expiryDate}${q},")
-                sb.append("${q}reminderDate${q}:${q}${sub.reminderDate}${q},")
-                sb.append("${q}category${q}:${q}${sub.category}${q},")
-                sb.append("${q}billingCycle${q}:${q}${sub.billingCycle}${q},")
-                sb.append("${q}isActive${q}:${sub.isActive},")
-                sb.append("${q}isTrial${q}:${sub.isTrial},")
-                sb.append("${q}trialEndDate${q}:${q}${sub.trialEndDate}${q}")
+                sb.append("\"subscriptionName\":\"${sub.subscriptionName}\",")
+                sb.append("\"subscriptionAmount\":\"${sub.subscriptionAmount}\",")
+                sb.append("\"subscriptionDate\":\"${sub.subscriptionDate}\",")
+                sb.append("\"expiryDate\":\"${sub.expiryDate}\",")
+                sb.append("\"reminderDate\":\"${sub.reminderDate}\",")
+                sb.append("\"category\":\"${sub.category}\",")
+                sb.append("\"billingCycle\":\"${sub.billingCycle}\",")
+                sb.append("\"isActive\":${sub.isActive},")
+                sb.append("\"isTrial\":${sub.isTrial},")
+                sb.append("\"trialEndDate\":\"${sub.trialEndDate}\"")
                 sb.append("}")
                 if (index < subs.lastIndex) sb.append(",")
             }
@@ -285,28 +288,23 @@ class SubscriptionViewModel : ViewModel() {
             toast(context, "Backup failed: ${ex.message}")
         }
     }
+
     fun restoreFromJson(context: Context, jsonText: String) {
         try {
             val trimmed = jsonText.trim()
             if (!trimmed.startsWith("[")) { toast(context, "Invalid backup file."); return }
-            val entries = trimmed.removePrefix("[").removeSuffix("]").split("},{")
-                .map { it.trim().removePrefix("{").removeSuffix("}") }
+            val entries = trimmed.removePrefix("[").removeSuffix("]")
+                .split("},{").map { it.removePrefix("{").removeSuffix("}") }
             var imported = 0
             entries.forEach { entry ->
                 fun field(key: String): String {
-                    val pattern = ""$key":"([^"]*)""
-                    val regex   = Regex(pattern)
-                    return regex.find(entry)?.groupValues?.getOrNull(1) ?: ""
+                    return Regex("\"$key\":\"([^\"]*)\"").find(entry)?.groupValues?.getOrNull(1) ?: ""
                 }
-                fun boolField(key: String): Boolean {
-                    return entry.contains(""$key":true")
-                }
+                fun boolField(key: String) = entry.contains("\"$key\":true")
                 val name = field("subscriptionName")
                 if (name.isBlank()) return@forEach
-                val duplicate = _subscriptions.value.any {
-                    it.subscriptionName.trim().lowercase() == name.trim().lowercase()
-                }
-                if (duplicate) return@forEach
+                if (_subscriptions.value.any { it.subscriptionName.trim().lowercase() == name.trim().lowercase() })
+                    return@forEach
                 addSubscription(
                     subscriptionName   = name,
                     subscriptionAmount = field("subscriptionAmount"),
@@ -319,6 +317,7 @@ class SubscriptionViewModel : ViewModel() {
                     isTrial            = boolField("isTrial"),
                     trialEndDate       = field("trialEndDate")
                 )
+                imported++
             }
             toast(context, "Restored $imported subscription${if (imported != 1) "s" else ""}!")
         } catch (ex: Exception) {
@@ -330,31 +329,27 @@ class SubscriptionViewModel : ViewModel() {
         val subs = _subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to export."); return }
         try {
-            val fileName = "trackify_${System.currentTimeMillis()}.csv"
-            val dir = android.os.Environment.getExternalStoragePublicDirectory(
-                android.os.Environment.DIRECTORY_DOWNLOADS
-            )
-            dir.mkdirs()
-            val file   = java.io.File(dir, fileName)
-            val sb     = StringBuilder()
+            val sb = StringBuilder()
             sb.appendLine("Name,Amount,Cycle,Category,Start,Expiry,Status,Trial,Trial End,Price History")
             subs.forEach { sub ->
-                val history = sub.priceHistory.entries
-                    .sortedByDescending { entry -> entry.key }
-                    .joinToString("; ") { entry -> "${entry.key}:${entry.value}" }
-                val status  = if (sub.isActive) "Active" else "Paused"
-                val trial   = if (sub.isTrial) "Yes" else "No"
+                val history = sub.priceHistory.entries.sortedByDescending { it.key }
+                    .joinToString("; ") { "${it.key}:${it.value}" }
+                val status = if (sub.isActive) "Active" else "Paused"
+                val trial  = if (sub.isTrial) "Yes" else "No"
                 sb.append("\"${sub.subscriptionName}\",")
                 sb.append("${sub.subscriptionAmount},${sub.billingCycle},")
                 sb.append("\"${sub.category}\",")
                 sb.append("${sub.subscriptionDate},${sub.expiryDate},")
-                sb.append("${status},${trial},${sub.trialEndDate},")
-                sb.appendLine("\"${history}\"")
+                sb.appendLine("$status,$trial,${sub.trialEndDate},\"$history\"")
             }
+            val fileName = "trackify_${System.currentTimeMillis()}.csv"
+            val dir = android.os.Environment.getExternalStoragePublicDirectory(
+                android.os.Environment.DIRECTORY_DOWNLOADS)
+            dir.mkdirs()
+            val file = java.io.File(dir, fileName)
             file.writeText(sb.toString())
             val uri = androidx.core.content.FileProvider.getUriForFile(
-                context, "com.example.trackifyv1.provider", file
-            )
+                context, "com.example.trackifyv1.provider", file)
             val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                 type = "text/csv"
                 putExtra(android.content.Intent.EXTRA_STREAM, uri)
@@ -368,5 +363,13 @@ class SubscriptionViewModel : ViewModel() {
             toast(context, "Export failed: ${ex.message}")
         }
     }
-    private fun toast(ctx: Context, msg: String) = Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
+
+    override fun onCleared() {
+        super.onCleared()
+        auth.removeAuthStateListener(authListener)
+        detach()
+    }
+
+    private fun toast(ctx: Context, msg: String) =
+        Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
 }
