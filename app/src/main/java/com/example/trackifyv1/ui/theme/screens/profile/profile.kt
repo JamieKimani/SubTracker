@@ -41,7 +41,6 @@ import com.example.trackifyv1.models.RecentlyDeletedViewModel
 import com.example.trackifyv1.ui.theme.screens.dashboard.monthlyAmount
 import com.example.trackifyv1.navigation.ROUTE_LOGIN
 import android.net.Uri
-import com.example.trackifyv1.navigation.ROUTE_NOTIFICATION_HISTORY
 import com.example.trackifyv1.ui.theme.screens.dashboard.SheetFilter
 import com.example.trackifyv1.ui.theme.screens.dashboard.SubscriptionDetailSheet
 
@@ -201,7 +200,6 @@ fun ProfileScreen(navController: NavController) {
             HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
             SettingRow(Icons.Default.Lock,    "Change Password", "••••••••")                          { showChangePassword = true }
             HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
-            SettingRow(Icons.Default.Notifications, "Notification History", "View recent alerts") { navController.navigate(ROUTE_NOTIFICATION_HISTORY) }
             HorizontalDivider(color = BorderIdle.copy(alpha = 0.3f), thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
