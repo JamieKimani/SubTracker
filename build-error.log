@@ -27,19 +27,13 @@ Starting a Gradle Daemon (subsequent builds will be faster)
 > Task :app:generateDebugGlobalSynthetics
 > Task :app:desugarDebugFileDependencies
 > Task :app:checkDebugDuplicateClasses
-> Task :app:checkDebugAarMetadata
 > Task :app:compileDebugKotlin
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:22:48 Unresolved reference 'history'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:87:13 Unresolved reference 'NotificationHistoryScreen'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:5:31 Unresolved reference 'data'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:6:31 Unresolved reference 'data'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:76:13 Unresolved reference 'AppDatabase'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:76:25 Cannot infer type for this parameter. Specify it explicitly.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:76:38 Unresolved reference 'notificationHistoryDao'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:77:17 Unresolved reference 'NotificationHistoryEntity'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:90:55 Unresolved reference 'importJson'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:286:45 Unresolved reference 'exportJson'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:83:31 Unresolved reference 'ROUTE_NOTIFICATION_HISTORY'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:86:13 Unresolved reference 'NotificationHistoryScreen'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:44:42 Unresolved reference 'ROUTE_NOTIFICATION_HISTORY'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:204:124 Unresolved reference 'ROUTE_NOTIFICATION_HISTORY'.
 
+> Task :app:checkDebugAarMetadata
 > Task :app:mergeExtDexDebug
 > Task :app:compileDebugKotlin FAILED
 
@@ -56,5 +50,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 3m 9s
+BUILD FAILED in 3m 16s
 15 actionable tasks: 15 executed
