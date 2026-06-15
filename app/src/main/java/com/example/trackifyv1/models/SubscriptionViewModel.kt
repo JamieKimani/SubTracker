@@ -91,7 +91,7 @@ class SubscriptionViewModel : ViewModel() {
             it.subscriptionName.trim().equals(subscriptionName.trim(), ignoreCase = true)
         }
         if (duplicate) {
-            toast(context, "⚠️ You already have a subscription named "${subscriptionName.trim()}". Added anyway.")
+            toast(context, "Already have: ${subscriptionName.trim()}. Added anyway.")
         }
         val id  = ref.push().key ?: run { toast(context, "Connection error. Try again."); return }
         val sub = SubscriptionModel(
@@ -331,26 +331,27 @@ class SubscriptionViewModel : ViewModel() {
         val subs = _subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to backup."); return }
         try {
+            val q  = """
             val sb = StringBuilder()
             sb.append("[")
             subs.forEachIndexed { index, sub ->
                 sb.append("{")
-                sb.append(""subscriptionName":"${sub.subscriptionName}",")
-                sb.append(""subscriptionAmount":"${sub.subscriptionAmount}",")
-                sb.append(""subscriptionDate":"${sub.subscriptionDate}",")
-                sb.append(""expiryDate":"${sub.expiryDate}",")
-                sb.append(""reminderDate":"${sub.reminderDate}",")
-                sb.append(""category":"${sub.category}",")
-                sb.append(""billingCycle":"${sub.billingCycle}",")
-                sb.append(""isActive":${sub.isActive},")
-                sb.append(""isTrial":${sub.isTrial},")
-                sb.append(""trialEndDate":"${sub.trialEndDate}"")
+                sb.append("${q}subscriptionName${q}:${q}${sub.subscriptionName}${q},")
+                sb.append("${q}subscriptionAmount${q}:${q}${sub.subscriptionAmount}${q},")
+                sb.append("${q}subscriptionDate${q}:${q}${sub.subscriptionDate}${q},")
+                sb.append("${q}expiryDate${q}:${q}${sub.expiryDate}${q},")
+                sb.append("${q}reminderDate${q}:${q}${sub.reminderDate}${q},")
+                sb.append("${q}category${q}:${q}${sub.category}${q},")
+                sb.append("${q}billingCycle${q}:${q}${sub.billingCycle}${q},")
+                sb.append("${q}isActive${q}:${sub.isActive},")
+                sb.append("${q}isTrial${q}:${sub.isTrial},")
+                sb.append("${q}trialEndDate${q}:${q}${sub.trialEndDate}${q}")
                 sb.append("}")
                 if (index < subs.lastIndex) sb.append(",")
             }
             sb.append("]")
             val fileName = "trackify_backup_${System.currentTimeMillis()}.json"
-            val dir  = android.os.Environment.getExternalStoragePublicDirectory(
+            val dir = android.os.Environment.getExternalStoragePublicDirectory(
                 android.os.Environment.DIRECTORY_DOWNLOADS)
             dir.mkdirs()
             val file = java.io.File(dir, fileName)
@@ -364,12 +365,12 @@ class SubscriptionViewModel : ViewModel() {
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             context.startActivity(android.content.Intent.createChooser(shareIntent, "Save backup"))
-            toast(context, "Backup of ${subs.size} subscriptions created!")
+            val count = subs.size
+            toast(context, "Backup of $count subscription${if (count != 1) "s" else ""} created!")
         } catch (ex: Exception) {
             toast(context, "Backup failed: ${ex.message}")
         }
     }
-
     fun restoreFromJson(context: Context, jsonText: String) {
         try {
             val trimmed = jsonText.trim()

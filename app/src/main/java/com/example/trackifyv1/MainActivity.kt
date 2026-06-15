@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.trackifyv1.models.ThemeViewModel
 import com.example.trackifyv1.navigation.AppNavHost
-import com.example.trackifyv1.notifications.MonthlySummaryWorker
 import com.example.trackifyv1.ui.theme.DarkAppPalette
 import com.example.trackifyv1.ui.theme.LightAppPalette
 import com.example.trackifyv1.ui.theme.LocalAppPalette
@@ -52,7 +51,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        MonthlySummaryWorker.schedule(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
