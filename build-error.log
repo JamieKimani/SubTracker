@@ -42,131 +42,77 @@ e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:188:13 Unresolved reference 'toast'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:211:17 Unresolved reference 'toast'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:215:17 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:221:31 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:29 Unresolved reference 'name'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:36 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:37 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:227:59 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:29 Unresolved reference 'amount'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:38 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:39 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:228:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:29 Unresolved reference 'startDate'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:41 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:42 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:229:64 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:29 Unresolved reference 'expiryDate'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:42 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:43 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:230:59 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:29 Unresolved reference 'reminderDate'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:44 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:231:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:29 Unresolved reference 'category'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:40 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:41 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:232:55 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:29 Unresolved reference 'billingCycle'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:44 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:233:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:234:29 Unresolved reference 'isActive'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:234:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:235:29 Unresolved reference 'isTrial'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:235:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:29 Unresolved reference 'trialEndDate'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:29 Literals must be surrounded by whitespace.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:44 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:45 Passing value as a vararg is allowed only inside a parenthesized argument list.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:236:63 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:258:13 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:260:13 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:265:38 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:273:43 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:273:47 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:277:43 Syntax error: Expecting ')'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:277:47 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:299:13 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:301:13 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:332:31 Unresolved reference 'toast'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:50 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:55 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:59 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:339:82 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:52 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:57 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:61 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:340:86 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:50 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:55 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:59 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:341:82 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:44 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:49 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:53 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:342:70 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:46 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:51 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:55 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:343:74 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:42 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:47 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:51 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:66 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:345:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:345:46 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:345:51 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:345:55 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:345:74 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:346:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:346:42 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:346:47 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:41 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:46 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:348:30 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:348:46 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:348:51 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:348:55 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:348:74 Unresolved reference 'q'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:369:40 Unresolved reference 'count'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:369:64 Unresolved reference 'count'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:371:46 Unresolved reference 'ex'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:383:38 Unresolved reference 'key'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:388:46 Unresolved reference 'key'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:409:39 Unresolved reference 'imported'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:409:66 Unresolved reference 'imported'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:411:47 Unresolved reference 'ex'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:430:55 Unresolved reference 'entry'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:430:68 Unresolved reference 'entry'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:433:32 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:434:30 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:434:56 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:435:32 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:436:30 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:436:54 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:437:30 Unresolved reference 'status'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:437:40 Unresolved reference 'trial'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:437:49 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:438:36 Unresolved reference 'history'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:452:39 Unresolved reference 'count'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:452:63 Unresolved reference 'count'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:454:46 Unresolved reference 'ex'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:459:1 Syntax error: Expecting '"'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:246:31 Unresolved reference 'toast'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:253:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:253:50 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:253:55 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:253:59 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:253:82 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:254:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:254:52 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:254:57 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:254:61 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:254:86 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:255:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:255:50 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:255:55 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:255:59 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:255:82 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:256:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:256:44 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:256:49 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:256:53 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:256:70 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:257:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:257:46 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:257:51 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:257:55 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:257:74 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:258:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:258:42 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:258:47 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:258:51 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:258:66 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:259:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:259:46 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:259:51 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:259:55 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:259:74 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:260:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:260:42 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:260:47 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:261:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:261:41 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:261:46 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:262:30 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:262:46 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:262:51 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:262:55 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:262:74 Unresolved reference 'q'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:283:40 Unresolved reference 'count'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:283:64 Unresolved reference 'count'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:285:46 Unresolved reference 'ex'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:297:38 Unresolved reference 'key'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:302:46 Unresolved reference 'key'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:323:39 Unresolved reference 'imported'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:323:66 Unresolved reference 'imported'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:325:47 Unresolved reference 'ex'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:55 Unresolved reference 'entry'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:344:68 Unresolved reference 'entry'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:347:32 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:348:30 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:348:56 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:349:32 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:350:30 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:350:54 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:351:30 Unresolved reference 'status'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:351:40 Unresolved reference 'trial'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:351:49 Unresolved reference 'sub'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:352:36 Unresolved reference 'history'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:366:39 Unresolved reference 'count'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:366:63 Unresolved reference 'count'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:368:46 Unresolved reference 'ex'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/models/SubscriptionViewModel.kt:373:1 Syntax error: Expecting '"'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:22:48 Unresolved reference 'history'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/navigation/AppNavHost.kt:87:13 Unresolved reference 'NotificationHistoryScreen'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:5:31 Unresolved reference 'data'.
@@ -176,12 +122,14 @@ e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:76:38 Unresolved reference 'notificationHistoryDao'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/notifications/Notificationhelper.kt:77:17 Unresolved reference 'NotificationHistoryEntity'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:78:51 Unresolved reference 'restoreFromJson'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:90:55 Unresolved reference 'importJson'.
+e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:286:45 Unresolved reference 'exportJson'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:309:41 Unresolved reference 'exportToCsv'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:480:67 Unresolved reference 'restoreSubscription'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:484:67 Unresolved reference 'permanentlyDelete'.
 
-> Task :app:compileDebugKotlin FAILED
 > Task :app:mergeExtDexDebug
+> Task :app:compileDebugKotlin FAILED
 
 FAILURE: Build failed with an exception.
 
@@ -196,5 +144,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 2m 21s
+BUILD FAILED in 2m 6s
 15 actionable tasks: 15 executed
