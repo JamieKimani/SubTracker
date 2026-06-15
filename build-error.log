@@ -1,3 +1,5 @@
+Downloading https://services.gradle.org/distributions/gradle-9.4.1-bin.zip
+.............10%.............20%.............30%.............40%.............50%.............60%..............70%.............80%.............90%.............100%
 
 Welcome to Gradle 9.4.1!
 
@@ -128,8 +130,8 @@ e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:480:67 Unresolved reference 'restoreSubscription'.
 e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/profile/profile.kt:484:67 Unresolved reference 'permanentlyDelete'.
 
-> Task :app:mergeExtDexDebug
 > Task :app:compileDebugKotlin FAILED
+> Task :app:mergeExtDexDebug
 
 FAILURE: Build failed with an exception.
 
@@ -144,5 +146,5 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 2m 6s
+BUILD FAILED in 3m 3s
 15 actionable tasks: 15 executed
