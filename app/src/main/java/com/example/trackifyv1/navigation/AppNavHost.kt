@@ -79,6 +79,5 @@ fun AppNavHost(
 
         composable(ROUTE_VIEW_SUBSCRIPTIONS) { ViewSubscriptionsScreen(navController) }
         composable(ROUTE_PROFILE)            { ProfileScreen(navController) }
-        composable(
     }
 }
