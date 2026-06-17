@@ -89,6 +89,8 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
                 SortOrder.NEWEST       -> list
             }
         }
+        }
+    }
 
     val gradientBg = Brush.verticalGradient(listOf(SubDarkPurple, SubDarkGreen, SubDarkYellow))
 

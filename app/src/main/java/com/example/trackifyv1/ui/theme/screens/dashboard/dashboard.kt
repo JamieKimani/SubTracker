@@ -370,29 +370,31 @@ fun DashboardTab(
     val subs      by vm.subscriptions.collectAsState()
     val isLoading by vm.isLoading.collectAsState()
     val budgets   by budgetVm.budgets.collectAsState()
-    val activeSubs = subs.filter { it.isActive }
-
     if (isLoading && subs.isEmpty()) {
         DashboardSkeleton()
         return
     }
 
-    androidx.compose.runtime.LaunchedEffect(subs.size) {
+    androidx.compose.runtime.LaunchedEffect(Unit) {
         if (subs.isNotEmpty()) vm.scheduleMonthlySummary(context)
     }
 
-    val monthlyTotal = activeSubs.sumOf { monthlyAmount(it) }
-    val annualTotal  = monthlyTotal * 12
-    val amounts      = activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }
-        .mapValues { e -> e.value.sumOf { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 } }
-    val counts       = activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }.mapValues { it.value.size }
-
-    val upcoming = activeSubs
-        .mapNotNull { sub ->
+    val activeSubs   by remember(subs) { derivedStateOf { subs.filter { it.isActive } } }
+    val monthlyTotal by remember(activeSubs) { derivedStateOf { activeSubs.sumOf { monthlyAmount(it) } } }
+    val annualTotal  by remember(monthlyTotal) { derivedStateOf { monthlyTotal * 12 } }
+    val amounts      by remember(activeSubs) { derivedStateOf {
+        activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }
+            .mapValues { e -> e.value.sumOf { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 } }
+    }}
+    val counts       by remember(activeSubs) { derivedStateOf {
+        activeSubs.groupBy { it.category.ifBlank { "Uncategorized" } }.mapValues { it.value.size }
+    }}
+    val upcoming     by remember(activeSubs) { derivedStateOf {
+        activeSubs.mapNotNull { sub ->
             val days = daysUntil(sub.expiryDate) ?: return@mapNotNull null
             if (days in 0..30) Pair(sub, days) else null
-        }
-        .sortedBy { it.second }
+        }.sortedBy { it.second }
+    }}
 
     var renewalTarget by remember { mutableStateOf<SubscriptionModel?>(null) }
 

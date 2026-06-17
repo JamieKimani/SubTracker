@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -31,11 +32,13 @@ fun shimmerBrush(): Brush {
         animationSpec  = infiniteRepeatable(tween(1100, easing = LinearEasing), RepeatMode.Restart),
         label          = "shimmerOffset"
     )
-    return Brush.linearGradient(
-        colors      = listOf(SkeletonBase, SkeletonHighlight, SkeletonBase),
-        start       = Offset(progress - 300f, 0f),
-        end         = Offset(progress, 0f)
-    )
+    return remember(progress) {
+        Brush.linearGradient(
+            colors = listOf(SkeletonBase, SkeletonHighlight, SkeletonBase),
+            start  = Offset(progress - 300f, 0f),
+            end    = Offset(progress, 0f)
+        )
+    }
 }
 
 @Composable

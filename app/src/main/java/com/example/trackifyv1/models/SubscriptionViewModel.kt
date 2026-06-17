@@ -11,7 +11,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -89,7 +92,8 @@ class SubscriptionViewModel : ViewModel() {
             it.subscriptionName.trim().equals(subscriptionName.trim(), ignoreCase = true)
         }
         if (duplicate) {
-            toast(context, "Already have: ${subscriptionName.trim()}. Added anyway.")
+            toast(context, ""${subscriptionName.trim()}" already exists. Rename it to add separately.")
+            return
         }
         val id  = ref.push().key ?: run { toast(context, "Connection error. Try again."); return }
         val sub = SubscriptionModel(
@@ -248,6 +252,7 @@ class SubscriptionViewModel : ViewModel() {
     fun exportToJson(context: Context) {
         val subs = _subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to backup."); return }
+        viewModelScope.launch(Dispatchers.IO) {
         try {
             val sb = StringBuilder()
             sb.append("[")
@@ -281,11 +286,14 @@ class SubscriptionViewModel : ViewModel() {
                 putExtra(android.content.Intent.EXTRA_SUBJECT, "Trackify Backup")
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            context.startActivity(android.content.Intent.createChooser(shareIntent, "Save backup"))
-            val count = subs.size
-            toast(context, "Backup of $count subscription${if (count != 1) "s" else ""} created!")
+            withContext(Dispatchers.Main) {
+                context.startActivity(android.content.Intent.createChooser(shareIntent, "Save backup"))
+                val count = subs.size
+                toast(context, "Backup of $count subscription${if (count != 1) "s" else ""} created!")
+            }
         } catch (ex: Exception) {
-            toast(context, "Backup failed: ${ex.message}")
+            withContext(Dispatchers.Main) { toast(context, "Backup failed: ${ex.message}") }
+        }
         }
     }
 
@@ -328,6 +336,7 @@ class SubscriptionViewModel : ViewModel() {
     fun exportToCsv(context: Context) {
         val subs = _subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to export."); return }
+        viewModelScope.launch(Dispatchers.IO) {
         try {
             val sb = StringBuilder()
             sb.appendLine("Name,Amount,Cycle,Category,Start,Expiry,Status,Trial,Trial End,Price History")
@@ -356,11 +365,14 @@ class SubscriptionViewModel : ViewModel() {
                 putExtra(android.content.Intent.EXTRA_SUBJECT, "Trackify Export")
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            context.startActivity(android.content.Intent.createChooser(shareIntent, "Share CSV"))
-            val count = subs.size
-            toast(context, "Exported $count subscription${if (count != 1) "s" else ""}!")
+            withContext(Dispatchers.Main) {
+                context.startActivity(android.content.Intent.createChooser(shareIntent, "Share CSV"))
+                val count = subs.size
+                toast(context, "Exported $count subscription${if (count != 1) "s" else ""}!")
+            }
         } catch (ex: Exception) {
-            toast(context, "Export failed: ${ex.message}")
+            withContext(Dispatchers.Main) { toast(context, "Export failed: ${ex.message}") }
+        }
         }
     }
 

@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -114,7 +115,7 @@ fun brandFor(subscriptionName: String): ServiceBrand {
 
 @Composable
 fun ServiceIcon(subscriptionName: String, size: Dp = 38.dp) {
-    val brand    = brandFor(subscriptionName)
+    val brand    = remember(subscriptionName) { brandFor(subscriptionName) }
     val fontSize = if (brand.label.length >= 3) (size.value * 0.28f).sp
                    else if (brand.label.length == 2) (size.value * 0.34f).sp
                    else (size.value * 0.42f).sp
