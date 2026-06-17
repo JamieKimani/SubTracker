@@ -74,20 +74,23 @@ fun ViewSubscriptionsScreen(navController: NavController, isStandalone: Boolean 
     var sortExpanded by remember { mutableStateOf(false) }
     var filterActive by remember { mutableStateOf<Boolean?>(null) }
 
-    val displayed = allSubs
-        .filter { sub ->
-            (query.isBlank() || sub.subscriptionName.contains(query, ignoreCase = true) ||
-                    sub.category.contains(query, ignoreCase = true))
-                    && (filterActive == null || sub.isActive == filterActive)
-        }
-        .let { list ->
-            when (sortOrder) {
-                SortOrder.NAME         -> list.sortedBy { it.subscriptionName.lowercase() }
-                SortOrder.AMOUNT_HIGH  -> list.sortedByDescending { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 }
-                SortOrder.AMOUNT_LOW   -> list.sortedBy { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 }
-                SortOrder.EXPIRY       -> list.sortedBy { daysUntil(it.expiryDate) ?: Int.MAX_VALUE }
-                SortOrder.NEWEST       -> list
-            }
+    val displayed by remember(allSubs, query, sortOrder, filterActive) {
+        derivedStateOf {
+            allSubs
+                .filter { sub ->
+                    (query.isBlank() || sub.subscriptionName.contains(query, ignoreCase = true) ||
+                            sub.category.contains(query, ignoreCase = true))
+                            && (filterActive == null || sub.isActive == filterActive)
+                }
+                .let { list ->
+                    when (sortOrder) {
+                        SortOrder.NAME         -> list.sortedBy { it.subscriptionName.lowercase() }
+                        SortOrder.AMOUNT_HIGH  -> list.sortedByDescending { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 }
+                        SortOrder.AMOUNT_LOW   -> list.sortedBy { it.subscriptionAmount.toDoubleOrNull() ?: 0.0 }
+                        SortOrder.EXPIRY       -> list.sortedBy { daysUntil(it.expiryDate) ?: Int.MAX_VALUE }
+                        SortOrder.NEWEST       -> list
+                    }
+                }
         }
     }
 
