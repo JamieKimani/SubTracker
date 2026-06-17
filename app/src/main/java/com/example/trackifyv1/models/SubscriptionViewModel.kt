@@ -11,6 +11,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -92,7 +93,7 @@ class SubscriptionViewModel : ViewModel() {
             it.subscriptionName.trim().equals(subscriptionName.trim(), ignoreCase = true)
         }
         if (duplicate) {
-            toast(context, ""${subscriptionName.trim()}" already exists. Rename it to add separately.")
+            toast(context, "${subscriptionName.trim()} already exists. Rename it to add separately.")
             return
         }
         val id  = ref.push().key ?: run { toast(context, "Connection error. Try again."); return }
