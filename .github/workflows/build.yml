@@ -63,10 +63,12 @@ jobs:
             -alias androiddebugkey -storepass android -keypass android 2>&1 \
             | grep -E "SHA1:|SHA256:" >> apk-fingerprint.txt
           echo "RUN=${{ github.run_number }}" >> apk-fingerprint.txt
+          mkdir -p releases
+          cp app/build/outputs/apk/debug/app-debug.apk releases/app-debug.apk
           git config user.email "ci@trackify.build"
           git config user.name "CI Bot"
-          git add apk-fingerprint.txt
-          git diff --cached --quiet || git commit -m "ci: APK fingerprint run ${{ github.run_number }} [skip ci]"
+          git add apk-fingerprint.txt releases/app-debug.apk
+          git diff --cached --quiet || git commit -m "ci: APK fingerprint + build run ${{ github.run_number }} [skip ci]"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main || true
 
       - name: Save errors to step summary and repo
