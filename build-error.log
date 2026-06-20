@@ -9,146 +9,16 @@ Here are the highlights of this release:
 For more details see https://docs.gradle.org/9.4.1/release-notes.html
 
 Starting a Gradle Daemon (subsequent builds will be faster)
-> Task :app:preBuild UP-TO-DATE
-> Task :app:preDebugBuild UP-TO-DATE
-> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
-> Task :app:generateDebugResources
-> Task :app:processDebugGoogleServices
-> Task :app:packageDebugResources
-> Task :app:processDebugNavigationResources
-> Task :app:generateDebugAssets UP-TO-DATE
-> Task :app:javaPreCompileDebug
-> Task :app:parseDebugLocalResources
-> Task :app:mergeDebugAssets
-> Task :app:compressDebugAssets
-> Task :app:generateDebugRFile
-> Task :app:generateDebugGlobalSynthetics
-> Task :app:desugarDebugFileDependencies
-> Task :app:checkDebugDuplicateClasses
-> Task :app:checkDebugAarMetadata
-> Task :app:mapDebugSourceSetPaths
-> Task :app:mergeLibDexDebug
-> Task :app:compileDebugNavigationResources
-> Task :app:createDebugCompatibleScreenManifests
-> Task :app:extractDeepLinksDebug
-> Task :app:processDebugMainManifest
-> Task :app:processDebugManifest
-> Task :app:processDebugManifestForPackage
-> Task :app:mergeDebugJniLibFolders
-> Task :app:mergeDebugResources
-> Task :app:mergeDebugNativeLibs
-> Task :app:processDebugResources
-> Task :app:validateSigningDebug
-> Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
-> Task :app:stripDebugDebugSymbols
-> Task :app:mergeExtDexDebug
-
-> Task :app:compileDebugKotlin FAILED
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:96:5 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:96:13 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:9 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:18 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:20 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:28 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:29 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:46 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:47 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:97:48 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:98:9 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:98:16 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:98:18 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:98:18 Functions which invoke @Composable functions must be marked with the @Composable annotation
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:98:18 Function declaration must have a name.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:99:13 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:99:13 This material API is experimental and is likely to change or to be removed in the future.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:102:25 Unresolved reference 'isStandalone'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:103:48 Unresolved reference 'navController'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:111:48 Unresolved reference 'sortExpanded'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:114:49 Unresolved reference 'sortExpanded'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:114:84 Unresolved reference 'sortExpanded'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:124:70 Unresolved reference 'sortOrder'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:125:49 Unresolved reference 'sortOrder'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:125:68 Unresolved reference 'sortExpanded'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:126:57 Unresolved reference 'sortOrder'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:132:44 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:133:42 Unresolved reference 'isStandalone'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:136:10 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:137:9 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:137:30 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:137:32 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:137:32 Functions which invoke @Composable functions must be marked with the @Composable annotation
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:137:32 Function declaration must have a name.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:138:17 Unresolved reference 'isStandalone'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:139:17 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:140:33 Unresolved reference 'navController'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:144:10 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:145:9 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:145:24 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:145:26 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:145:31 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:145:32 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:146:5 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:146:7 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:146:7 Functions which invoke @Composable functions must be marked with the @Composable annotation
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:146:7 Function declaration must have a name.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:146:9 Unresolved reference 'padding'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:146:17 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:147:9 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:147:67 Unresolved reference 'padding'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:151:29 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:151:54 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:151:62 Unresolved reference 'it'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:152:37 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:153:38 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:154:42 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:154:62 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:154:85 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:172:40 Unresolved reference 'filterActive'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:173:42 Unresolved reference 'filterActive'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:183:52 Unresolved reference 'filterActive'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:190:29 Unresolved reference 'displayed'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:190:54 Unresolved reference 'displayed'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:195:21 Unresolved reference 'displayed'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:201:34 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:203:34 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:203:73 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:205:29 Unresolved reference 'query'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:214:39 Unresolved reference 'displayed'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:214:58 Unresolved reference 'it'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:214:69 Cannot infer type for this parameter. Specify it explicitly.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:215:29 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:217:57 Unresolved reference 'view'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:217:121 Unresolved reference 'vm'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:217:147 Unresolved reference 'id'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:218:66 Unresolved reference 'vm'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:219:50 Unresolved reference 'renewalTarget'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:220:51 Unresolved reference 'view'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:220:116 Unresolved reference 'vm'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:220:137 Function invocation 'context(...)' expected.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:5 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:18 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:20 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:24 Syntax error: Expecting a top level declaration.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:24 Functions which invoke @Composable functions must be marked with the @Composable annotation
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:24 Function declaration must have a name.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:26 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:229:30 Syntax error: Unexpected tokens (use ';' to separate expressions on the same line).
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:230:9 @Composable invocations can only happen from the context of a @Composable function
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:231:25 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:232:27 Unresolved reference 'renewalTarget'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:234:17 Unresolved reference 'vm'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:234:38 Unresolved reference 'sub'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:234:43 Function invocation 'context(...)' expected.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:235:17 Unresolved reference 'renewalTarget'.
-e: file:///home/runner/work/SubTracker/SubTracker/app/src/main/java/com/example/trackifyv1/ui/theme/screens/subscriptions/viewSubsscriptions.kt:239:1 Syntax error: Expecting a top level declaration.
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:compileDebugKotlin'.
-> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
-   > Compilation error. See log for more details
+A problem occurred configuring project ':app'.
+> Using kotlin.sourceSets DSL to add Kotlin sources is not allowed with built-in Kotlin.
+  Kotlin source set 'debug' contains: [/home/runner/work/SubTracker/SubTracker/app/build/generated/ksp/debug/kotlin, /home/runner/work/SubTracker/SubTracker/app/build/generated/ksp/debug/java]
+  Solution: Use android.sourceSets DSL instead.
+  For more information, see https://developer.android.com/r/tools/built-in-kotlin
+  To suppress this error, set android.disallowKotlinSourceSets=false in gradle.properties.
 
 * Try:
 > Run with --stacktrace option to get the stack trace.
@@ -156,5 +26,4 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 39s
-31 actionable tasks: 31 executed
+BUILD FAILED in 26s
