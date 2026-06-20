@@ -1,54 +1,49 @@
 package com.example.trackifyv1.models
 
-import android.content.Context
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.trackifyv1.data.repo.TrackifyRepository
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class RecentlyDeletedViewModel : ViewModel() {
+class RecentlyDeletedViewModel(application: Application) : AndroidViewModel(application) {
 
     private val auth = FirebaseAuth.getInstance()
-    private val db   = FirebaseDatabase
-        .getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").reference
-
-    private val _deleted = MutableStateFlow<List<DeletedSubscriptionModel>>(emptyList())
-    val deleted: StateFlow<List<DeletedSubscriptionModel>> = _deleted.asStateFlow()
-
-    private var listener: ValueEventListener? = null
+    private val repo = TrackifyRepository.getInstance(application)
     private val SEVEN_DAYS_MS = 7L * 24 * 60 * 60 * 1000
 
-    init { attach() }
+    private val _authUid = MutableStateFlow(auth.currentUser?.uid)
+    private val authListener = FirebaseAuth.AuthStateListener { fa -> _authUid.value = fa.currentUser?.uid }
 
-    private fun deletedRef() = auth.currentUser?.uid?.let { db.child("DeletedSubscriptions").child(it) }
-
-    private fun attach() {
-        val ref = deletedRef() ?: return
-        listener = object : ValueEventListener {
-            override fun onDataChange(snap: DataSnapshot) {
-                val now  = System.currentTimeMillis()
-                val list = snap.children.mapNotNull { child ->
-                    child.getValue(DeletedSubscriptionModel::class.java)?.copy(id = child.key ?: "")
-                }
-                val valid   = list.filter { now - it.deletedAt < SEVEN_DAYS_MS }
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val deleted: StateFlow<List<DeletedSubscriptionModel>> =
+        _authUid.flatMapLatest { uid -> uid?.let { repo.observeDeleted(it) } ?: flowOf(emptyList()) }
+            .map { list ->
+                val now = System.currentTimeMillis()
+                val valid = list.filter { now - it.deletedAt < SEVEN_DAYS_MS }
                 val expired = list.filter { now - it.deletedAt >= SEVEN_DAYS_MS }
-                _deleted.value = valid.sortedByDescending { it.deletedAt }
-                expired.forEach { deletedRef()?.child(it.id)?.removeValue() }
+                if (expired.isNotEmpty()) {
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) viewModelScope.launch {
+                        expired.forEach { repo.permanentlyDelete(uid, it.id) }
+                    }
+                }
+                valid.sortedByDescending { it.deletedAt }
             }
-            override fun onCancelled(e: DatabaseError) {}
-        }
-        ref.addValueEventListener(listener!!)
-    }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    init { auth.addAuthStateListener(authListener) }
 
     override fun onCleared() {
         super.onCleared()
-        listener?.let { deletedRef()?.removeEventListener(it) }
+        auth.removeAuthStateListener(authListener)
     }
 }

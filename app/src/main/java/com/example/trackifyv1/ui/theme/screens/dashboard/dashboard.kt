@@ -10,6 +10,7 @@ import androidx.compose.animation.togetherWith
 import com.example.trackifyv1.ui.theme.DashboardSkeleton
 import com.example.trackifyv1.ui.theme.SubscriptionListSkeleton
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -411,7 +413,13 @@ fun DashboardTab(
             Box(
                 Modifier.size(56.dp).background(Brush.linearGradient(listOf(Gold, Crimson)), RoundedCornerShape(12.dp)),
                 Alignment.Center
-            ) { Text("TK", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold) }
+            ) {
+                Image(
+                    painter = painterResource(id = com.example.trackifyv1.R.drawable.trackify),
+                    contentDescription = "Trackify logo",
+                    modifier = Modifier.size(38.dp)
+                )
+            }
             Column {
                 Text("Dashboard", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
                 Text("Your subscription overview", color = Muted, fontSize = 12.sp, fontFamily = FontFamily.Monospace)

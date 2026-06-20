@@ -1,73 +1,58 @@
 package com.example.trackifyv1.models
 
+import android.app.Application
 import android.content.Context
 import android.widget.Toast
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.trackifyv1.data.repo.TrackifyRepository
 import com.example.trackifyv1.notifications.NotificationHelper
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class SubscriptionViewModel : ViewModel() {
+class SubscriptionViewModel(application: Application) : AndroidViewModel(application) {
 
     private val auth = FirebaseAuth.getInstance()
-    private val db   = FirebaseDatabase
-        .getInstance("https://trackify-aab65-default-rtdb.firebaseio.com").reference
-
-    private val _subscriptions = MutableStateFlow<List<SubscriptionModel>>(emptyList())
-    val subscriptions: StateFlow<List<SubscriptionModel>> = _subscriptions.asStateFlow()
+    private val repo = TrackifyRepository.getInstance(application)
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private var listener: ValueEventListener? = null
+    private val _authUid = MutableStateFlow(auth.currentUser?.uid)
 
     private val authListener = FirebaseAuth.AuthStateListener { fa ->
-        if (fa.currentUser != null && listener == null) attach()
-        else if (fa.currentUser == null) { detach(); _subscriptions.value = emptyList() }
+        _authUid.value = fa.currentUser?.uid
+        if (fa.currentUser != null) repo.startListening(fa.currentUser!!.uid)
+        else repo.stopListening()
     }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val subscriptions: StateFlow<List<SubscriptionModel>> =
+        _authUid.flatMapLatest { uid -> uid?.let { repo.observeSubscriptions(it) } ?: flowOf(emptyList()) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         auth.addAuthStateListener(authListener)
-        if (auth.currentUser != null) attach()
-    }
-
-    private fun userRef()    = auth.currentUser?.uid?.let { db.child("Subscriptions").child(it) }
-    private fun deletedRef() = auth.currentUser?.uid?.let { db.child("DeletedSubscriptions").child(it) }
-
-    private fun attach() {
-        val ref = userRef() ?: return
-        if (listener != null) return
-        ref.keepSynced(true)
-        _isLoading.value = true
-        listener = object : ValueEventListener {
-            override fun onDataChange(snap: DataSnapshot) {
-                _subscriptions.value = snap.children.mapNotNull { child ->
-                    child.getValue(SubscriptionModel::class.java)?.copy(id = child.key ?: "")
-                }
-                _isLoading.value = false
-            }
-            override fun onCancelled(e: DatabaseError) { _isLoading.value = false }
+        auth.currentUser?.let { _isLoading.value = true; repo.startListening(it.uid) }
+        // Cache emits instantly once Room has rows, so loading just reflects "do we have anything yet".
+        viewModelScope.launch {
+            subscriptions.collect { if (it.isNotEmpty()) _isLoading.value = false }
         }
-        ref.addValueEventListener(listener!!)
     }
 
-    private fun detach() {
-        listener?.let { userRef()?.removeEventListener(it) }
-        listener = null
-    }
+    private fun uid() = auth.currentUser?.uid
 
     fun addSubscription(
         subscriptionName: String,
@@ -82,21 +67,21 @@ class SubscriptionViewModel : ViewModel() {
         trialEndDate: String = "",
         onSuccess: () -> Unit = {}
     ) {
-        val ref = userRef() ?: run { toast(context, "You must be logged in."); return }
+        val uid = uid() ?: run { toast(context, "You must be logged in."); return }
         when {
             subscriptionName.isBlank()                        -> { toast(context, "Enter a subscription name."); return }
             subscriptionAmount.isBlank()                      -> { toast(context, "Enter an amount."); return }
             subscriptionAmount.toDoubleOrNull() == null       -> { toast(context, "Amount must be a valid number."); return }
             (subscriptionAmount.toDoubleOrNull() ?: 0.0) < 0 -> { toast(context, "Amount cannot be negative."); return }
         }
-        val duplicate = _subscriptions.value.any {
+        val duplicate = subscriptions.value.any {
             it.subscriptionName.trim().equals(subscriptionName.trim(), ignoreCase = true)
         }
         if (duplicate) {
             toast(context, "${subscriptionName.trim()} already exists. Rename it to add separately.")
             return
         }
-        val id  = ref.push().key ?: run { toast(context, "Connection error. Try again."); return }
+        val id = repo.newSubscriptionId()
         val sub = SubscriptionModel(
             id = id, subscriptionName = subscriptionName.trim(),
             subscriptionAmount = subscriptionAmount.trim(), subscriptionDate = subscriptionDate,
@@ -104,74 +89,62 @@ class SubscriptionViewModel : ViewModel() {
             category = category, billingCycle = billingCycle, isActive = true,
             isTrial = isTrial, trialEndDate = trialEndDate
         )
-        ref.child(id).setValue(sub)
-            .addOnSuccessListener {
-                val helper = NotificationHelper(context)
-                if (reminderDate.isNotBlank())
-                    helper.scheduleForSubscription(id, subscriptionName.trim(), reminderDate)
-                if (isTrial && trialEndDate.isNotBlank())
-                    helper.scheduleTrialEndingNotification(id, subscriptionName.trim(), trialEndDate)
-                toast(context, "\"${subscriptionName.trim()}\" added!")
-                onSuccess()
-            }
-            .addOnFailureListener { e ->
-                toast(context, if (e.message?.contains("Permission denied", true) == true)
-                    "Permission denied. Log out and back in." else "Failed to save. Check connection.")
-            }
+        viewModelScope.launch {
+            repo.addOrUpdateSubscription(uid, sub)
+            val helper = NotificationHelper(context)
+            if (reminderDate.isNotBlank())
+                helper.scheduleForSubscription(id, subscriptionName.trim(), reminderDate)
+            if (isTrial && trialEndDate.isNotBlank())
+                helper.scheduleTrialEndingNotification(id, subscriptionName.trim(), trialEndDate)
+            toast(context, "\"${subscriptionName.trim()}\" added!")
+            onSuccess()
+        }
     }
 
     fun deleteSubscription(id: String, context: Context? = null) {
         if (id.isBlank()) return
-        val sub = _subscriptions.value.find { it.id == id }
-        _subscriptions.value = _subscriptions.value.filter { it.id != id }
+        val uid = uid() ?: return
+        val sub = subscriptions.value.find { it.id == id } ?: return
         context?.let { ctx ->
             NotificationHelper(ctx).cancelScheduledNotification(id.hashCode())
             NotificationHelper(ctx).cancelScheduledNotification(("trial_" + id).hashCode())
         }
-        if (sub != null) {
-            deletedRef()?.child(id)?.setValue(sub.toDeleted())
-        }
-        userRef()?.child(id)?.removeValue()
-            ?.addOnFailureListener {
-                context?.let { toast(it, "Could not delete. Try again.") }
-            }
+        viewModelScope.launch { repo.deleteSubscription(uid, sub) }
     }
 
     fun restoreSubscription(deleted: DeletedSubscriptionModel, context: Context) {
-        val ref = userRef() ?: return
-        val id  = ref.push().key ?: return
-        val sub = deleted.toSubscription().copy(id = id)
-        _subscriptions.value = _subscriptions.value + sub
-        ref.child(id).setValue(sub)
-            .addOnSuccessListener {
-                deletedRef()?.child(deleted.id)?.removeValue()
-                toast(context, "\"${sub.subscriptionName}\" restored!")
-            }
-            .addOnFailureListener { toast(context, "Could not restore. Try again.") }
+        val uid = uid() ?: return
+        val newId = repo.newSubscriptionId()
+        viewModelScope.launch {
+            repo.restoreSubscription(uid, deleted, newId)
+            toast(context, "\"${deleted.subscriptionName}\" restored!")
+        }
     }
 
     fun permanentlyDelete(deletedId: String, context: Context) {
-        deletedRef()?.child(deletedId)?.removeValue()
-            ?.addOnSuccessListener { toast(context, "Permanently deleted.") }
+        val uid = uid() ?: return
+        viewModelScope.launch {
+            repo.permanentlyDelete(uid, deletedId)
+            toast(context, "Permanently deleted.")
+        }
     }
 
     fun updateSubscription(sub: SubscriptionModel, context: Context? = null) {
         if (sub.id.isBlank()) return
-        _subscriptions.value = _subscriptions.value.map { if (it.id == sub.id) sub else it }
-        userRef()?.child(sub.id)?.setValue(sub)
-            ?.addOnSuccessListener {
-                context?.let { ctx ->
-                    val h = NotificationHelper(ctx)
-                    h.cancelScheduledNotification(sub.id.hashCode())
-                    h.cancelScheduledNotification(("trial_" + sub.id).hashCode())
-                    if (sub.reminderDate.isNotBlank())
-                        h.scheduleForSubscription(sub.id, sub.subscriptionName, sub.reminderDate)
-                    if (sub.isTrial && sub.trialEndDate.isNotBlank())
-                        h.scheduleTrialEndingNotification(sub.id, sub.subscriptionName, sub.trialEndDate)
-                    toast(ctx, "Updated!")
-                }
+        val uid = uid() ?: return
+        viewModelScope.launch {
+            repo.addOrUpdateSubscription(uid, sub)
+            context?.let { ctx ->
+                val h = NotificationHelper(ctx)
+                h.cancelScheduledNotification(sub.id.hashCode())
+                h.cancelScheduledNotification(("trial_" + sub.id).hashCode())
+                if (sub.reminderDate.isNotBlank())
+                    h.scheduleForSubscription(sub.id, sub.subscriptionName, sub.reminderDate)
+                if (sub.isTrial && sub.trialEndDate.isNotBlank())
+                    h.scheduleTrialEndingNotification(sub.id, sub.subscriptionName, sub.trialEndDate)
+                toast(ctx, "Updated!")
             }
-            ?.addOnFailureListener { context?.let { toast(it, "Could not update. Try again.") } }
+        }
     }
 
     fun renewSubscription(sub: SubscriptionModel, context: Context, newAmount: String? = null) {
@@ -214,20 +187,22 @@ class SubscriptionViewModel : ViewModel() {
         updateSubscription(sub.copy(isActive = !sub.isActive), context)
 
     fun clearAllSubscriptions(context: Context, onComplete: () -> Unit = {}) {
-        val current = _subscriptions.value
-        _subscriptions.value = emptyList()
+        val uid = uid() ?: return
+        val current = subscriptions.value
         current.forEach { sub ->
             val h = NotificationHelper(context)
             h.cancelScheduledNotification(sub.id.hashCode())
             h.cancelScheduledNotification(("trial_" + sub.id).hashCode())
         }
-        userRef()?.removeValue()
-            ?.addOnSuccessListener { toast(context, "All subscription data cleared."); onComplete() }
-            ?.addOnFailureListener { toast(context, "Could not clear data. Try again.") }
+        viewModelScope.launch {
+            repo.clearAllSubscriptions(uid)
+            toast(context, "All subscription data cleared.")
+            onComplete()
+        }
     }
 
     fun scheduleMonthlySummary(context: Context) {
-        val activeSubs   = _subscriptions.value.filter { it.isActive }
+        val activeSubs   = subscriptions.value.filter { it.isActive }
         val monthlyTotal = activeSubs.sumOf { sub ->
             val amt = sub.subscriptionAmount.toDoubleOrNull() ?: 0.0
             when (sub.billingCycle) {
@@ -251,7 +226,7 @@ class SubscriptionViewModel : ViewModel() {
     }
 
     fun exportToJson(context: Context) {
-        val subs = _subscriptions.value
+        val subs = subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to backup."); return }
         viewModelScope.launch(Dispatchers.IO) {
         try {
@@ -312,7 +287,7 @@ class SubscriptionViewModel : ViewModel() {
                 fun boolField(key: String) = entry.contains("\"$key\":true")
                 val name = field("subscriptionName")
                 if (name.isBlank()) return@forEach
-                if (_subscriptions.value.any { it.subscriptionName.trim().lowercase() == name.trim().lowercase() })
+                if (subscriptions.value.any { it.subscriptionName.trim().lowercase() == name.trim().lowercase() })
                     return@forEach
                 addSubscription(
                     subscriptionName   = name,
@@ -335,7 +310,7 @@ class SubscriptionViewModel : ViewModel() {
     }
 
     fun exportToCsv(context: Context) {
-        val subs = _subscriptions.value
+        val subs = subscriptions.value
         if (subs.isEmpty()) { toast(context, "No subscriptions to export."); return }
         viewModelScope.launch(Dispatchers.IO) {
         try {
@@ -380,7 +355,6 @@ class SubscriptionViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         auth.removeAuthStateListener(authListener)
-        detach()
     }
 
     private fun toast(ctx: Context, msg: String) =
